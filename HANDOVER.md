@@ -136,9 +136,10 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 
 | Item                  | How it works                                                                                                               |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Style                 | Glossy, chunky 3D "toy" look in brand colours (original artwork, drawn in SVG in code)                                     |
-| Default               | Green 3D arrow with a darker thickness edge, shine highlight and soft shadow                                               |
-| Clickable things      | Pops into a royal-blue 3D pointing hand over links, buttons, FAQ questions and dropdowns                                   |
+| Style                 | Glossy, chunky 3D "toy" arrow in brand colours (original artwork, drawn in SVG in code)                                    |
+| Default               | Green 3D arrow with a darker thickness edge, shine highlight and a soft green glow                                         |
+| Clickable things      | The same arrow turns bright blue with a strong blue glow and grows slightly                                                |
+| Trail                 | Nine small glowing dots (green to blue, getting smaller) follow behind while the mouse moves, and fade out when it stops   |
 | Click                 | Green and lime spark lines burst from the tip                                                                              |
 | Movement              | Follows the mouse exactly (no lag) and tilts slightly in the direction of movement                                         |
 | Normal cursor instead | Over text fields (so typing works as usual) and while a pop-up form is open                                                |
@@ -282,3 +283,9 @@ recruitment data), and optionally one page per service for SEO.
   green arrow, blue pointing hand, spark burst on click, slight tilt with movement.
 - Verified in a browser: arrow, hand over buttons, spark burst, tilt, text field and pop-up
   fall back to the normal cursor.
+
+### Update: simpler hover and a dot trail
+
+- Owner asked to replace the pointing hand with a simple colour change and more glow, and to
+  add dots following the cursor. Hover now turns the arrow glowing blue; a trail of nine
+  glowing dots follows the cursor and fades out when it stops.

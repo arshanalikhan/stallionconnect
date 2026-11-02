@@ -9,30 +9,28 @@ const TEXT = 'input:not([type="checkbox"]):not([type="radio"]), textarea, [conte
 
 const ARROW = "M10 6 L10 46 L20 37 L27 54 L35 50.5 L28 34 L42 33 Z";
 
-function Arrow() {
+const PALETTES = {
+  green: { light: "#6af59b", mid: "#22b24a", dark: "#0f8028", edge: "#0a5c1c" },
+  blue: { light: "#8ec0ff", mid: "#2f74ff", dark: "#1246c4", edge: "#012b75" },
+} as const;
+
+function Arrow({ tone }: { tone: keyof typeof PALETTES }) {
+  const c = PALETTES[tone];
+  const id = `cc-arrow-${tone}`;
   return (
-    <svg viewBox="0 0 64 64" className="cursor-arrow" aria-hidden="true">
+    <svg viewBox="0 0 64 64" className={`cursor-arrow cursor-arrow-${tone}`} aria-hidden="true">
       <defs>
-        <linearGradient id="cc-arrow" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#6af59b" />
-          <stop offset="0.45" stopColor="#22b24a" />
-          <stop offset="1" stopColor="#0f8028" />
+        <linearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor={c.light} />
+          <stop offset="0.45" stopColor={c.mid} />
+          <stop offset="1" stopColor={c.dark} />
         </linearGradient>
-        <filter id="cc-shadow" x="-30%" y="-30%" width="160%" height="160%">
-          <feDropShadow dx="1.5" dy="3" stdDeviation="2" floodColor="#012b75" floodOpacity="0.35" />
-        </filter>
       </defs>
-      <g filter="url(#cc-shadow)" strokeLinejoin="round">
+      <g strokeLinejoin="round">
         {/* thickness */}
-        <path
-          d={ARROW}
-          transform="translate(2 3)"
-          fill="#0a5c1c"
-          stroke="#0a5c1c"
-          strokeWidth="7"
-        />
+        <path d={ARROW} transform="translate(2 3)" fill={c.edge} stroke={c.edge} strokeWidth="7" />
         {/* face */}
-        <path d={ARROW} fill="url(#cc-arrow)" stroke="url(#cc-arrow)" strokeWidth="7" />
+        <path d={ARROW} fill={`url(#${id})`} stroke={`url(#${id})`} strokeWidth="7" />
         {/* shine */}
         <path
           d="M12.5 12 L12.5 36"
@@ -47,53 +45,7 @@ function Arrow() {
   );
 }
 
-/** Pointing hand (index finger up), drawn back to front: palm, curled fingers, index, thumb. */
-function HandShapes(props: React.SVGProps<SVGGElement>) {
-  return (
-    <g {...props}>
-      <rect x="14" y="27" width="34" height="30" rx="12" />
-      <rect x="27" y="44" width="20" height="9" rx="4.5" />
-      <rect x="27" y="36" width="22" height="9" rx="4.5" />
-      <rect x="27" y="28" width="23" height="9" rx="4.5" />
-      <rect x="16" y="4" width="12" height="33" rx="6" />
-      <rect x="11" y="40" width="22" height="10" rx="5" transform="rotate(-18 22 45)" />
-    </g>
-  );
-}
-
-function Hand() {
-  return (
-    <svg viewBox="0 0 64 64" className="cursor-hand" aria-hidden="true">
-      <defs>
-        <linearGradient id="cc-hand" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#7fb0ff" />
-          <stop offset="0.45" stopColor="#2a63d4" />
-          <stop offset="1" stopColor="#0d3a8f" />
-        </linearGradient>
-      </defs>
-      <g filter="url(#cc-shadow)">
-        <HandShapes transform="translate(2 3)" fill="#012b75" />
-        <HandShapes fill="url(#cc-hand)" stroke="#012b75" strokeOpacity="0.35" strokeWidth="1.2" />
-        <path
-          d="M19.5 10 L19.5 27"
-          stroke="#fff"
-          strokeOpacity="0.65"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-        />
-        <path
-          d="M31 31 L44 31"
-          stroke="#fff"
-          strokeOpacity="0.4"
-          strokeWidth="2"
-          strokeLinecap="round"
-          fill="none"
-        />
-        <ellipse cx="21" cy="7.5" rx="1.8" ry="1.3" fill="#fff" fillOpacity="0.8" />
-      </g>
-    </svg>
-  );
-}
+const TRAIL = 9;
 
 /** Spark burst markup, created per click. */
 const SPARK = (() => {
@@ -109,9 +61,9 @@ const SPARK = (() => {
 })();
 
 /**
- * Brand cursor in a glossy 3D toy style: a green arrow that becomes a blue
- * pointing hand over anything clickable, with a spark burst on click.
- * Follows the mouse exactly and tilts slightly with movement.
+ * Brand cursor in a glossy 3D toy style: a green arrow that turns glowing
+ * blue over anything clickable, a trail of dots behind it, and a spark burst
+ * on click. Follows the mouse exactly and tilts slightly with movement.
  * Desktop mouse only; the normal cursor stays for touch, reduced motion,
  * text fields and open dialogs.
  */
@@ -119,6 +71,7 @@ export function CustomCursor() {
   const root = useRef<HTMLDivElement>(null);
   const tilt = useRef<HTMLDivElement>(null);
   const sparks = useRef<HTMLDivElement>(null);
+  const dots = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
@@ -128,6 +81,9 @@ export function CustomCursor() {
     const html = document.documentElement;
     const el = root.current!;
     const t = tilt.current!;
+    const trail = dots.current!;
+    const dotEls = Array.from(trail.children) as HTMLElement[];
+    const pts = dotEls.map(() => ({ x: -200, y: -200 }));
     html.classList.add("custom-cursor");
 
     let x = -200;
@@ -142,7 +98,8 @@ export function CustomCursor() {
       const overText = !!target?.closest(TEXT);
       html.classList.toggle("custom-cursor", !dialogOpen);
       el.dataset.hidden = String(dialogOpen || overText || !visible);
-      el.dataset.mode = target?.closest(INTERACTIVE) ? "hand" : "arrow";
+      el.dataset.hover = String(!!target?.closest(INTERACTIVE));
+      trail.dataset.hidden = el.dataset.hidden;
     };
 
     const loop = () => {
@@ -153,7 +110,22 @@ export function CustomCursor() {
       angle += (target - angle) * 0.18;
       el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
       t.style.transform = `rotate(${angle.toFixed(2)}deg)`;
-      raf = Math.abs(angle) > 0.05 || vx !== 0 ? requestAnimationFrame(loop) : 0;
+
+      // Each dot eases towards the one in front of it, forming a trail.
+      let lead = { x, y };
+      let moving = false;
+      pts.forEach((p, i) => {
+        p.x += (lead.x - p.x) * 0.42;
+        p.y += (lead.y - p.y) * 0.42;
+        if (Math.abs(lead.x - p.x) + Math.abs(lead.y - p.y) > 0.2) moving = true;
+        dotEls[i].style.transform = `translate3d(${p.x}px, ${p.y}px, 0)`;
+        lead = p;
+      });
+
+      // Fade the trail out while the mouse is still, so dots do not pile up at the tip.
+      trail.dataset.idle = String(!moving);
+
+      raf = Math.abs(angle) > 0.05 || vx !== 0 || moving ? requestAnimationFrame(loop) : 0;
     };
     const kick = () => {
       if (!raf) raf = requestAnimationFrame(loop);
@@ -166,6 +138,7 @@ export function CustomCursor() {
       if (!visible) {
         visible = true;
         lastX = x;
+        pts.forEach((p) => ((p.x = x), (p.y = y)));
       }
       el.style.transform = `translate3d(${x}px, ${y}px, 0)`; // exact, no lag
       setState(e.target as Element);
@@ -186,7 +159,7 @@ export function CustomCursor() {
     const onUp = () => (el.dataset.pressed = "false");
     const onLeave = () => {
       visible = false;
-      el.dataset.hidden = "true";
+      el.dataset.hidden = trail.dataset.hidden = "true";
     };
     const onScroll = () => setState(document.elementFromPoint(x, y));
 
@@ -213,11 +186,25 @@ export function CustomCursor() {
   return (
     <div aria-hidden="true" className="cursor-layer">
       <div ref={sparks} />
-      <div ref={root} className="cursor" data-hidden="true" data-mode="arrow">
+      <div ref={dots} className="cursor-trail" data-hidden="true">
+        {Array.from({ length: TRAIL }, (_, i) => (
+          <span
+            key={i}
+            style={
+              {
+                "--s": `${8 - i * 0.6}px`,
+                "--o": `${0.85 - i * 0.08}`,
+                "--c": i < TRAIL / 2 ? "var(--color-brand-green-light)" : "#4f8dff",
+              } as React.CSSProperties
+            }
+          />
+        ))}
+      </div>
+      <div ref={root} className="cursor" data-hidden="true" data-hover="false">
         <div ref={tilt} className="cursor-tilt">
           <div className="cursor-press">
-            <Arrow />
-            <Hand />
+            <Arrow tone="green" />
+            <Arrow tone="blue" />
           </div>
         </div>
       </div>
