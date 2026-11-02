@@ -134,15 +134,16 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 
 ## 9. Custom cursor
 
-| Item                  | How it works                                                                                                                              |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Look                  | Small green dot that follows the mouse exactly, plus a soft navy ring that trails behind                                                  |
-| Clickable things      | The ring grows and turns green over links, buttons, FAQ questions and dropdowns                                                           |
-| Click                 | A green "connection ping" ripple spreads from the cursor                                                                                  |
-| Dark areas            | Light colours (mint dot, white ring) over areas marked `data-cursor="dark"`: Why us, the contact panel, the "Need something custom?" card |
-| Normal cursor instead | Over text fields (so typing works as usual) and while a pop-up form is open                                                               |
-| Off completely        | Phones, tablets, touch screens and reduced-motion users                                                                                   |
-| Code                  | `src/components/layout/CustomCursor.tsx`; styles at the end of `src/app/globals.css` (`.cursor-*`)                                        |
+| Item                  | How it works                                                                                                               |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Style                 | Glossy, chunky 3D "toy" look in brand colours (original artwork, drawn in SVG in code)                                     |
+| Default               | Green 3D arrow with a darker thickness edge, shine highlight and soft shadow                                               |
+| Clickable things      | Pops into a royal-blue 3D pointing hand over links, buttons, FAQ questions and dropdowns                                   |
+| Click                 | Green and lime spark lines burst from the tip                                                                              |
+| Movement              | Follows the mouse exactly (no lag) and tilts slightly in the direction of movement                                         |
+| Normal cursor instead | Over text fields (so typing works as usual) and while a pop-up form is open                                                |
+| Off completely        | Phones, tablets, touch screens and reduced-motion users                                                                    |
+| Code                  | `src/components/layout/CustomCursor.tsx` (artwork and behaviour); styles at the end of `src/app/globals.css` (`.cursor-*`) |
 
 ## 10. Placeholders to replace before launch
 
@@ -273,3 +274,11 @@ recruitment data), and optionally one page per service for SEO.
 - Buttons now show the hand pointer everywhere (Tailwind resets it to an arrow).
 - Verified in a browser: plain area, button hover, click ripple cleanup, dark section, text
   field, pop-up open and closed, touch device and reduced motion.
+
+### Update: 3D-style cursor
+
+- Owner asked for a glossy 3D cartoon-style cursor (arrow and pointing hand with click
+  sparks). Replaced the dot-and-ring cursor with original SVG artwork in brand colours:
+  green arrow, blue pointing hand, spark burst on click, slight tilt with movement.
+- Verified in a browser: arrow, hand over buttons, spark burst, tilt, text field and pop-up
+  fall back to the normal cursor.
