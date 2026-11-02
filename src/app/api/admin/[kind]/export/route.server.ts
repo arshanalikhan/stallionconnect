@@ -12,7 +12,7 @@ function cell(value: unknown) {
 }
 
 /** GET /api/admin/{enquiries|applications}/export: download as CSV. */
-export async function GET(request: Request, ctx: RouteContext<"/api/admin/[kind]/export">) {
+export async function GET(request: Request, ctx: { params: Promise<{ kind: string }> }) {
   if (!(await getAdmin(request.headers))) return json({ ok: false, error: "Unauthorised" }, 401);
 
   const { kind } = await ctx.params;

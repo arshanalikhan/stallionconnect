@@ -11,7 +11,10 @@ const patchSchema = z
   .refine((v) => v.status !== undefined || v.note !== undefined);
 
 /** PATCH /api/admin/{enquiries|applications}/{id}: change status or note. */
-export async function PATCH(request: Request, ctx: RouteContext<"/api/admin/[kind]/[id]">) {
+export async function PATCH(
+  request: Request,
+  ctx: { params: Promise<{ kind: string; id: string }> },
+) {
   if (!(await getAdmin(request.headers))) return json({ ok: false, error: "Unauthorised" }, 401);
 
   const { kind, id } = await ctx.params;
