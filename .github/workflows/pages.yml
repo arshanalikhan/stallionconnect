@@ -1,0 +1,47 @@
+# Builds a static preview of the site and publishes it to GitHub Pages
+# (served from the gh-pages branch). Production hosting will be Cloudflare.
+name: Deploy preview to GitHub Pages
+
+on:
+  push:
+    branches: [main, claude/modest-euler-dz9n9e]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+
+      - name: Build static export
+        run: npm run build:pages
+        env:
+          PAGES_BASE_PATH: /${{ github.event.repository.name }}
+
+      - name: Disable Jekyll
+        run: touch out/.nojekyll
+
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./out
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: "Deploy preview from ${{ github.ref_name }}"

@@ -1,11 +1,31 @@
 import type { NextConfig } from "next";
 
+/**
+ * Build targets
+ * - Default (`npm run build`): normal Next.js server build. This is what the
+ *   Cloudflare deployment (final phase) will use via the OpenNext adapter.
+ * - GitHub Pages preview (`npm run build:pages`): fully static export served
+ *   from https://<user>.github.io/<repo>/, so everything lives under a basePath.
+ */
+const isPagesPreview = process.env.GITHUB_PAGES === "true";
+const basePath = isPagesPreview ? process.env.PAGES_BASE_PATH || "/stallionconnect" : "";
+
 const nextConfig: NextConfig = {
-  // cacheComponents / partialPrefetching are intentionally off: they hang on
-  // the Cloudflare Workers runtime (setTimeout semantics differ).
-  // Images are served as-is from /public. Avoids paid image transformations
-  // on Cloudflare; we pre-optimise assets (WebP) at build time instead.
+  // Cloudflare notes:
+  // - cacheComponents / partialPrefetching stay off: they hang on the
+  //   Workers runtime (setTimeout semantics differ).
+  // - Images are served unoptimised (pre-compressed WebP, imported statically)
+  //   so we never depend on a paid image-transformation service.
   images: { unoptimized: true },
+  ...(isPagesPreview && {
+    output: "export",
+    basePath,
+    trailingSlash: true,
+  }),
+  env: {
+    NEXT_PUBLIC_BASE_PATH: basePath,
+    NEXT_PUBLIC_STATIC_PREVIEW: isPagesPreview ? "true" : "false",
+  },
   turbopack: {
     rules: {
       "*.css": {
@@ -17,6 +37,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
-// Lets `next dev` access Cloudflare bindings (D1 etc.) locally.
-import("@opennextjs/cloudflare").then((m) => m.initOpenNextCloudflareForDev());

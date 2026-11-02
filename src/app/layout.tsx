@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { site } from "@/config/site";
+import logoFull from "@/assets/brand/logo-full.webp";
 import "./globals.css";
 
 const syne = Syne({
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     locale: site.locale,
     siteName: site.name,
     url: site.url,
-    images: [{ url: "/brand/logo-full.webp", width: 900, height: 276, alt: site.name }],
+    images: [{ url: logoFull.src, width: logoFull.width, height: logoFull.height, alt: site.name }],
   },
 };
 

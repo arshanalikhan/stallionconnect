@@ -1,7 +1,10 @@
 # Stallion Connect website
 
 Marketing and lead-generation site for **Stallion Connect Pvt Ltd**, a call centre, BPO and
-back-office outsourcing company. Hosted entirely on the Cloudflare free tier.
+back-office outsourcing company.
+
+**Live preview:** https://arshanalikhan.github.io/stallionconnect/ (static build, updated on every push).
+Production will run on the Cloudflare free tier; see [docs/cloudflare-deployment.md](docs/cloudflare-deployment.md).
 
 ## Tech stack
 
@@ -42,9 +45,9 @@ src/
     ui/                Button, Container, Section primitives
   config/site.ts       business details: contacts, WhatsApp, nav (edit here)
   lib/                 small helpers
-public/brand/          logo files
-wrangler.jsonc         Cloudflare Worker config
-open-next.config.ts    OpenNext adapter config
+  assets/brand/        logo files (imported, so paths work under any basePath)
+docs/                  deployment notes
+.github/workflows/     GitHub Pages preview deploy
 ```
 
 ## Editing business details
@@ -54,17 +57,18 @@ Values marked `TODO` are placeholders to replace before launch.
 
 ## Notes
 
-- `cacheComponents` is disabled in `next.config.ts` because it hangs on the Workers runtime.
-- Images are served unoptimised (pre-compressed WebP in `public/`) to stay within the free tier.
+- `cacheComponents` is disabled in `next.config.ts` because it hangs on the Cloudflare Workers runtime.
+- Images are served unoptimised (pre-compressed WebP) to stay within free tiers.
+- On Windows PowerShell 5, run commands one per line (`&&` is not supported).
 - The logo is currently a raster image cut from the supplied artwork. Replace with an SVG when available.
 
 ## Roadmap
 
-1. **Foundation** (done): project setup, brand tokens, layout shell, Cloudflare deploy config
+1. **Foundation** (done): project setup, brand tokens, layout shell, GitHub Pages preview
 2. Static site: all homepage sections, responsive
 3. Quote form and careers section, D1 storage, admin panel
 4. 3D scroll scene (lazy-loaded, with fallbacks)
 5. Content pages: Privacy, Terms, service pages
 6. SEO and performance
 7. Device testing and accessibility
-8. Launch on stallionconnect.in
+8. Cloudflare setup and launch on stallionconnect.in
