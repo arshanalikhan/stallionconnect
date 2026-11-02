@@ -1,6 +1,6 @@
 import { careers } from "@/content/home";
 import { site } from "@/config/site";
-import { buttonClasses } from "@/components/ui/Button";
+import { ApplyButton } from "@/components/forms/FormDialogs";
 import { Container } from "@/components/ui/Container";
 import { Heading } from "@/components/ui/Heading";
 import { Icon } from "@/components/ui/Icon";
@@ -24,8 +24,9 @@ export function Careers() {
               </li>
             ))}
           </ul>
-          <div className="mt-8 rounded-2xl border border-line bg-surface p-5">
-            <p className="text-sm text-muted">Send your CV to</p>
+          <ApplyButton style={{ className: "mt-8" }} />
+          <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
+            <p className="text-sm text-muted">Then email your CV to</p>
             <a
               href={applyHref("General application")}
               className="mt-1 inline-flex items-center gap-2 text-lg font-bold break-all text-navy hover:text-brand-green"
@@ -47,16 +48,12 @@ export function Careers() {
                 <p className="mt-1 flex-1 text-sm text-muted">
                   {job.mode} &middot; {job.type}
                 </p>
-                <a
-                  href={applyHref(job.title)}
-                  className={buttonClasses({
-                    variant: "secondary",
-                    size: "sm",
-                    className: "mt-4 self-start",
-                  })}
+                <ApplyButton
+                  role={job.title}
+                  style={{ variant: "secondary", size: "sm", className: "mt-4 self-start" }}
                 >
-                  Apply by email
-                </a>
+                  Apply
+                </ApplyButton>
               </article>
             </Reveal>
           ))}

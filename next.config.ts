@@ -11,6 +11,11 @@ const isPagesPreview = process.env.GITHUB_PAGES === "true";
 const basePath = isPagesPreview ? process.env.PAGES_BASE_PATH || "/stallionconnect" : "";
 
 const nextConfig: NextConfig = {
+  // Files named `*.server.ts(x)` (API routes, admin) need a server. They are
+  // part of the normal build but left out of the static GitHub Pages export.
+  pageExtensions: isPagesPreview
+    ? ["tsx", "ts", "jsx", "js"]
+    : ["tsx", "ts", "jsx", "js", "server.tsx", "server.ts"],
   // Cloudflare notes:
   // - cacheComponents / partialPrefetching stay off: they hang on the
   //   Workers runtime (setTimeout semantics differ).

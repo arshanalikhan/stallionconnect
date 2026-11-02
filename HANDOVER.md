@@ -7,7 +7,7 @@ end of every phase.
 - **Working branch:** `claude/modest-euler-dz9n9e`
 - **Live preview:** https://arshanalikhan.github.io/stallionconnect/ (GitHub Pages, static)
 - **Production (final phase):** Cloudflare Workers on `stallionconnect.in` (domain purchased)
-- **Last updated:** Phase 2
+- **Last updated:** Phase 3
 
 ---
 
@@ -71,12 +71,21 @@ One-time setting (done by the owner): repository **Settings > Pages > Deploy fro
 ## 5. Where things live
 
 ```
-src/app/                 routes, root layout, global styles (brand tokens), favicon
+src/app/layout.tsx       root html, fonts, metadata
+src/app/(site)/          public pages with header, footer and form dialogs
+src/app/admin/           admin panel (page.server.tsx)
+src/app/api/             API routes (route.server.ts): enquiries, applications, admin
 src/components/layout/   Header, Footer, Logo, WhatsAppButton
 src/components/ui/       Button, Container, Section, Heading, Icon, Reveal
 src/components/sections/ homepage sections (Hero, Services, About, WhyUs, Process,
                          Industries, Careers, Faq, Contact, plus CallCard and CountUp)
 src/content/home.ts      all homepage text, lists and numbers
+src/components/forms/    quote form, application form, dialogs, field components
+src/components/admin/    admin lead list
+src/lib/forms/           shared validation (schemas.ts) and submit logic
+src/lib/db/              data store: D1 (production) and in-memory (local dev)
+src/lib/admin-auth.ts    Cloudflare Access check for the admin
+migrations/              D1 database schema
 src/config/site.ts       business details, WhatsApp number, navigation
 src/assets/brand/        logo files
 docs/                    Cloudflare deployment steps
@@ -89,7 +98,22 @@ docs/                    Cloudflare deployment steps
 - **Icons:** add a path to `src/components/ui/Icon.tsx`, then use its name in the content file
 - **Brand colours and fonts:** top of `src/app/globals.css`
 
-## 7. Placeholders to replace before launch
+## 7. Forms and admin
+
+| Item                 | How it works                                                                                                                               |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Quote form           | On the Contact section and in a pop-up from every "Get a Quote" and "Enquire" button (service pre-selected)                                |
+| Application form     | Pop-up from "Apply" buttons in Careers (role pre-selected). No CV upload; applicants email CVs to careers@                                 |
+| Validation           | Same rules in the browser and on the server (`src/lib/forms/schemas.ts`)                                                                   |
+| Spam                 | Hidden honeypot field now; Turnstile later                                                                                                 |
+| Storage              | Cloudflare D1 in production; in-memory while running `npm run dev` (resets on restart)                                                     |
+| Admin                | `/admin`: two tabs, filter by status, change status (new, contacted, closed), private notes, CSV download, quick email/call/WhatsApp links |
+| Admin login          | Cloudflare Access in production. Open without login only in `npm run dev`. Locked everywhere else                                          |
+| GitHub Pages preview | No server there, so the forms open a pre-filled email to info@ or careers@ instead, and `/admin` does not exist                            |
+
+To try it locally: `npm run dev`, submit a form, then open http://localhost:3000/admin.
+
+## 8. Placeholders to replace before launch
 
 | Item              | Where                              | Current value                                                          |
 | ----------------- | ---------------------------------- | ---------------------------------------------------------------------- |
@@ -100,23 +124,22 @@ docs/                    Cloudflare deployment steps
 | Logo              | `src/assets/brand/`                | Raster cut from the supplied JPEG; replace with SVG or transparent PNG |
 | Privacy and Terms | `src/app/privacy`, `src/app/terms` | Placeholder text                                                       |
 
-## 8. Known issues
+## 9. Known issues
 
 - The logo only works on light backgrounds (its navy text disappears on dark). A white or
   single-colour version is needed if we ever place it on a dark section.
 - GitHub Pages deploys occasionally hang on GitHub's side ("Deploying" for a long time). Fix:
   push again, or cancel the stuck "pages build and deployment" run in Actions and re-run it.
-- "Get a Quote" buttons currently open an email to info@. Phase 3 replaces this with the
-  quote form.
-- Forms and the admin panel (Phase 3) cannot work on GitHub Pages, which only serves static
-  files. They will work once deployed to Cloudflare.
+- On the GitHub Pages preview the forms fall back to a pre-filled email, and there is no admin.
+  Saving to the database and the admin panel start working once deployed to Cloudflare.
+- No email notification for new leads yet (deferred). Until then, check the admin panel.
 
-## 9. Next up
+## 10. Next up
 
-Phase 3: quote form (on the page and in a dialog from every "Get a Quote" button), careers
-enquiry form, API routes written for Cloudflare D1, and an admin panel to view leads.
+Phase 4: 3D scroll scene in the hero, loaded only after the page text appears, with a
+lightweight fallback for phones, slow devices and reduced-motion users.
 
-## 10. Phase log
+## 11. Phase log
 
 ### Phase 1: Foundation (done)
 
@@ -147,3 +170,25 @@ enquiry form, API routes written for Cloudflare D1, and an admin panel to view l
 - Follow-up: logo replaced with the owner's file, background made transparent, shown larger
   in the header and footer. Tagline "Where every connection counts" added to the hero, the
   footer and the browser tab title.
+
+### Phase 3: Forms and admin (done)
+
+- Quote form on the Contact section and in a pop-up opened by every "Get a Quote" and
+  "Enquire" button; the chosen service is pre-selected.
+- Job application form in a pop-up from the Careers "Apply" buttons; the role is
+  pre-selected. CVs go by email to careers@.
+- Shared validation for browser and server, clear per-field messages, consent checkbox,
+  honeypot against bots, 20 KB request limit.
+- API routes: `POST /api/enquiries`, `POST /api/applications`,
+  `PATCH /api/admin/{type}/{id}`, `GET /api/admin/{type}/export` (CSV).
+- Data store with a Cloudflare D1 implementation and schema, plus an in-memory store
+  for local development.
+- Admin panel at `/admin`: tabs, status filters with counts, status changes, private notes,
+  CSV download, email/phone/WhatsApp links. Hidden from search engines.
+- Admin security: Cloudflare Access JWT verification; locked unless configured (except
+  local dev).
+- Public pages moved into a `(site)` route group so the admin has its own layout.
+- GitHub Pages preview: forms open a pre-filled email, `/admin` and the API are left out.
+- Verified: lint, typecheck, production and static builds; browser tests for both forms,
+  dialogs, validation, admin status/note updates, filters, CSV; production build returns 401
+  for the admin and API without login; preview fallback tested.

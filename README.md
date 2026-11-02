@@ -65,8 +65,8 @@ Values marked `TODO` are placeholders to replace before launch.
 ## Roadmap
 
 1. **Foundation** (done): project setup, brand tokens, layout shell, GitHub Pages preview
-2. Static site: all homepage sections, responsive
-3. Quote form and careers section, D1 storage, admin panel
+2. **Static site** (done): all homepage sections, responsive
+3. **Forms and admin** (done): quote and application forms, D1-ready storage, admin panel
 4. 3D scroll scene (lazy-loaded, with fallbacks)
 5. Content pages: Privacy, Terms, service pages
 6. SEO and performance

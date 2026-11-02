@@ -3,7 +3,7 @@ import { Container } from "@/components/ui/Container";
 import { Heading } from "@/components/ui/Heading";
 import { Icon } from "@/components/ui/Icon";
 import { Reveal } from "@/components/ui/Reveal";
-import Link from "next/link";
+import { QuoteButton } from "@/components/forms/FormDialogs";
 
 export function Services() {
   return (
@@ -42,13 +42,13 @@ export function Services() {
                   <p className={`mt-2 flex-1 text-sm ${custom ? "text-white/80" : "text-muted"}`}>
                     {s.text}
                   </p>
-                  <Link
-                    href="/#contact"
-                    className={`mt-5 inline-flex items-center gap-1.5 text-sm font-semibold ${custom ? "text-white" : "text-navy"}`}
+                  <QuoteButton
+                    service={custom ? "Custom process" : s.title}
+                    className={`mt-5 inline-flex items-center gap-1.5 self-start text-sm font-semibold hover:underline ${custom ? "text-white" : "text-navy"}`}
                   >
                     {custom ? "Talk to us" : "Enquire"}
                     <Icon name="arrow" className="size-4" strokeWidth={2} />
-                  </Link>
+                  </QuoteButton>
                 </article>
               </Reveal>
             );

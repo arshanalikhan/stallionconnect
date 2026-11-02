@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { site } from "@/config/site";
 import { cn } from "@/lib/cn";
-import { ButtonLink } from "@/components/ui/Button";
+import { QuoteButton } from "@/components/forms/FormDialogs";
 import { Container } from "@/components/ui/Container";
 import { Logo } from "./Logo";
 
@@ -54,9 +54,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <ButtonLink href="/#contact" size="sm" className="hidden sm:inline-flex">
-            Get a Quote
-          </ButtonLink>
+          <QuoteButton style={{ size: "sm" }} />
           <button
             type="button"
             className="relative size-11 rounded-lg xl:hidden"
@@ -106,11 +104,6 @@ export function Header() {
                 </Link>
               </li>
             ))}
-            <li className="px-3 pt-2 pb-1 sm:hidden">
-              <ButtonLink href="/#contact" className="w-full" onClick={() => setOpen(false)}>
-                Get a Quote
-              </ButtonLink>
-            </li>
           </ul>
         </Container>
       </nav>
