@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/*
+ * Brand tokens, sampled from the Stallion Connect logo.
+ * Use them in Tailwind as bg-navy, text-brand-green, etc.
+ */
+@theme {
+  --color-navy: #012b75;
+  --color-navy-deep: #001a4d;
+  --color-royal: #1a56c4;
+  --color-brand-green: #139528;
+  --color-brand-green-dark: #025924;
+  --color-brand-green-light: #2bd66b;
+  --color-mint: #e6f6ec;
+  --color-ink: #0b1526;
+  --color-muted: #4b5b6b;
+  --color-line: #dbe5ee;
+  --color-surface: #f5f8fc;
+
+  --font-sans: var(--font-syne), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --shadow-soft: 0 22px 60px -24px rgb(0 30 70 / 0.45);
+  --radius-card: 1.5rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    @apply bg-white font-sans text-ink antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply text-navy;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  :focus-visible {
+    @apply rounded-md outline-3 outline-offset-3 outline-brand-green-light;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
