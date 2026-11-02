@@ -102,8 +102,10 @@ docs/                    Cloudflare deployment steps
 
 ## 8. Known issues
 
-- The logo has a white background, so it shows as a white box on the light-grey footer.
-  Fix: supply an SVG or transparent PNG.
+- The logo only works on light backgrounds (its navy text disappears on dark). A white or
+  single-colour version is needed if we ever place it on a dark section.
+- GitHub Pages deploys occasionally hang on GitHub's side ("Deploying" for a long time). Fix:
+  push again, or cancel the stuck "pages build and deployment" run in Actions and re-run it.
 - "Get a Quote" buttons currently open an email to info@. Phase 3 replaces this with the
   quote form.
 - Forms and the admin panel (Phase 3) cannot work on GitHub Pages, which only serves static
@@ -142,3 +144,6 @@ enquiry form, API routes written for Cloudflare D1, and an admin panel to view l
   the menu button.
 - Verified: lint, typecheck and static build pass; no console errors and no horizontal
   scrolling at 1366px, 1024px and 390px wide.
+- Follow-up: logo replaced with the owner's file, background made transparent, shown larger
+  in the header and footer. Tagline "Where every connection counts" added to the hero, the
+  footer and the browser tab title.

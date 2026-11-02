@@ -10,7 +10,8 @@ export function Footer() {
     <footer className="border-t border-line bg-surface">
       <Container className="grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <Logo />
+          <Logo imgClassName="h-20 w-auto" />
+          <p className="mt-3 font-semibold text-navy">{site.tagline}</p>
           <p className="mt-4 max-w-sm text-sm text-muted">{site.description}</p>
         </div>
 

@@ -1,4 +1,5 @@
 import { hero } from "@/content/home";
+import { site } from "@/config/site";
 import { ButtonLink } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Icon } from "@/components/ui/Icon";
@@ -32,7 +33,8 @@ export function Hero() {
           <h1 className="text-4xl font-bold sm:text-5xl lg:text-6xl">
             {hero.title} <span className="text-brand-green">{hero.highlight}</span>
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-muted">{hero.intro}</p>
+          <p className="mt-5 text-xl font-semibold text-royal italic">{site.tagline}</p>
+          <p className="mt-4 max-w-xl text-lg text-muted">{hero.intro}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <ButtonLink href="/#contact">Get a Quote</ButtonLink>
             <ButtonLink href="/#services" variant="secondary">
