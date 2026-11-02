@@ -10,13 +10,13 @@ import {
   roleOptions,
   type FieldErrors,
 } from "@/lib/forms/schemas";
-import { submitForm } from "@/lib/forms/submit";
+import { submitForm, type SubmitSuccess } from "@/lib/forms/submit";
 import { ConsentField, Honeypot, SelectField, TextAreaField, TextField } from "./fields";
 import { FormError, FormSuccess } from "./FormStatus";
 
 type State =
   | { kind: "idle" | "sending" }
-  | { kind: "done"; via: "api" | "email" }
+  | { kind: "done"; result: SubmitSuccess }
   | { kind: "error"; message?: string };
 
 export function ApplicationForm({ defaultRole }: { defaultRole?: string }) {
@@ -27,7 +27,7 @@ export function ApplicationForm({ defaultRole }: { defaultRole?: string }) {
     return (
       <FormSuccess
         title="Thank you for applying."
-        via={state.via}
+        result={state.result}
         onReset={() => setState({ kind: "idle" })}
       >
         Please email your CV to <strong className="text-navy">{site.contact.careersEmail}</strong>{" "}
@@ -61,7 +61,7 @@ export function ApplicationForm({ defaultRole }: { defaultRole?: string }) {
     });
     if (result.ok) {
       setErrors({});
-      setState({ kind: "done", via: result.via });
+      setState({ kind: "done", result });
       return;
     }
     setErrors(result.errors ?? {});

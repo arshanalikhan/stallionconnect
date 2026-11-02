@@ -10,13 +10,13 @@ import {
   teamSizeOptions,
   type FieldErrors,
 } from "@/lib/forms/schemas";
-import { submitForm } from "@/lib/forms/submit";
+import { submitForm, type SubmitSuccess } from "@/lib/forms/submit";
 import { ConsentField, Honeypot, SelectField, TextAreaField, TextField } from "./fields";
 import { FormError, FormSuccess } from "./FormStatus";
 
 type State =
   | { kind: "idle" | "sending" }
-  | { kind: "done"; via: "api" | "email" }
+  | { kind: "done"; result: SubmitSuccess }
   | { kind: "error"; message?: string };
 
 export function QuoteForm({
@@ -33,7 +33,7 @@ export function QuoteForm({
     return (
       <FormSuccess
         title="Thank you, we have your enquiry."
-        via={state.via}
+        result={state.result}
         onReset={() => setState({ kind: "idle" })}
       >
         Our team will get back to you within one working day.
@@ -65,7 +65,7 @@ export function QuoteForm({
     });
     if (result.ok) {
       setErrors({});
-      setState({ kind: "done", via: result.via });
+      setState({ kind: "done", result });
       return;
     }
     setErrors(result.errors ?? {});

@@ -1,8 +1,13 @@
 import type { z } from "zod";
 import { HONEYPOT_FIELD, toFieldErrors, type FieldErrors } from "./schemas";
 
-export type SubmitResult =
-  { ok: true; via: "api" | "email" } | { ok: false; errors?: FieldErrors; message?: string };
+/** A ready-to-send email, used where there is no server to save the form. */
+export type EmailDraft = { to: string; subject: string; body: string; href: string };
+
+export type SubmitSuccess =
+  { ok: true; via: "api" } | { ok: true; via: "email"; draft: EmailDraft };
+
+export type SubmitResult = SubmitSuccess | { ok: false; errors?: FieldErrors; message?: string };
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 export const isStaticPreview = process.env.NEXT_PUBLIC_STATIC_PREVIEW === "true";
@@ -19,8 +24,8 @@ export function readForm(form: HTMLFormElement) {
 
 /**
  * Validates in the browser, then sends to the API.
- * On the static GitHub Pages preview there is no API, so it opens a pre-filled
- * email instead (no data is lost while we are on the preview host).
+ * On the static GitHub Pages preview there is no API and nothing is saved, so it
+ * returns a ready-to-send email draft for the visitor to send themselves.
  */
 export async function submitForm<S extends z.ZodType>(opts: {
   form: HTMLFormElement;
@@ -37,11 +42,11 @@ export async function submitForm<S extends z.ZodType>(opts: {
     const body = Object.entries(opts.email.labels)
       .map(([k, label]) => `${label}: ${String(data[k] ?? "") || "-"}`)
       .join("\n");
+    const subject = opts.email.subject(parsed.data);
     const href = `mailto:${opts.email.to}?subject=${encodeURIComponent(
-      opts.email.subject(parsed.data),
+      subject,
     )}&body=${encodeURIComponent(body)}`;
-    window.location.href = href;
-    return { ok: true, via: "email" };
+    return { ok: true, via: "email", draft: { to: opts.email.to, subject, body, href } };
   }
 
   try {
