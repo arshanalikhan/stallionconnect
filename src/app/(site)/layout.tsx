@@ -1,6 +1,7 @@
 import { FormDialogProvider } from "@/components/forms/FormDialogs";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { CustomCursor } from "@/components/layout/CustomCursor";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { Scene3D } from "@/components/three/Scene3D";
 
@@ -21,6 +22,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       </main>
       <Footer />
       <WhatsAppButton />
+      <CustomCursor />
     </FormDialogProvider>
   );
 }

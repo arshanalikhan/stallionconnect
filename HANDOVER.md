@@ -75,7 +75,7 @@ src/app/layout.tsx       root html, fonts, metadata
 src/app/(site)/          public pages with header, footer and form dialogs
 src/app/admin/           admin panel (page.server.tsx)
 src/app/api/             API routes (route.server.ts): enquiries, applications, admin
-src/components/layout/   Header, Footer, Logo, WhatsAppButton
+src/components/layout/   Header, Footer, Logo, WhatsAppButton, CustomCursor
 src/components/ui/       Button, Container, Section, Heading, Icon, Reveal
 src/components/sections/ homepage sections (Hero, Services, About, WhyUs, Process,
                          Industries, Careers, Faq, Contact, plus CallCard and CountUp)
@@ -132,7 +132,19 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 | How the page adapts                       | `<html data-scene="high                                                                                                                                                                                                         | low">`is set when the scene is showing. CSS classes in`globals.css`: `scene-clear`(see-through section),`scene-panel`(glass panel),`scene-night`, `scene-hide`, `scene-only`, `scene-hide-card` |
 | Tuning                                    | Camera route (`PATH`), colours, building density and card behaviour are at the top of each component in `SiteScene.tsx`                                                                                                         |
 
-## 9. Placeholders to replace before launch
+## 9. Custom cursor
+
+| Item                  | How it works                                                                                                                              |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Look                  | Small green dot that follows the mouse exactly, plus a soft navy ring that trails behind                                                  |
+| Clickable things      | The ring grows and turns green over links, buttons, FAQ questions and dropdowns                                                           |
+| Click                 | A green "connection ping" ripple spreads from the cursor                                                                                  |
+| Dark areas            | Light colours (mint dot, white ring) over areas marked `data-cursor="dark"`: Why us, the contact panel, the "Need something custom?" card |
+| Normal cursor instead | Over text fields (so typing works as usual) and while a pop-up form is open                                                               |
+| Off completely        | Phones, tablets, touch screens and reduced-motion users                                                                                   |
+| Code                  | `src/components/layout/CustomCursor.tsx`; styles at the end of `src/app/globals.css` (`.cursor-*`)                                        |
+
+## 10. Placeholders to replace before launch
 
 | Item              | Where                              | Current value                                                          |
 | ----------------- | ---------------------------------- | ---------------------------------------------------------------------- |
@@ -143,7 +155,7 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 | Logo              | `src/assets/brand/`                | Raster cut from the supplied JPEG; replace with SVG or transparent PNG |
 | Privacy and Terms | `src/app/privacy`, `src/app/terms` | Placeholder text                                                       |
 
-## 10. Known issues
+## 11. Known issues
 
 - The logo only works on light backgrounds (its navy text disappears on dark). A white or
   single-colour version is needed if we ever place it on a dark section.
@@ -156,12 +168,12 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 - The browser console shows a harmless `THREE.Clock` deprecation warning from React Three
   Fiber. It goes away when the library updates.
 
-## 11. Next up
+## 12. Next up
 
 Phase 5: content pages. Privacy Policy and Terms (with DPDP Act coverage for form and
 recruitment data), and optionally one page per service for SEO.
 
-## 12. Phase log
+## 13. Phase log
 
 ### Phase 1: Foundation (done)
 
@@ -252,3 +264,12 @@ recruitment data), and optionally one page per service for SEO.
 - Mouse parallax now works (it was not receiving mouse events before).
 - Verified: lint, typecheck, static build; browser checks at 1600px, 1892px and 390px, every
   section scrolled; reduced motion falls back to solid sections; no horizontal scrolling.
+
+### Update: brand cursor
+
+- Custom cursor on desktop: green dot, trailing ring that grows over clickable things, click
+  ripple, light colours on dark sections. Normal cursor kept for text fields, pop-up forms,
+  touch devices and reduced motion.
+- Buttons now show the hand pointer everywhere (Tailwind resets it to an arrow).
+- Verified in a browser: plain area, button hover, click ripple cleanup, dark section, text
+  field, pop-up open and closed, touch device and reduced motion.

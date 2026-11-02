@@ -7,6 +7,7 @@ export function WhyUs() {
   return (
     <section
       id="why-us"
+      data-cursor="dark"
       className="scene-night relative overflow-hidden bg-linear-to-br from-navy-deep via-navy to-[#03306b] py-20 sm:py-28"
     >
       <div

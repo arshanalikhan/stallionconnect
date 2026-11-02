@@ -16,6 +16,7 @@ export function Services() {
             return (
               <Reveal as="li" key={s.id} delay={(i % 4) * 80}>
                 <article
+                  data-cursor={custom ? "dark" : undefined}
                   className={
                     custom
                       ? "flex h-full flex-col rounded-card bg-linear-to-br from-navy to-brand-green-dark p-6 text-white shadow-soft"

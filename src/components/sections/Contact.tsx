@@ -28,7 +28,10 @@ export function Contact() {
     <section id="contact" className="scene-clear bg-white py-20 sm:py-28">
       <Container>
         <div className="grid overflow-hidden rounded-[2rem] shadow-soft lg:grid-cols-[0.85fr_1.15fr]">
-          <div className="bg-linear-to-br from-navy via-[#0a4580] to-brand-green-dark p-8 text-white sm:p-10">
+          <div
+            data-cursor="dark"
+            className="bg-linear-to-br from-navy via-[#0a4580] to-brand-green-dark p-8 text-white sm:p-10"
+          >
             <p className="mb-3 text-xs font-bold tracking-[0.16em] text-brand-green-light uppercase">
               {contact.eyebrow}
             </p>

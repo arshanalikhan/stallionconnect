@@ -41,6 +41,13 @@
     line-height: 1.1;
   }
 
+  button:not(:disabled),
+  [role="button"],
+  summary,
+  select {
+    cursor: pointer;
+  }
+
   :focus-visible {
     @apply rounded-md outline-3 outline-offset-3 outline-brand-green-light;
   }
@@ -127,5 +134,115 @@ html[data-scene] .scene-panel {
   html[data-scene="high"] .scene-hide-card {
     opacity: 0;
     pointer-events: none;
+  }
+}
+
+/*
+ * Brand cursor (CustomCursor.tsx). Only active on desktop mice; the class
+ * `custom-cursor` is added by JavaScript, so without it the normal cursor stays.
+ */
+html.custom-cursor,
+html.custom-cursor * {
+  cursor: none !important;
+}
+html.custom-cursor :is(input:not([type="checkbox"]):not([type="radio"]), textarea) {
+  cursor: text !important;
+}
+
+.cursor-layer {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+  will-change: transform;
+}
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  background: var(--color-brand-green);
+  box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9);
+  transition:
+    opacity 0.2s,
+    background-color 0.2s;
+}
+.cursor-ring {
+  width: 36px;
+  height: 36px;
+  margin: -18px 0 0 -18px;
+}
+/* The ring's look lives on a pseudo-element so its size can animate
+   without fighting the JavaScript transform on the element itself. */
+.cursor-ring::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid rgb(1 43 117 / 0.45);
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.25s,
+    border-color 0.25s;
+}
+.cursor-ring[data-hover="true"]::before {
+  transform: scale(1.6);
+  border-color: var(--color-brand-green);
+  background: rgb(19 149 40 / 0.12);
+}
+.cursor-ring[data-pressed="true"]::before {
+  transform: scale(0.8);
+}
+.cursor-ring[data-hover="true"][data-pressed="true"]::before {
+  transform: scale(1.35);
+}
+.cursor-ring {
+  transition: opacity 0.2s;
+}
+.cursor-dot[data-dark="true"] {
+  background: var(--color-brand-green-light);
+  box-shadow: 0 0 0 2px rgb(1 43 117 / 0.6);
+}
+.cursor-ring[data-dark="true"]::before {
+  border-color: rgb(255 255 255 / 0.6);
+}
+.cursor-ring[data-dark="true"][data-hover="true"]::before {
+  border-color: var(--color-brand-green-light);
+  background: rgb(43 214 107 / 0.15);
+}
+.cursor-dot[data-hidden="true"],
+.cursor-ring[data-hidden="true"] {
+  opacity: 0;
+}
+
+/* "Connection ping" on click */
+.cursor-ping {
+  position: fixed;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 9999px;
+  border: 2px solid var(--color-brand-green);
+  pointer-events: none;
+  animation: cursor-ping 0.6s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+.cursor-ping[data-dark="true"] {
+  border-color: var(--color-brand-green-light);
+}
+@keyframes cursor-ping {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(5);
+    opacity: 0;
   }
 }
