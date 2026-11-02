@@ -145,3 +145,26 @@ function finish(c: HTMLCanvasElement) {
   t.anisotropy = 4;
   return t;
 }
+
+/**
+ * Diagonal light streak for the glossy sweep across the card. The edges are
+ * transparent so the streak can slide fully off the card.
+ */
+export function sheenTexture() {
+  const c = document.createElement("canvas");
+  c.width = 512;
+  c.height = 512;
+  const g = c.getContext("2d")!;
+  const grad = g.createLinearGradient(0, 512, 512, 0);
+  grad.addColorStop(0, "rgba(255,255,255,0)");
+  grad.addColorStop(0.42, "rgba(255,255,255,0)");
+  grad.addColorStop(0.5, "rgba(255,255,255,0.55)");
+  grad.addColorStop(0.53, "rgba(255,255,255,0.15)");
+  grad.addColorStop(0.6, "rgba(255,255,255,0)");
+  grad.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = grad;
+  g.fillRect(0, 0, 512, 512);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
+  return t;
+}

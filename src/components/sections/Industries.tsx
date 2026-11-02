@@ -6,9 +6,9 @@ import { Reveal } from "@/components/ui/Reveal";
 
 export function Industries() {
   return (
-    <section id="industries" className="bg-mint/60 py-20 sm:py-28">
+    <section id="industries" className="scene-clear bg-mint/60 py-20 sm:py-28">
       <Container>
-        <Heading {...industries} />
+        <Heading {...industries} panel />
         <ul className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
           {industries.items.map((item, i) => (
             <Reveal as="li" key={item.name} delay={(i % 4) * 70}>

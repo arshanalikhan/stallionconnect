@@ -7,9 +7,9 @@ import { QuoteButton } from "@/components/forms/FormDialogs";
 
 export function Services() {
   return (
-    <section id="services" className="bg-white py-20 sm:py-28">
+    <section id="services" className="scene-clear bg-white py-20 sm:py-28">
       <Container>
-        <Heading {...services} />
+        <Heading {...services} panel />
         <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {services.items.map((s, i) => {
             const custom = s.id === "custom";
@@ -19,7 +19,7 @@ export function Services() {
                   className={
                     custom
                       ? "flex h-full flex-col rounded-card bg-linear-to-br from-navy to-brand-green-dark p-6 text-white shadow-soft"
-                      : "group flex h-full flex-col rounded-card border border-line bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-brand-green/40 hover:shadow-soft"
+                      : "group flex h-full flex-col rounded-card border border-line bg-white/90 p-6 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-brand-green/40 hover:shadow-soft"
                   }
                 >
                   <span

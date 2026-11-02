@@ -4,26 +4,29 @@ import { ButtonLink } from "@/components/ui/Button";
 import { QuoteButton } from "@/components/forms/FormDialogs";
 import { Container } from "@/components/ui/Container";
 import { Icon } from "@/components/ui/Icon";
-import { Hero3D } from "@/components/three/Hero3D";
 import { CallCard } from "./CallCard";
 
 export function Hero() {
   return (
     <section
       id="home"
-      className="group/hero relative flex items-center overflow-hidden bg-linear-to-b from-[#eaf3fc] via-surface to-white pt-14 pb-20 sm:pt-20 sm:pb-28 lg:min-h-[calc(100svh-5rem)]"
+      className="scene-clear relative flex items-center overflow-hidden bg-linear-to-b from-[#eaf3fc] via-surface to-white pt-14 pb-20 sm:pt-20 sm:pb-28 lg:min-h-[calc(100svh-5rem)]"
     >
       {/* soft brand glows */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -top-40 -right-40 size-[520px] rounded-full bg-royal/15 blur-3xl"
+        className="scene-hide pointer-events-none absolute -top-40 -right-40 size-[520px] rounded-full bg-royal/15 blur-3xl"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-48 -left-32 size-[460px] rounded-full bg-brand-green/10 blur-3xl"
+        className="scene-hide pointer-events-none absolute -bottom-48 -left-32 size-[460px] rounded-full bg-brand-green/10 blur-3xl"
       />
 
-      <Hero3D targetId="home" />
+      {/* keeps the headline readable over the 3D scene */}
+      <div
+        aria-hidden="true"
+        className="scene-only pointer-events-none absolute inset-0 bg-linear-to-b from-white/75 via-white/50 to-white/10 lg:bg-linear-to-r lg:from-white/85 lg:via-white/45 lg:to-transparent"
+      />
 
       <Container className="relative grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
@@ -56,7 +59,7 @@ export function Hero() {
         </div>
 
         {/* On desktops with the 3D scene, the 3D card replaces this one */}
-        <div className="transition-opacity duration-700 lg:group-data-[scene=high]/hero:pointer-events-none lg:group-data-[scene=high]/hero:opacity-0">
+        <div className="scene-hide-card transition-opacity duration-700">
           <CallCard />
         </div>
       </Container>

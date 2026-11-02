@@ -4,9 +4,9 @@ import { Heading } from "@/components/ui/Heading";
 
 export function Faq() {
   return (
-    <section id="faq" className="bg-surface py-20 sm:py-28">
+    <section id="faq" className="scene-clear bg-surface py-20 sm:py-28">
       <Container className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
-        <Heading eyebrow={faq.eyebrow} title={faq.title} highlight={faq.highlight} />
+        <Heading eyebrow={faq.eyebrow} title={faq.title} highlight={faq.highlight} panel />
         <div className="divide-y divide-line rounded-card border border-line bg-white px-6">
           {faq.items.map((item) => (
             <details key={item.q} className="group py-5">

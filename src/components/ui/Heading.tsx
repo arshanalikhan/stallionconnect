@@ -8,6 +8,7 @@ export function Heading({
   intro,
   align = "left",
   tone = "light",
+  panel = false,
   className,
 }: {
   eyebrow: string;
@@ -16,11 +17,20 @@ export function Heading({
   intro?: string;
   align?: "left" | "center";
   tone?: "light" | "dark";
+  /** Frosted-glass background when the 3D scene is showing behind the page. */
+  panel?: boolean;
   className?: string;
 }) {
   const dark = tone === "dark";
   return (
-    <header className={cn("max-w-2xl", align === "center" && "mx-auto text-center", className)}>
+    <header
+      className={cn(
+        "max-w-2xl",
+        align === "center" && "mx-auto text-center",
+        panel && "scene-panel w-fit",
+        className,
+      )}
+    >
       <p
         className={cn(
           "mb-3 text-xs font-bold tracking-[0.16em] uppercase",

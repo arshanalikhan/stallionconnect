@@ -7,7 +7,7 @@ end of every phase.
 - **Working branch:** `claude/modest-euler-dz9n9e`
 - **Live preview:** https://arshanalikhan.github.io/stallionconnect/ (GitHub Pages, static)
 - **Production (final phase):** Cloudflare Workers on `stallionconnect.in` (domain purchased)
-- **Last updated:** Phase 4
+- **Last updated:** Phase 4 (full-site 3D update)
 
 ---
 
@@ -82,8 +82,8 @@ src/components/sections/ homepage sections (Hero, Services, About, WhyUs, Proces
 src/content/home.ts      all homepage text, lists and numbers
 src/components/forms/    quote form, application form, dialogs, field components
 src/components/admin/    admin lead list
-src/components/three/    3D hero: Hero3D.tsx (loader and device checks), HeroScene.tsx
-                         (scene), textures.ts (card faces, building windows)
+src/components/three/    3D: Scene3D.tsx (loader, device checks, scroll tracking),
+                         SiteScene.tsx (scene), sceneState.ts, textures.ts
 src/lib/forms/           shared validation (schemas.ts) and submit logic
 src/lib/db/              data store: D1 (production) and in-memory (local dev)
 src/lib/admin-auth.ts    Cloudflare Access check for the admin
@@ -115,19 +115,22 @@ docs/                    Cloudflare deployment steps
 
 To try it locally: `npm run dev`, submit a form, then open http://localhost:3000/admin.
 
-## 8. 3D hero
+## 8. 3D scene
 
-| Item                                      | How it works                                                                                                                                                |
-| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| What it shows                             | Light-blue city avenue, four green gates (the four process steps), floating particles, and on desktops a 3D "live call" card with orbiting connection nodes |
-| Scroll                                    | The camera glides down the avenue and the card flips to show the logo and tagline                                                                           |
-| Mouse                                     | Gentle parallax on the camera and card                                                                                                                      |
-| Loading                                   | The page text and buttons load first. The 3D code (about 245 KB compressed) downloads only after the page has loaded and the browser is idle, then fades in |
-| Desktop (1024px+, mouse, 4+ cores, 4+ GB) | Full scene with the 3D card, which replaces the flat card                                                                                                   |
-| Phones and modest devices                 | Lighter scene (fewer buildings and particles, no 3D card, lower resolution); the flat card stays                                                            |
-| No 3D at all                              | Reduced-motion setting, Data Saver, no WebGL, or very weak devices: the plain hero from Phase 2                                                             |
-| Battery and CPU                           | Rendering stops while the hero is off screen or the tab is hidden                                                                                           |
-| Tuning                                    | Colours, building density, card size and scroll behaviour are at the top of each component in `HeroScene.tsx`                                               |
+| Item                                      | How it works                                                                                                                                                                                                                    |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Where                                     | One fixed 3D scene behind the whole site. Sections are see-through and text sits on frosted-glass panels                                                                                                                        |
+| Journey                                   | Scrolling the page flies the camera down a city avenue from the hero to Contact                                                                                                                                                 |
+| Hero                                      | Glossy 3D "live call" card (desktop): rounded corners, curved polished rim, clear-coat reflections and a moving light streak. Tilts with the mouse; as the hero scrolls away it flips to the logo and flies off down the avenue |
+| How we work                               | The camera passes through four glowing gates, one per step, while the section is on screen                                                                                                                                      |
+| Why us                                    | The city turns to night: dark sky, glowing windows                                                                                                                                                                              |
+| Mouse                                     | Gentle parallax on the camera and card                                                                                                                                                                                          |
+| Loading                                   | The page text and buttons load first. The 3D code (about 245 KB compressed) downloads only after the page has loaded and the browser is idle, then fades in                                                                     |
+| Desktop (1024px+, mouse, 4+ cores, 4+ GB) | Full scene with the 3D card, which replaces the flat card                                                                                                                                                                       |
+| Phones and modest devices                 | Lighter scene (fewer buildings and particles, no 3D card, lower resolution); the flat card stays                                                                                                                                |
+| No 3D at all                              | Reduced-motion setting, Data Saver, no WebGL, or very weak devices: normal solid sections (Phase 2 look)                                                                                                                        |
+| How the page adapts                       | `<html data-scene="high                                                                                                                                                                                                         | low">`is set when the scene is showing. CSS classes in`globals.css`: `scene-clear`(see-through section),`scene-panel`(glass panel),`scene-night`, `scene-hide`, `scene-only`, `scene-hide-card` |
+| Tuning                                    | Camera route (`PATH`), colours, building density and card behaviour are at the top of each component in `SiteScene.tsx`                                                                                                         |
 
 ## 9. Placeholders to replace before launch
 
@@ -233,3 +236,19 @@ recruitment data), and optionally one page per service for SEO.
   email app automatically. That was misleading (nothing is saved there) and did nothing on
   computers without an email app. It now says the details have not been sent yet and offers
   "Open email app" and "Copy details". On the real server the normal thank-you message shows.
+
+### Phase 4 update: 3D across the whole site, glossy card
+
+- Owner feedback: 3D on the whole site, not only the hero; the card looked flat and had
+  square corners.
+- The scene is now one fixed background for every section. Scroll flies the camera down the
+  avenue; gates sit at "How we work"; night falls at "Why us".
+- Sections became see-through with frosted-glass panels for text. Without 3D they keep their
+  solid backgrounds, and nothing shifts when the scene fades in.
+- New card: rounded faces (not just the body), curved polished rim, clear-coat reflections
+  from a studio environment, a light streak that sweeps across and follows the tilt.
+- Card size now follows the page layout, so it fits on wide screens (it was oversized and
+  cut off at 1892px).
+- Mouse parallax now works (it was not receiving mouse events before).
+- Verified: lint, typecheck, static build; browser checks at 1600px, 1892px and 390px, every
+  section scrolled; reduced motion falls back to solid sections; no horizontal scrolling.

@@ -25,7 +25,7 @@ const methods: {
 
 export function Contact() {
   return (
-    <section id="contact" className="bg-white py-20 sm:py-28">
+    <section id="contact" className="scene-clear bg-white py-20 sm:py-28">
       <Container>
         <div className="grid overflow-hidden rounded-[2rem] shadow-soft lg:grid-cols-[0.85fr_1.15fr]">
           <div className="bg-linear-to-br from-navy via-[#0a4580] to-brand-green-dark p-8 text-white sm:p-10">
