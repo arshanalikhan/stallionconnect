@@ -4,13 +4,14 @@ import { ButtonLink } from "@/components/ui/Button";
 import { QuoteButton } from "@/components/forms/FormDialogs";
 import { Container } from "@/components/ui/Container";
 import { Icon } from "@/components/ui/Icon";
+import { Hero3D } from "@/components/three/Hero3D";
 import { CallCard } from "./CallCard";
 
 export function Hero() {
   return (
     <section
       id="home"
-      className="relative overflow-hidden bg-linear-to-b from-[#eaf3fc] via-surface to-white pt-14 pb-20 sm:pt-20 sm:pb-28"
+      className="group/hero relative flex items-center overflow-hidden bg-linear-to-b from-[#eaf3fc] via-surface to-white pt-14 pb-20 sm:pt-20 sm:pb-28 lg:min-h-[calc(100svh-5rem)]"
     >
       {/* soft brand glows */}
       <div
@@ -21,6 +22,8 @@ export function Hero() {
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-48 -left-32 size-[460px] rounded-full bg-brand-green/10 blur-3xl"
       />
+
+      <Hero3D targetId="home" />
 
       <Container className="relative grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
@@ -52,7 +55,10 @@ export function Hero() {
           </ul>
         </div>
 
-        <CallCard />
+        {/* On desktops with the 3D scene, the 3D card replaces this one */}
+        <div className="transition-opacity duration-700 lg:group-data-[scene=high]/hero:pointer-events-none lg:group-data-[scene=high]/hero:opacity-0">
+          <CallCard />
+        </div>
       </Container>
     </section>
   );

@@ -7,7 +7,7 @@ end of every phase.
 - **Working branch:** `claude/modest-euler-dz9n9e`
 - **Live preview:** https://arshanalikhan.github.io/stallionconnect/ (GitHub Pages, static)
 - **Production (final phase):** Cloudflare Workers on `stallionconnect.in` (domain purchased)
-- **Last updated:** Phase 3
+- **Last updated:** Phase 4
 
 ---
 
@@ -82,6 +82,8 @@ src/components/sections/ homepage sections (Hero, Services, About, WhyUs, Proces
 src/content/home.ts      all homepage text, lists and numbers
 src/components/forms/    quote form, application form, dialogs, field components
 src/components/admin/    admin lead list
+src/components/three/    3D hero: Hero3D.tsx (loader and device checks), HeroScene.tsx
+                         (scene), textures.ts (card faces, building windows)
 src/lib/forms/           shared validation (schemas.ts) and submit logic
 src/lib/db/              data store: D1 (production) and in-memory (local dev)
 src/lib/admin-auth.ts    Cloudflare Access check for the admin
@@ -113,7 +115,21 @@ docs/                    Cloudflare deployment steps
 
 To try it locally: `npm run dev`, submit a form, then open http://localhost:3000/admin.
 
-## 8. Placeholders to replace before launch
+## 8. 3D hero
+
+| Item                                      | How it works                                                                                                                                                |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| What it shows                             | Light-blue city avenue, four green gates (the four process steps), floating particles, and on desktops a 3D "live call" card with orbiting connection nodes |
+| Scroll                                    | The camera glides down the avenue and the card flips to show the logo and tagline                                                                           |
+| Mouse                                     | Gentle parallax on the camera and card                                                                                                                      |
+| Loading                                   | The page text and buttons load first. The 3D code (about 245 KB compressed) downloads only after the page has loaded and the browser is idle, then fades in |
+| Desktop (1024px+, mouse, 4+ cores, 4+ GB) | Full scene with the 3D card, which replaces the flat card                                                                                                   |
+| Phones and modest devices                 | Lighter scene (fewer buildings and particles, no 3D card, lower resolution); the flat card stays                                                            |
+| No 3D at all                              | Reduced-motion setting, Data Saver, no WebGL, or very weak devices: the plain hero from Phase 2                                                             |
+| Battery and CPU                           | Rendering stops while the hero is off screen or the tab is hidden                                                                                           |
+| Tuning                                    | Colours, building density, card size and scroll behaviour are at the top of each component in `HeroScene.tsx`                                               |
+
+## 9. Placeholders to replace before launch
 
 | Item              | Where                              | Current value                                                          |
 | ----------------- | ---------------------------------- | ---------------------------------------------------------------------- |
@@ -124,7 +140,7 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 | Logo              | `src/assets/brand/`                | Raster cut from the supplied JPEG; replace with SVG or transparent PNG |
 | Privacy and Terms | `src/app/privacy`, `src/app/terms` | Placeholder text                                                       |
 
-## 9. Known issues
+## 10. Known issues
 
 - The logo only works on light backgrounds (its navy text disappears on dark). A white or
   single-colour version is needed if we ever place it on a dark section.
@@ -133,13 +149,15 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 - On the GitHub Pages preview the forms fall back to a pre-filled email, and there is no admin.
   Saving to the database and the admin panel start working once deployed to Cloudflare.
 - No email notification for new leads yet (deferred). Until then, check the admin panel.
+- The browser console shows a harmless `THREE.Clock` deprecation warning from React Three
+  Fiber. It goes away when the library updates.
 
-## 10. Next up
+## 11. Next up
 
-Phase 4: 3D scroll scene in the hero, loaded only after the page text appears, with a
-lightweight fallback for phones, slow devices and reduced-motion users.
+Phase 5: content pages. Privacy Policy and Terms (with DPDP Act coverage for form and
+recruitment data), and optionally one page per service for SEO.
 
-## 11. Phase log
+## 12. Phase log
 
 ### Phase 1: Foundation (done)
 
@@ -192,3 +210,18 @@ lightweight fallback for phones, slow devices and reduced-motion users.
 - Verified: lint, typecheck, production and static builds; browser tests for both forms,
   dialogs, validation, admin status/note updates, filters, CSV; production build returns 401
   for the admin and API without login; preview fallback tested.
+
+### Phase 4: 3D hero (done)
+
+- Three.js scene behind the hero, built with React Three Fiber: city skyline (instanced, so
+  it is cheap to draw), four glowing process gates, particles, and a 3D "live call" card with
+  orbiting nodes on desktop.
+- Scroll moves the camera down the avenue and flips the card to the logo and tagline; the
+  mouse adds parallax.
+- Headline, text and buttons stay as real HTML on top (good for SEO and accessibility),
+  with a soft white overlay for readability.
+- Loads after the page and only on capable devices; lighter mode for phones; plain hero for
+  reduced motion, Data Saver, no WebGL or weak hardware; pauses when off screen.
+- Hero now fills the first screen on desktops.
+- Verified: lint, typecheck, static build; rendered in a browser at desktop and phone sizes;
+  reduced-motion users get no canvas; the 3D code is not in the initial page load.
