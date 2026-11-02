@@ -102,16 +102,16 @@ docs/                    Cloudflare deployment steps
 
 ## 7. Forms and admin
 
-| Item                 | How it works                                                                                                                               |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Quote form           | On the Contact section and in a pop-up from every "Get a Quote" and "Enquire" button (service pre-selected)                                |
-| Application form     | Pop-up from "Apply" buttons in Careers (role pre-selected). No CV upload; applicants email CVs to careers@                                 |
-| Validation           | Same rules in the browser and on the server (`src/lib/forms/schemas.ts`)                                                                   |
-| Spam                 | Hidden honeypot field now; Turnstile later                                                                                                 |
-| Storage              | Cloudflare D1 in production; in-memory while running `npm run dev` (resets on restart)                                                     |
-| Admin                | `/admin`: two tabs, filter by status, change status (new, contacted, closed), private notes, CSV download, quick email/call/WhatsApp links |
-| Admin login          | Cloudflare Access in production. Open without login only in `npm run dev`. Locked everywhere else                                          |
-| GitHub Pages preview | No server there, so the forms open a pre-filled email to info@ or careers@ instead, and `/admin` does not exist                            |
+| Item                 | How it works                                                                                                                                                                                                                     |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Quote form           | On the Contact section and in a pop-up from every "Get a Quote" and "Enquire" button (service pre-selected)                                                                                                                      |
+| Application form     | Pop-up from "Apply" buttons in Careers (role pre-selected). No CV upload; applicants email CVs to careers@                                                                                                                       |
+| Validation           | Same rules in the browser and on the server (`src/lib/forms/schemas.ts`)                                                                                                                                                         |
+| Spam                 | Hidden honeypot field now; Turnstile later                                                                                                                                                                                       |
+| Storage              | Cloudflare D1 in production; in-memory while running `npm run dev` (resets on restart)                                                                                                                                           |
+| Admin                | `/admin`: two tabs, filter by status, change status (new, contacted, closed), private notes, CSV download, quick email/call/WhatsApp links                                                                                       |
+| Admin login          | Cloudflare Access in production. Open without login only in `npm run dev`. Locked everywhere else                                                                                                                                |
+| GitHub Pages preview | No server or database there, so nothing is saved. After submitting, the visitor sees "One more step: send it by email" with their details, an "Open email app" button and a "Copy details" button. `/admin` does not exist there |
 
 To try it locally: `npm run dev`, submit a form, then open http://localhost:3000/admin.
 
@@ -146,7 +146,8 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
   single-colour version is needed if we ever place it on a dark section.
 - GitHub Pages deploys occasionally hang on GitHub's side ("Deploying" for a long time). Fix:
   push again, or cancel the stuck "pages build and deployment" run in Actions and re-run it.
-- On the GitHub Pages preview the forms fall back to a pre-filled email, and there is no admin.
+- On the GitHub Pages preview nothing is saved: the forms ask the visitor to send their details
+  by email (Open email app or Copy details), and there is no admin.
   Saving to the database and the admin panel start working once deployed to Cloudflare.
 - No email notification for new leads yet (deferred). Until then, check the admin panel.
 - The browser console shows a harmless `THREE.Clock` deprecation warning from React Three
@@ -225,3 +226,10 @@ recruitment data), and optionally one page per service for SEO.
 - Hero now fills the first screen on desktops.
 - Verified: lint, typecheck, static build; rendered in a browser at desktop and phone sizes;
   reduced-motion users get no canvas; the 3D code is not in the initial page load.
+
+### Fix after Phase 4: clearer form message on the preview
+
+- On GitHub Pages the form used to say "Thank you, we have your enquiry" and try to open the
+  email app automatically. That was misleading (nothing is saved there) and did nothing on
+  computers without an email app. It now says the details have not been sent yet and offers
+  "Open email app" and "Copy details". On the real server the normal thank-you message shows.
