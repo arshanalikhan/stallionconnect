@@ -38,13 +38,13 @@ export function Header() {
       <Container className="flex items-center justify-between gap-4">
         <Logo priority />
 
-        <nav aria-label="Main" className="hidden lg:block">
+        <nav aria-label="Main" className="hidden xl:block">
           <ul className="flex items-center gap-7 font-medium text-ink">
             {site.nav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="relative py-1.5 after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-brand-green after:transition-all hover:text-navy hover:after:w-full"
+                  className="relative py-1.5 whitespace-nowrap after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-brand-green after:transition-all hover:text-navy hover:after:w-full"
                 >
                   {item.label}
                 </Link>
@@ -59,7 +59,7 @@ export function Header() {
           </ButtonLink>
           <button
             type="button"
-            className="relative size-11 rounded-lg lg:hidden"
+            className="relative size-11 rounded-lg xl:hidden"
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="mobile-menu"
@@ -91,7 +91,7 @@ export function Header() {
         id="mobile-menu"
         aria-label="Mobile"
         hidden={!open}
-        className="border-t border-line bg-white lg:hidden"
+        className="border-t border-line bg-white xl:hidden"
       >
         <Container>
           <ul className="flex flex-col py-3">

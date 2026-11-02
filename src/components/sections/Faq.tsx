@@ -1,0 +1,29 @@
+import { faq } from "@/content/home";
+import { Container } from "@/components/ui/Container";
+import { Heading } from "@/components/ui/Heading";
+
+export function Faq() {
+  return (
+    <section id="faq" className="bg-surface py-20 sm:py-28">
+      <Container className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+        <Heading eyebrow={faq.eyebrow} title={faq.title} highlight={faq.highlight} />
+        <div className="divide-y divide-line rounded-card border border-line bg-white px-6">
+          {faq.items.map((item) => (
+            <details key={item.q} className="group py-5">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-6 font-semibold text-navy [&::-webkit-details-marker]:hidden">
+                {item.q}
+                <span
+                  aria-hidden="true"
+                  className="text-2xl leading-none text-brand-green transition group-open:rotate-45"
+                >
+                  +
+                </span>
+              </summary>
+              <p className="mt-3 text-muted">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}

@@ -7,7 +7,7 @@ end of every phase.
 - **Working branch:** `claude/modest-euler-dz9n9e`
 - **Live preview:** https://arshanalikhan.github.io/stallionconnect/ (GitHub Pages, static)
 - **Production (final phase):** Cloudflare Workers on `stallionconnect.in` (domain purchased)
-- **Last updated:** Phase 1
+- **Last updated:** Phase 2
 
 ---
 
@@ -73,8 +73,10 @@ One-time setting (done by the owner): repository **Settings > Pages > Deploy fro
 ```
 src/app/                 routes, root layout, global styles (brand tokens), favicon
 src/components/layout/   Header, Footer, Logo, WhatsAppButton
-src/components/ui/       Button, Container, Section
-src/components/sections/ homepage sections (Phase 2)
+src/components/ui/       Button, Container, Section, Heading, Icon, Reveal
+src/components/sections/ homepage sections (Hero, Services, About, WhyUs, Process,
+                         Industries, Careers, Faq, Contact, plus CallCard and CountUp)
+src/content/home.ts      all homepage text, lists and numbers
 src/config/site.ts       business details, WhatsApp number, navigation
 src/assets/brand/        logo files
 docs/                    Cloudflare deployment steps
@@ -82,7 +84,9 @@ docs/                    Cloudflare deployment steps
 
 ## 6. Editing content
 
+- **Homepage text, services, stats, job openings, FAQ:** `src/content/home.ts`
 - **Contact details, WhatsApp, nav:** `src/config/site.ts`
+- **Icons:** add a path to `src/components/ui/Icon.tsx`, then use its name in the content file
 - **Brand colours and fonts:** top of `src/app/globals.css`
 
 ## 7. Placeholders to replace before launch
@@ -100,10 +104,17 @@ docs/                    Cloudflare deployment steps
 
 - The logo has a white background, so it shows as a white box on the light-grey footer.
   Fix: supply an SVG or transparent PNG.
+- "Get a Quote" buttons currently open an email to info@. Phase 3 replaces this with the
+  quote form.
 - Forms and the admin panel (Phase 3) cannot work on GitHub Pages, which only serves static
   files. They will work once deployed to Cloudflare.
 
-## 9. Phase log
+## 9. Next up
+
+Phase 3: quote form (on the page and in a dialog from every "Get a Quote" button), careers
+enquiry form, API routes written for Cloudflare D1, and an admin panel to view leads.
+
+## 10. Phase log
 
 ### Phase 1: Foundation (done)
 
@@ -116,3 +127,18 @@ docs/                    Cloudflare deployment steps
   `docs/cloudflare-deployment.md`.
 - GitHub Pages preview workflow added.
 - Verified: lint, typecheck and static build pass; no browser errors on desktop or mobile.
+
+### Phase 2: Static site (done)
+
+- All homepage sections built: Hero (with animated "live call" card), Services (8 cards),
+  About (mission, vision, animated stats), Why us (6 points, dark section), How we work
+  (4 steps), Industries (8 sectors), Careers (6 openings, apply by email), FAQ (5 questions),
+  Contact (email, phone, WhatsApp, hours, office).
+- All text moved into `src/content/home.ts` so copy can be changed without touching layout.
+- Scroll reveal and count-up animations; both respect "reduce motion" and work without JS.
+- Careers: each opening has an "Apply by email" button that opens a pre-filled email to
+  careers@ (no CV upload, as decided).
+- FAQ link added to the navigation. The full menu shows from 1280px wide; smaller screens use
+  the menu button.
+- Verified: lint, typecheck and static build pass; no console errors and no horizontal
+  scrolling at 1366px, 1024px and 390px wide.

@@ -29,6 +29,7 @@ export const site = {
     { label: "How we work", href: "/#process" },
     { label: "Industries", href: "/#industries" },
     { label: "Careers", href: "/#careers" },
+    { label: "FAQ", href: "/#faq" },
     { label: "Contact", href: "/#contact" },
   ],
 } as const;
