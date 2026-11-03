@@ -6,7 +6,7 @@ import { Reveal } from "@/components/ui/Reveal";
 
 export function Industries() {
   return (
-    <section id="industries" className="scene-clear bg-mint/60 py-20 sm:py-28">
+    <section id="industries" className="scene-clear scene-window bg-mint/60 py-20 sm:py-28">
       <Container className="card-lane-right">
         <Heading {...industries} panel />
         <ul className="lane-2col mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">

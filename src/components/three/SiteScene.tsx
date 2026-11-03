@@ -298,6 +298,22 @@ const streak = {
  * resting places as the page scrolls (see `stops`).
  */
 /**
+ * Phones and tablets: every section opens with an empty "window" at the top
+ * (`.scene-window` / `.scene-hero` in globals.css). The card rests centred in
+ * that window, then the section content scrolls up over it.
+ */
+function mobileStops(vw: number, vh: number): Stop[] {
+  const w = Math.min(vw * 0.68, 340);
+  const tilt = 0.22;
+  return Array.from({ length: 9 }, (_, i) => ({
+    x: i === 8 ? vw + 300 : vw / 2,
+    y: i === 0 ? vh * 0.27 : vh * 0.33,
+    w,
+    yaw: i * Math.PI + (i % 2 ? tilt : -tilt),
+  }));
+}
+
+/**
  * Where the card rests in each section, in CSS pixels on screen, plus its turn
  * (yaw). These are the positions seen when a section starts (its top near the
  * top of the screen). Between sections it glides and turns to the next one,
@@ -307,6 +323,7 @@ const streak = {
  */
 type Stop = { x: number; y: number; w: number; yaw: number };
 function stops(vw: number, vh: number): Stop[] {
+  if (vw < 1024) return mobileStops(vw, vh);
   const c = Math.min(vw, 1280) - 64; // container width
   const left = (vw - c) / 2;
   const right = left + c;
@@ -597,7 +614,7 @@ export default function SiteScene({ quality, state, onReady }: Props) {
       <Skyline quality={quality} />
       <Gates state={state} />
       <Particles count={high ? 500 : 220} />
-      {high && <GlossyCard state={state} />}
+      <GlossyCard state={state} />
       <Ready onReady={onReady} />
     </Canvas>
   );

@@ -7,10 +7,10 @@ import { QuoteButton } from "@/components/forms/FormDialogs";
 
 export function Services() {
   return (
-    <section id="services" className="scene-clear bg-white py-20 sm:py-28">
+    <section id="services" className="scene-clear scene-window bg-white py-20 sm:py-28">
       <Container>
         <Heading {...services} panel />
-        <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="m-rail mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {services.items.map((s, i) => {
             const custom = s.id === "custom";
             return (

@@ -7,7 +7,7 @@ export function WhyUs() {
   return (
     <section
       id="why-us"
-      className="scene-night relative overflow-hidden bg-linear-to-br from-navy-deep via-navy to-[#03306b] py-20 sm:py-28"
+      className="scene-night scene-window relative overflow-hidden bg-linear-to-br from-navy-deep via-navy to-[#03306b] py-20 sm:py-28"
     >
       <div
         aria-hidden="true"
@@ -15,7 +15,7 @@ export function WhyUs() {
       />
       <Container className="relative">
         <Heading {...whyUs} tone="dark" />
-        <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="m-rail mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {whyUs.items.map((item, i) => (
             <Reveal as="li" key={item.title} delay={(i % 3) * 80}>
               <div className="h-full rounded-card border border-white/15 bg-navy-deep/65 p-6 backdrop-blur-md transition duration-300 hover:border-brand-green-light/50">

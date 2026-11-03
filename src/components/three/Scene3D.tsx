@@ -91,7 +91,8 @@ export function Scene3D() {
       // in a short window just before each section starts, so by the time a
       // section's top reaches the upper part of the screen the card has
       // already settled in that section's position.
-      const line = window.scrollY + vh * 0.4;
+      // Phones: settle earlier, while the section's top window is on screen.
+      const line = window.scrollY + vh * (window.innerWidth < 1024 ? 0.22 : 0.4);
       const tops = SECTION_IDS.map((id) => {
         const el = document.getElementById(id);
         return el ? el.getBoundingClientRect().top + window.scrollY : 0;

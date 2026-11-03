@@ -10,7 +10,7 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="scene-clear relative flex items-center overflow-hidden bg-linear-to-b from-[#eaf3fc] via-surface to-white pt-32 pb-20 sm:pt-36 sm:pb-28 lg:min-h-svh"
+      className="scene-clear scene-hero relative flex items-center overflow-hidden bg-linear-to-b from-[#eaf3fc] via-surface to-white pt-32 pb-20 sm:pt-36 sm:pb-28 lg:min-h-svh"
     >
       {/* soft brand glows */}
       <div

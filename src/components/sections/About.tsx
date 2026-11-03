@@ -6,7 +6,7 @@ import { CountUp } from "./CountUp";
 
 export function About() {
   return (
-    <section id="about" className="scene-clear bg-surface py-20 sm:py-28">
+    <section id="about" className="scene-clear scene-window bg-surface py-20 sm:py-28">
       <Container className="card-lane-left lane-1col grid items-start gap-12 lg:grid-cols-2">
         <Reveal className="scene-panel">
           <Heading eyebrow={about.eyebrow} title={about.title} highlight={about.highlight} />

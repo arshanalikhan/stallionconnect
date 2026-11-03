@@ -222,10 +222,52 @@ html[data-scene] .scene-panel {
 .scene-hide-card {
   transition: opacity 0.7s;
 }
-@media (min-width: 1024px) {
-  html[data-scene="high"] .scene-hide-card {
-    opacity: 0;
-    pointer-events: none;
+html[data-scene] .scene-hide-card {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/*
+ * Phones and tablets with the 3D scene: each section opens with an empty
+ * window where the 3D card and city show, and long lists become swipeable
+ * rows so sections stay short and the scene stays visible.
+ */
+@media (max-width: 1023px) {
+  html[data-scene] .scene-hide-card {
+    display: none;
+  }
+  html[data-scene] .scene-hero {
+    padding-top: calc(6rem + 34svh);
+  }
+  html[data-scene] .scene-window {
+    padding-top: calc(3rem + 40svh);
+  }
+  html[data-scene] .m-rail {
+    display: flex;
+    gap: 0.875rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    margin-inline: -1rem;
+    padding: 0.25rem 1rem 1rem;
+    scroll-padding-inline: 1rem;
+    scrollbar-width: none;
+  }
+  html[data-scene] .m-rail::-webkit-scrollbar {
+    display: none;
+  }
+  html[data-scene] .m-rail > * {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+  }
+}
+@media (max-width: 639px) {
+  /* Slightly smaller type and padding so sections are compact on phones. */
+  html[data-scene] .scene-panel h2 {
+    font-size: 1.75rem;
+  }
+  html[data-scene] .scene-glass-text {
+    font-size: 15px;
   }
 }
 
@@ -393,6 +435,8 @@ html.custom-cursor :is(input:not([type="checkbox"]):not([type="radio"]), textare
   animation: fd-fade 0.4s ease-out;
 }
 .fd {
+  max-height: 94svh;
+  overflow-y: auto;
   --brand-w: 40%;
   --ease: cubic-bezier(0.65, 0, 0.35, 1);
   position: relative;
@@ -444,11 +488,16 @@ html.custom-cursor :is(input:not([type="checkbox"]):not([type="radio"]), textare
     top: 0;
     padding: 3rem 2.75rem;
   }
+  .fd {
+    overflow: hidden;
+  }
   .fd-form {
+    max-height: 94svh;
+    overflow-y: auto;
     transition: margin-left 0.9s var(--ease);
   }
   .fd-form-inner {
-    padding: 3rem 2.75rem 2.5rem;
+    padding: 2.5rem 2.75rem 2rem;
   }
   .fd[data-mode="quote"] .fd-brand {
     left: 0;
@@ -529,4 +578,30 @@ html.custom-cursor :is(input:not([type="checkbox"]):not([type="radio"]), textare
     opacity: 1;
     transform: none;
   }
+}
+
+/* Slim scrollbar that sits inside the rounded card, clear of its corners. */
+.fd,
+.fd-form {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(1 43 117 / 0.22) transparent;
+  overscroll-behavior: contain;
+}
+.fd::-webkit-scrollbar,
+.fd-form::-webkit-scrollbar {
+  width: 6px;
+}
+.fd::-webkit-scrollbar-track,
+.fd-form::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 28px 0;
+}
+.fd::-webkit-scrollbar-thumb,
+.fd-form::-webkit-scrollbar-thumb {
+  background: rgb(1 43 117 / 0.22);
+  border-radius: 9999px;
+}
+.fd::-webkit-scrollbar-thumb:hover,
+.fd-form::-webkit-scrollbar-thumb:hover {
+  background: rgb(1 43 117 / 0.4);
 }

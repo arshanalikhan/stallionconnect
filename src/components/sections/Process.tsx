@@ -5,11 +5,11 @@ import { Reveal } from "@/components/ui/Reveal";
 
 export function Process() {
   return (
-    <section id="process" className="scene-clear bg-white py-20 sm:py-28">
+    <section id="process" className="scene-clear scene-window bg-white py-20 sm:py-28">
       <Container>
         <Heading {...process} align="center" panel />
         <div className="mt-14">
-          <ol className="scene-panel relative grid gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
+          <ol className="scene-panel relative grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4 lg:gap-6">
             {/* connecting line on large screens */}
             <span
               aria-hidden="true"

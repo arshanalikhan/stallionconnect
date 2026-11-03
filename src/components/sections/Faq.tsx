@@ -4,7 +4,7 @@ import { Heading } from "@/components/ui/Heading";
 
 export function Faq() {
   return (
-    <section id="faq" className="scene-clear bg-surface py-20 sm:py-28">
+    <section id="faq" className="scene-clear scene-window bg-surface py-20 sm:py-28">
       <Container className="card-lane-right lane-1col grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
         <Heading eyebrow={faq.eyebrow} title={faq.title} highlight={faq.highlight} panel />
         <div className="gloss divide-y divide-line rounded-card border border-line/80 bg-white/95 px-6 shadow-soft">

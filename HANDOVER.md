@@ -355,3 +355,16 @@ recruitment data), and optionally one page per service for SEO.
 - Phones: the brand side stacks on top as a compact header.
 - Code: `src/components/forms/FormDialogs.tsx` (content in `brandCopy`), styles `.fd-*` in
   `globals.css`. The forms themselves, validation and saving are unchanged.
+
+### Update: 3D on phones, form card scrolling
+
+- Phones and tablets now get the 3D card too. Every section opens with an empty "window"
+  at the top (`.scene-window`, `.scene-hero` in `globals.css`) where the card rests centred
+  over the city, turning between the call and the logo from section to section; the content
+  follows below. At Contact it slides away.
+- Long lists become swipeable rows on phones (`.m-rail`: Services, Why us, Careers openings);
+  How we work shows two steps per row. Sections are shorter and the scene stays visible.
+- These rules only apply when the 3D scene is showing; without it the normal phone layout
+  is used.
+- Quote/Apply card: the browser's scrollbar no longer appears outside the card. Only the
+  form side scrolls, with a slim rounded scrollbar inside the card; slightly tighter spacing.

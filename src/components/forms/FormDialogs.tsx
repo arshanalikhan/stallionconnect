@@ -81,7 +81,7 @@ export function FormDialogProvider({ children }: { children: React.ReactNode }) 
         aria-labelledby="form-dialog-title"
         onClose={() => setCurrent(null)}
         onClick={(e) => e.target === e.currentTarget && close()}
-        className="fd-dialog m-auto max-h-[94svh] w-[min(1060px,calc(100%-1.5rem))] overflow-y-auto overscroll-contain rounded-[2rem] bg-transparent p-0 backdrop:bg-navy-deep/60 backdrop:backdrop-blur-md"
+        className="fd-dialog m-auto max-h-[94svh] w-[min(1060px,calc(100%-1.5rem))] overflow-hidden rounded-[2rem] bg-transparent p-0 backdrop:bg-navy-deep/60 backdrop:backdrop-blur-md"
       >
         {current && (
           <div key={version} className="fd" data-mode={mode} data-enter={current.type}>
