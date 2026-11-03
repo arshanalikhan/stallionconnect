@@ -26,20 +26,20 @@ end of every phase.
 
 ## 2. Decisions so far
 
-| Topic             | Decision                                                                | Reason                                                    |
-| ----------------- | ----------------------------------------------------------------------- | --------------------------------------------------------- |
-| Framework         | Next.js 16 (App Router) + TypeScript                                    | SEO-friendly, API routes for forms, grows into more pages |
-| Styling           | Tailwind CSS v4 with brand tokens                                       | Fast to build, consistent colours                         |
-| Fonts             | Plus Jakarta Sans (headings, buttons) and Inter (body), via `next/font` | Clean, professional, self-hosted at build time            |
-| Production host   | Cloudflare (Workers, D1, Access), free tier                             | Owner's first preference; one account for everything      |
-| Preview host      | GitHub Pages via Actions                                                | Cloudflare deferred until the final phase                 |
-| Careers           | Listings + application details form, **no CV upload**; CVs go by email  | Owner's choice                                            |
-| WhatsApp          | Floating chat button on every page                                      | Owner asked for it                                        |
-| Admin panel       | Yes, protected by Cloudflare Access                                     | Owner asked for it                                        |
-| Deferred to later | Spam protection (Turnstile), email notifications, CMS                   | Owner's choice                                            |
-| Content           | Placeholder text and numbers for now                                    | Owner will edit text after the build                      |
-| `cacheComponents` | Off                                                                     | Hangs on the Cloudflare Workers runtime                   |
-| Images            | Pre-compressed WebP, imported statically, unoptimised                   | Free tier, and works under the Pages sub-path             |
+| Topic             | Decision                                                                                                                                                                                                                                                                   | Reason                                                    |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Framework         | Next.js 16 (App Router) + TypeScript                                                                                                                                                                                                                                       | SEO-friendly, API routes for forms, grows into more pages |
+| Styling           | Tailwind CSS v4 with brand tokens                                                                                                                                                                                                                                          | Fast to build, consistent colours                         |
+| Fonts             | Plus Jakarta Sans (headings, buttons), Inter (body), Instrument Serif italic (highlighted words in headings, Times-style), Dancing Script (tagline, cursive). Loaded via `next/font` in `layout.tsx`; accent classes `.accent-serif` and `.accent-script` in `globals.css` | Clean and professional, with elegant accents for focus    |
+| Production host   | Cloudflare (Workers, D1, Access), free tier                                                                                                                                                                                                                                | Owner's first preference; one account for everything      |
+| Preview host      | GitHub Pages via Actions                                                                                                                                                                                                                                                   | Cloudflare deferred until the final phase                 |
+| Careers           | Listings + application details form, **no CV upload**; CVs go by email                                                                                                                                                                                                     | Owner's choice                                            |
+| WhatsApp          | Floating chat button on every page                                                                                                                                                                                                                                         | Owner asked for it                                        |
+| Admin panel       | Yes, protected by Cloudflare Access                                                                                                                                                                                                                                        | Owner asked for it                                        |
+| Deferred to later | Spam protection (Turnstile), email notifications, CMS                                                                                                                                                                                                                      | Owner's choice                                            |
+| Content           | Placeholder text and numbers for now                                                                                                                                                                                                                                       | Owner will edit text after the build                      |
+| `cacheComponents` | Off                                                                                                                                                                                                                                                                        | Hangs on the Cloudflare Workers runtime                   |
+| Images            | Pre-compressed WebP, imported statically, unoptimised                                                                                                                                                                                                                      | Free tier, and works under the Pages sub-path             |
 
 ## 3. How to run
 
@@ -322,3 +322,20 @@ recruitment data), and optionally one page per service for SEO.
 - Card motion now matches the prototype: per-section resting places with a glide and turn
   between them (replacing the bottom-right widget). About, Industries and FAQ leave room on
   one side for the large card on desktop.
+
+### Update: smooth navbar, card placement, gloss, accent fonts
+
+- Navbar is now fixed over the page (the band/line behind it at the top is gone). It glides
+  between states with one smooth easing: wide and transparent over the hero, then a narrower
+  glossy pill after scrolling; it tucks away when scrolling down through content and slides
+  back on any scroll up. A glossy pill glides between menu items to show the current section.
+  (The reference site linked by the owner could not be opened from the build environment, so
+  this follows the common pattern; easy to tune in `Header.tsx` and `.nav-ease`.)
+- Card: settles into each section's spot before the section starts, so every section opens
+  with the card at rest: beside the heading (Services, Why us, How we work) or in a free lane
+  (About on the left; Industries, Careers, FAQ on the right). At Contact it slides off so the
+  form has the full width. Careers now leaves a right lane on desktop.
+- Gloss: cards and panels have a bright inner top edge and a soft diagonal light reflection
+  (`.gloss`), glass panels have a sheen, buttons have a glossy gradient.
+- Accent fonts: highlighted words in headings use Instrument Serif italic; the tagline uses
+  Dancing Script (cursive).

@@ -10,7 +10,7 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="scene-clear relative flex items-center overflow-hidden bg-linear-to-b from-[#eaf3fc] via-surface to-white pt-14 pb-20 sm:pt-20 sm:pb-28 lg:min-h-[calc(100svh-5rem)]"
+      className="scene-clear relative flex items-center overflow-hidden bg-linear-to-b from-[#eaf3fc] via-surface to-white pt-32 pb-20 sm:pt-36 sm:pb-28 lg:min-h-svh"
     >
       {/* soft brand glows */}
       <div
@@ -37,9 +37,11 @@ export function Hero() {
             {hero.badge}
           </p>
           <h1 className="text-[2.6rem] leading-[1.05] font-extrabold tracking-[-0.035em] sm:text-6xl lg:text-[4.25rem]">
-            {hero.title} <span className="text-brand-green">{hero.highlight}</span>
+            {hero.title} <span className="accent-serif text-brand-green">{hero.highlight}</span>
           </h1>
-          <p className="mt-5 font-display text-lg font-semibold text-royal">{site.tagline}</p>
+          <p className="accent-script mt-4 text-[1.75rem] leading-tight text-royal">
+            {site.tagline}
+          </p>
           <p className="scene-glass-text mt-4 max-w-xl text-[17px] leading-relaxed text-[#2b3f57]">
             {hero.intro}
           </p>

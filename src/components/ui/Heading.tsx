@@ -44,7 +44,11 @@ export function Heading({
       <h2 className={cn("text-3xl font-bold sm:text-4xl lg:text-[2.6rem]", dark && "text-white")}>
         {title}{" "}
         {highlight && (
-          <span className={dark ? "text-brand-green-light" : "text-brand-green"}>{highlight}</span>
+          <span
+            className={cn("accent-serif", dark ? "text-brand-green-light" : "text-brand-green")}
+          >
+            {highlight}
+          </span>
         )}
       </h2>
       {intro && (

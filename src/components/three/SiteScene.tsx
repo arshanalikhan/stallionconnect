@@ -298,10 +298,12 @@ const streak = {
  * resting places as the page scrolls (see `stops`).
  */
 /**
- * Where the card rests in each section, in CSS pixels relative to the screen
- * and the page container, plus its turn (yaw). Between sections it glides from
- * one resting place to the next, turning as it goes, so the call side and the
- * logo side take turns facing you. Sections leave room for it on that side.
+ * Where the card rests in each section, in CSS pixels on screen, plus its turn
+ * (yaw). These are the positions seen when a section starts (its top near the
+ * top of the screen). Between sections it glides and turns to the next one,
+ * so the call side and the logo side take turns facing you. Each spot is a
+ * free area of that section's layout: the heading row's empty side, or a
+ * column the section leaves open on desktop (card lanes in globals.css).
  */
 type Stop = { x: number; y: number; w: number; yaw: number };
 function stops(vw: number, vh: number): Stop[] {
@@ -309,17 +311,28 @@ function stops(vw: number, vh: number): Stop[] {
   const left = (vw - c) / 2;
   const right = left + c;
   const PI = Math.PI;
-  const big = (share: number, max: number) => Math.min(c * share, max);
+  const lane = (share: number) => Math.min(c * share, 500); // card width in a lane
+  const side = (share: number) => Math.min(c * share, 400); // beside a heading
+  const tilt = 0.22; // slight angle at rest so it reads as 3D
   return [
-    { x: vw / 2 + c * 0.27, y: vh * 0.52, w: big(0.4, 540), yaw: -0.3 }, // home: right column
-    { x: right - c * 0.13, y: vh * 0.3, w: c * 0.2, yaw: PI + 0.35 }, // services: small, top right
-    { x: left + c * 0.22, y: vh * 0.52, w: big(0.36, 480), yaw: 2 * PI - 0.35 }, // about: large, left
-    { x: right - c * 0.13, y: vh * 0.28, w: c * 0.2, yaw: 3 * PI + 0.35 }, // why us: small, top right
-    { x: right - c * 0.12, y: vh * 0.26, w: c * 0.18, yaw: 4 * PI - 0.35 }, // process: small, top right
-    { x: right - c * 0.2, y: vh * 0.52, w: big(0.34, 460), yaw: 5 * PI + 0.35 }, // industries: large, right
-    { x: right - c * 0.13, y: vh * 0.3, w: c * 0.2, yaw: 6 * PI - 0.35 }, // careers: small, top right
-    { x: right - c * 0.2, y: vh * 0.52, w: big(0.32, 440), yaw: 7 * PI + 0.35 }, // faq: large, right
-    { x: right - c * 0.2, y: vh * 0.52, w: big(0.32, 440), yaw: 8 * PI - 0.35 }, // contact
+    // home: right column of the hero
+    { x: vw / 2 + c * 0.27, y: vh * 0.5, w: Math.min(c * 0.4, 540), yaw: -tilt },
+    // services: beside the heading, right
+    { x: right - c * 0.2, y: vh * 0.34, w: side(0.3), yaw: PI + tilt },
+    // about: left lane
+    { x: left + c * 0.2, y: vh * 0.48, w: lane(0.34), yaw: 2 * PI - tilt },
+    // why us: beside the heading, right
+    { x: right - c * 0.2, y: vh * 0.32, w: side(0.3), yaw: 3 * PI + tilt },
+    // how we work: beside the centred heading, right
+    { x: right - c * 0.1, y: vh * 0.3, w: side(0.19), yaw: 4 * PI - tilt },
+    // industries: right lane
+    { x: right - c * 0.19, y: vh * 0.48, w: lane(0.32), yaw: 5 * PI + tilt },
+    // careers: right lane
+    { x: right - c * 0.19, y: vh * 0.48, w: lane(0.32), yaw: 6 * PI - tilt },
+    // faq: right lane
+    { x: right - c * 0.19, y: vh * 0.48, w: lane(0.32), yaw: 7 * PI + tilt },
+    // contact: the form fills the width, so the card slides away to the right
+    { x: vw + 420, y: vh * 0.4, w: lane(0.32), yaw: 8 * PI - tilt },
   ];
 }
 
@@ -413,9 +426,11 @@ function GlossyCard({ state }: { state: React.RefObject<SceneState> }) {
     const ts = ((mix("w") / s.vw) * 2 * halfW) / CARD_W;
 
     // Glide rather than snap.
-    h.position.set(damp(h.position.x, tx, 4, dt), damp(h.position.y, ty, 4, dt), -dist);
-    h.scale.setScalar(damp(h.scale.x || ts, ts, 4, dt));
-    c.rotation.y = damp(c.rotation.y, mix("yaw") + s.mx * 0.3, 4, dt);
+    h.position.set(damp(h.position.x, tx, 6, dt), damp(h.position.y, ty, 6, dt), -dist);
+    h.scale.setScalar(damp(h.scale.x || ts, ts, 6, dt));
+    // Off screen at the end of the page: stop drawing it.
+    h.visible = mix("x") < s.vw + 300;
+    c.rotation.y = damp(c.rotation.y, mix("yaw") + s.mx * 0.15, 6, dt);
     c.rotation.x = damp(c.rotation.x, 0.08 - s.my * 0.2 + Math.sin(t * 0.8) * 0.03, 5, dt);
     c.rotation.z = Math.sin(t * 0.6) * 0.02;
     c.position.y = Math.sin(t * 1.1) * 0.07;

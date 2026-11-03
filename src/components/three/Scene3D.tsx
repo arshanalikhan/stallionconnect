@@ -87,20 +87,24 @@ export function Scene3D() {
         ];
       }
       // No veil over the hero (it has its own readability gradient), none at night.
-      // Where we are between section centres (drives the card's resting places).
-      const mid = window.scrollY + vh / 2;
-      const centres = SECTION_IDS.map((id) => {
+      // Which section's resting place the card should be at. The card moves only
+      // in a short window just before each section starts, so by the time a
+      // section's top reaches the upper part of the screen the card has
+      // already settled in that section's position.
+      const line = window.scrollY + vh * 0.4;
+      const tops = SECTION_IDS.map((id) => {
         const el = document.getElementById(id);
-        return el ? el.getBoundingClientRect().top + window.scrollY + el.offsetHeight / 2 : 0;
+        return el ? el.getBoundingClientRect().top + window.scrollY : 0;
       });
       let i = 0;
-      while (i < centres.length - 1 && mid > centres[i + 1]) i++;
-      const span = (centres[i + 1] ?? centres[i]) - centres[i];
-      s.sec =
-        i +
-        (i < centres.length - 1 && span > 0
-          ? Math.min(1, Math.max(0, (mid - centres[i]) / span))
-          : 0);
+      while (i < tops.length - 1 && line >= tops[i + 1]) i++;
+      if (i >= tops.length - 1) {
+        s.sec = tops.length - 1;
+      } else {
+        const next = tops[i + 1];
+        const win = Math.min(vh * 0.55, (next - tops[i]) * 0.6);
+        s.sec = i + Math.min(1, Math.max(0, (line - (next - win)) / win));
+      }
       if (veil.current)
         veil.current.style.opacity = String(Math.min(1, s.hero * 1.6) * (1 - s.night));
     };

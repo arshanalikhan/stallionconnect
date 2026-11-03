@@ -19,7 +19,7 @@ export function Services() {
                   className={
                     custom
                       ? "flex h-full flex-col rounded-card bg-linear-to-br from-navy to-brand-green-dark p-6 text-white shadow-soft"
-                      : "group flex h-full flex-col rounded-card border border-line/80 bg-white/95 p-6 shadow-soft backdrop-blur-sm transition duration-300 hover:border-navy/20 hover:shadow-lift"
+                      : "group gloss flex h-full flex-col rounded-card border border-line/80 bg-white/95 p-6 shadow-soft backdrop-blur-sm transition duration-300 hover:border-navy/20 hover:shadow-lift"
                   }
                 >
                   <span

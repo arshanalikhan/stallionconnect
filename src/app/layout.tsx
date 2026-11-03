@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Dancing_Script, Instrument_Serif, Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { site } from "@/config/site";
 import logoFull from "@/assets/brand/logo-full.webp";
 import "./globals.css";
@@ -8,6 +8,23 @@ import "./globals.css";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+});
+
+/** Accent: elegant serif italic for highlighted words in headings. */
+const serif = Instrument_Serif({
+  variable: "--font-instrument",
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+/** Accent: handwritten script, used sparingly (tagline). */
+const script = Dancing_Script({
+  variable: "--font-dancing",
+  subsets: ["latin"],
+  weight: ["600", "700"],
   display: "swap",
 });
 
@@ -41,7 +58,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-IN" className={`${inter.variable} ${jakarta.variable}`}>
+    <html
+      lang="en-IN"
+      className={`${inter.variable} ${jakarta.variable} ${serif.variable} ${script.variable}`}
+    >
       <body className="flex min-h-svh flex-col">
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>

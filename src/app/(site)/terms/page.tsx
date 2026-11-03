@@ -6,6 +6,7 @@ export const metadata: Metadata = { title: "Terms of Use" };
 export default function TermsPage() {
   return (
     <Section
+      className="pt-36 sm:pt-40"
       eyebrow="Legal"
       title="Terms of Use"
       intro="Our terms of use are being finalised and will be published here soon."

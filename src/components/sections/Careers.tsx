@@ -12,7 +12,7 @@ const applyHref = (role: string) =>
 export function Careers() {
   return (
     <section id="careers" className="scene-clear bg-white py-20 sm:py-28">
-      <Container className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
+      <Container className="card-lane-right lane-1col grid gap-12 lg:grid-cols-[0.8fr_1.2fr]">
         <Reveal className="scene-panel">
           <Heading eyebrow={careers.eyebrow} title={careers.title} highlight={careers.highlight} />
           <p className="mt-5 text-lg text-muted">{careers.intro}</p>
@@ -40,7 +40,7 @@ export function Careers() {
         <ul className="grid gap-4 sm:grid-cols-2">
           {careers.openings.map((job, i) => (
             <Reveal as="li" key={job.title} delay={(i % 2) * 80}>
-              <article className="flex h-full flex-col rounded-card border border-line/80 bg-white/95 p-5 shadow-soft transition duration-300 hover:border-navy/20 hover:shadow-lift">
+              <article className="gloss flex h-full flex-col rounded-card border border-line/80 bg-white/95 p-5 shadow-soft transition duration-300 hover:border-navy/20 hover:shadow-lift">
                 <span className="grid size-10 place-items-center rounded-xl bg-mint text-brand-green">
                   <Icon name="briefcase" className="size-5" />
                 </span>

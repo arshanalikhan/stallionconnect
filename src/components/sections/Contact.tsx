@@ -33,7 +33,8 @@ export function Contact() {
               {contact.eyebrow}
             </p>
             <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              {contact.title} <span className="text-brand-green-light">{contact.highlight}</span>
+              {contact.title}{" "}
+              <span className="accent-serif text-brand-green-light">{contact.highlight}</span>
             </h2>
             <p className="mt-4 text-lg text-[#d7e6f4]">{contact.intro}</p>
 
