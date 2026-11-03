@@ -74,7 +74,7 @@ One-time setting (done by the owner): repository **Settings > Pages > Deploy fro
 ```
 src/app/layout.tsx       root html, fonts, metadata
 src/app/(site)/          public pages with header, footer and form dialogs
-src/app/admin/           admin pages: dashboard, enquiries, applications
+src/app/izharuddin/      admin pages at /izharuddin: dashboard, enquiries, applications
 src/app/api/             API routes (route.server.ts): enquiries, applications, admin list/update/delete/export
 src/components/layout/   Header (glossy pill navbar), Footer, Logo, WhatsAppButton, CustomCursor
 src/components/ui/       Button, Container, Section, Heading, Icon, Reveal
@@ -107,18 +107,18 @@ docs/                    Cloudflare deployment steps; chatbot-questions.md (+ .d
 
 ## 7. Forms and admin
 
-| Item                 | How it works                                                                                                                                                                                                                                                                                                                                                                                 |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Quote form           | On the Contact section and in a pop-up from every "Get a Quote" and "Enquire" button (service pre-selected)                                                                                                                                                                                                                                                                                  |
-| Application form     | Pop-up from "Apply" buttons in Careers (role pre-selected). No CV upload; applicants email CVs to careers@                                                                                                                                                                                                                                                                                   |
-| Validation           | Same rules in the browser and on the server (`src/lib/forms/schemas.ts`)                                                                                                                                                                                                                                                                                                                     |
-| Spam                 | Hidden honeypot field now; Turnstile later                                                                                                                                                                                                                                                                                                                                                   |
-| Storage              | Cloudflare D1 in production; in-memory while running `npm run dev` (resets on restart)                                                                                                                                                                                                                                                                                                       |
-| Admin                | `/admin` with a sidebar: **Dashboard** (new leads, this week, chatbot vs form, latest activity, pipeline by status, most requested services, roles applied for, quick CSV downloads), **Enquiries** and **Applications** (search, filter by status and source, sort, expand a lead for contact buttons and details, change status, private notes, delete, download the filtered list as CSV) |
-| Admin login          | Cloudflare Access in production. Open without login only in `npm run dev`. Locked everywhere else                                                                                                                                                                                                                                                                                            |
-| GitHub Pages preview | No server or database. Forms show "One more step: send it by email". The admin panel runs as a **demo** with sample data stored only in that browser; forms and chatbot enquiries sent on the preview also appear there. "Reset demo data" restores the samples                                                                                                                              |
+| Item                 | How it works                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Quote form           | On the Contact section and in a pop-up from every "Get a Quote" and "Enquire" button (service pre-selected)                                                                                                                                                                                                                                                                                                                                                                                     |
+| Application form     | Pop-up from "Apply" buttons in Careers (role pre-selected). No CV upload; applicants email CVs to careers@                                                                                                                                                                                                                                                                                                                                                                                      |
+| Validation           | Same rules in the browser and on the server (`src/lib/forms/schemas.ts`)                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Spam                 | Hidden honeypot field now; Turnstile later                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Storage              | Cloudflare D1 in production; in-memory while running `npm run dev` (resets on restart)                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Admin                | `/izharuddin` (staff only; set by `ADMIN_PATH` in `src/config/site.ts` and the `src/app/izharuddin` folder) with a sidebar: **Dashboard** (new leads, this week, chatbot vs form, latest activity, pipeline by status, most requested services, roles applied for, quick CSV downloads), **Enquiries** and **Applications** (search, filter by status and source, sort, expand a lead for contact buttons and details, change status, private notes, delete, download the filtered list as CSV) |
+| Admin login          | Email + password, then a 6-digit code emailed to that address (Resend). Session cookie lasts 12 hours. Codes expire in 10 minutes, 5 tries per code; 8 wrong passwords per email lock for 15 minutes; only emails in `ADMIN_EMAILS` can sign in. Cloudflare Access is still supported if configured later. Local `npm run dev` with no sign-in settings opens without login                                                                                                                     |
+| GitHub Pages preview | No server or database. Forms show "One more step: send it by email". The admin panel runs as a **demo** with sample data stored only in that browser; forms and chatbot enquiries sent on the preview also appear there. "Reset demo data" restores the samples                                                                                                                                                                                                                                 |
 
-To try it locally: `npm run dev`, submit a form, then open http://localhost:3000/admin.
+To try it locally: `npm run dev`, submit a form, then open http://localhost:3000/izharuddin.
 
 ## 8. Chatbot
 
@@ -492,3 +492,29 @@ recruitment data), and optionally one page per service for SEO.
   `wrangler.jsonc`. Tested in the local Workers runtime: enquiries and applications save.
 - Tables are created once by pasting `docs/d1-setup.sql` into the D1 Console (same schema as
   `migrations/0001` + `0002` combined).
+
+### Update: admin sign-in with password and emailed code
+
+- `/admin` shows a Staff login screen: email and password, then a 6-digit code sent to that
+  email. Sign out in the sidebar (desktop) and top bar (phones).
+- Server: `src/app/api/admin/auth/{login,verify,logout}`, `src/lib/admin/{session,otp-store,crypto}.ts`,
+  `src/lib/email.ts` (Resend). Tables in `migrations/0003_admin_auth.sql` (also appended to
+  `docs/d1-setup.sql`).
+- Worker settings needed (Settings > Variables and Secrets, type Secret):
+  `ADMIN_EMAILS` (comma-separated), `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET` (40+ random
+  characters), `RESEND_API_KEY`; optional `EMAIL_FROM` (defaults to Resend's test sender,
+  which can only email the Resend account owner until stallionconnect.in is verified).
+- Security: HttpOnly, Secure, SameSite=Strict signed cookie; generic error for wrong email or
+  password; code hashed in the database; constant-time comparisons; rate limits as above.
+- Verified: dev server browser test of the whole flow (wrong password, unknown email, code,
+  wrong code countdown, lockout, sign out, tampered cookie) and the Workers runtime with a
+  local D1 copy.
+
+### Update: admin panel moved to /izharuddin
+
+- The admin panel lives at `/izharuddin` (and `/izharuddin/enquiries`,
+  `/izharuddin/applications`); `/admin` now shows page not found. The footer Staff login link,
+  admin menu, dashboard links and chatbot demo link use `ADMIN_PATH` from `src/config/site.ts`.
+  To change it again: rename the `src/app/izharuddin` folder and update `ADMIN_PATH`.
+- The API stays at `/api/admin/*` (protected by sign-in either way). If Cloudflare Access is
+  used later, protect `/izharuddin*` and `/api/admin/*`.

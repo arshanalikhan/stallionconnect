@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useFormDialog } from "@/components/forms/FormDialogs";
 import { Icon } from "@/components/ui/Icon";
-import { site, whatsappUrl } from "@/config/site";
+import { ADMIN_PATH, site, whatsappUrl } from "@/config/site";
 import { actionLabels, fallback, faqs, greeting, menu, type ChatAction } from "@/content/chatbot";
 import { cn } from "@/lib/cn";
 import {
@@ -294,7 +294,7 @@ export function ChatBot() {
       say(
         `${doneText}\n\n(Preview site: nothing was sent. The enquiry was saved in this browser so you can see it in the demo admin panel.)`,
         menu.map(chipFor),
-        [{ label: "Open demo admin", href: `/admin/${cfg.kind}` }],
+        [{ label: "Open demo admin", href: `${ADMIN_PATH}/${cfg.kind}` }],
       );
       return;
     }

@@ -34,5 +34,8 @@ export const site = {
   ],
 } as const;
 
+/** Address of the admin panel (staff only, behind sign-in). */
+export const ADMIN_PATH = "/izharuddin";
+
 export const whatsappUrl = (message: string = site.contact.whatsappMessage) =>
   `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(message)}`;

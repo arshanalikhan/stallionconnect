@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { site, whatsappUrl } from "@/config/site";
+import { ADMIN_PATH, site, whatsappUrl } from "@/config/site";
 import { Container } from "@/components/ui/Container";
 import { Logo } from "./Logo";
 
@@ -73,7 +73,7 @@ export function Footer() {
             <Link href="/terms" className="hover:text-navy">
               Terms
             </Link>
-            <Link href="/admin" className="inline-flex items-center gap-1 hover:text-navy">
+            <Link href={ADMIN_PATH} className="inline-flex items-center gap-1 hover:text-navy">
               <svg
                 aria-hidden="true"
                 viewBox="0 0 24 24"

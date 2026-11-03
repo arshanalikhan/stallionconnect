@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { ADMIN_PATH } from "@/config/site";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import logoFull from "@/assets/brand/logo-full.webp";
@@ -9,33 +10,32 @@ import { isDemo } from "@/lib/admin/client";
 import { demoStore } from "@/lib/admin/demo";
 import { cn } from "@/lib/cn";
 import { AdminDataProvider, useAdminData } from "./AdminData";
+import { AdminLogin } from "./AdminLogin";
 
 const nav: { href: string; label: string; icon: IconName; count?: "enquiries" | "applications" }[] =
   [
-    { href: "/admin", label: "Dashboard", icon: "monitor" },
-    { href: "/admin/enquiries", label: "Enquiries", icon: "chat", count: "enquiries" },
-    { href: "/admin/applications", label: "Applications", icon: "people", count: "applications" },
+    { href: ADMIN_PATH, label: "Dashboard", icon: "monitor" },
+    { href: `${ADMIN_PATH}/enquiries`, label: "Enquiries", icon: "chat", count: "enquiries" },
+    {
+      href: `${ADMIN_PATH}/applications`,
+      label: "Applications",
+      icon: "people",
+      count: "applications",
+    },
   ];
 
 function Shell({ children }: { children: React.ReactNode }) {
-  const path = usePathname().replace(/\/$/, "") || "/admin";
+  const path = usePathname().replace(/\/$/, "") || ADMIN_PATH;
   const data = useAdminData();
 
-  if (data.status === "unauthorised") {
-    return (
-      <main className="grid min-h-svh place-items-center bg-surface p-6 text-center">
-        <div className="max-w-sm">
-          <h1 className="text-2xl font-bold">Not authorised</h1>
-          <p className="mt-2 text-muted">
-            Sign in through the company login (Cloudflare Access) to view the admin panel.
-          </p>
-          <Link href="/" className="mt-6 inline-block font-semibold text-navy underline">
-            Back to the website
-          </Link>
-        </div>
-      </main>
-    );
-  }
+  if (data.status === "unauthorised") return <AdminLogin onSignedIn={() => void data.refresh()} />;
+
+  const signOut = async () => {
+    await fetch(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/admin/auth/logout`, {
+      method: "POST",
+    });
+    await data.refresh();
+  };
 
   const newCount = (k: "enquiries" | "applications") =>
     data[k].filter((r) => r.status === "new").length;
@@ -44,12 +44,23 @@ function Shell({ children }: { children: React.ReactNode }) {
     <div className="min-h-svh bg-[#f3f6fb] lg:grid lg:grid-cols-[248px_1fr]">
       <aside className="relative border-b border-line bg-white lg:sticky lg:top-0 lg:h-svh lg:border-r lg:border-b-0">
         <div className="flex items-center justify-between gap-3 px-5 py-4 lg:block lg:px-6 lg:py-6">
-          <Link href="/admin" className="flex items-center gap-3">
+          <Link href={ADMIN_PATH} className="flex items-center gap-3">
             <Image src={logoFull} alt="Stallion Connect" className="h-9 w-auto" priority />
           </Link>
-          <span className="rounded-full bg-navy px-2.5 py-1 font-display text-[11px] font-bold tracking-wider text-white lg:mt-3 lg:inline-block">
-            ADMIN
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="rounded-full bg-navy px-2.5 py-1 font-display text-[11px] font-bold tracking-wider text-white lg:mt-3 lg:inline-block">
+              ADMIN
+            </span>
+            {!isDemo && (
+              <button
+                type="button"
+                onClick={signOut}
+                className="text-sm font-semibold text-navy hover:underline lg:hidden"
+              >
+                Sign out
+              </button>
+            )}
+          </div>
         </div>
         <nav aria-label="Admin" className="overflow-x-auto px-3 pb-3 lg:px-4">
           <ul className="flex gap-1 lg:flex-col">
@@ -92,9 +103,13 @@ function Shell({ children }: { children: React.ReactNode }) {
               View site
             </Link>
             {!isDemo && (
-              <a href="/cdn-cgi/access/logout" className="font-semibold text-navy hover:underline">
+              <button
+                type="button"
+                onClick={signOut}
+                className="font-semibold text-navy hover:underline"
+              >
                 Sign out
-              </a>
+              </button>
             )}
           </div>
         </div>
