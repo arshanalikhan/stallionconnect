@@ -36,3 +36,20 @@ CREATE TABLE IF NOT EXISTS applications (
 );
 CREATE INDEX IF NOT EXISTS idx_applications_created ON applications (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_applications_status ON applications (status);
+
+-- Admin sign-in (password + emailed code). Same as migrations/0003_admin_auth.sql.
+CREATE TABLE IF NOT EXISTS admin_otps (
+  id          TEXT PRIMARY KEY,
+  email       TEXT NOT NULL,
+  code_hash   TEXT NOT NULL,
+  expires_at  TEXT NOT NULL,
+  attempts    INTEGER NOT NULL DEFAULT 0,
+  created_at  TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_admin_otps_email ON admin_otps (email, created_at);
+
+CREATE TABLE IF NOT EXISTS admin_auth_failures (
+  email       TEXT NOT NULL,
+  created_at  TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_admin_auth_failures ON admin_auth_failures (email, created_at);

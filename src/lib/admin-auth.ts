@@ -1,21 +1,27 @@
 import "server-only";
 import { createRemoteJWKSet, jwtVerify } from "jose";
+import { loginConfigured, readSession } from "@/lib/admin/session";
 
 /**
- * Admin access check.
+ * Admin access check. Any one of these lets a request through:
  *
- * Production: /admin sits behind Cloudflare Access. Access adds a signed JWT in
- * the `Cf-Access-Jwt-Assertion` header; we verify it here so the admin cannot be
- * reached by bypassing Access (for example through the workers.dev URL).
- * Needs CF_ACCESS_TEAM_DOMAIN (e.g. "stallion.cloudflareaccess.com") and
- * CF_ACCESS_AUD (the Access application's audience tag).
+ * 1. Password + emailed code sign-in: a valid signed session cookie
+ *    (see src/lib/admin/session.ts and /api/admin/auth/*).
+ * 2. Cloudflare Access, if configured later: Access adds a signed JWT in the
+ *    `Cf-Access-Jwt-Assertion` header, verified here. Needs
+ *    CF_ACCESS_TEAM_DOMAIN and CF_ACCESS_AUD.
+ * 3. Local development with no sign-in configured: allowed, for testing.
  *
- * Development: allowed without login so the panel can be tested locally.
  * Anything else fails closed.
  */
 let jwks: ReturnType<typeof createRemoteJWKSet> | undefined;
 
 export async function getAdmin(headers: Headers): Promise<{ email: string } | null> {
+  if (loginConfigured()) {
+    const session = await readSession(headers);
+    if (session) return session;
+  }
+
   const team = process.env.CF_ACCESS_TEAM_DOMAIN;
   const aud = process.env.CF_ACCESS_AUD;
 
@@ -34,6 +40,8 @@ export async function getAdmin(headers: Headers): Promise<{ email: string } | nu
     }
   }
 
-  if (process.env.NODE_ENV === "development") return { email: "dev@localhost" };
+  if (process.env.NODE_ENV === "development" && !loginConfigured()) {
+    return { email: "dev@localhost" };
+  }
   return null;
 }
