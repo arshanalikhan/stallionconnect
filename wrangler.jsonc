@@ -18,9 +18,8 @@
     },
   ],
   "observability": { "enabled": true },
-  // Keep variables added in the dashboard (Settings > Variables and Secrets)
-  // when GitHub builds deploy. Secrets are always kept.
-  "keep_vars": true,
+  // Admin settings are stored as Secrets in the dashboard (Settings > Variables
+  // and Secrets); secrets are always kept when GitHub builds deploy.
   // Database for enquiries and job applications (forms, chatbot, admin panel).
   "d1_databases": [
     {

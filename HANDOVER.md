@@ -518,3 +518,10 @@ recruitment data), and optionally one page per service for SEO.
   To change it again: rename the `src/app/izharuddin` folder and update `ADMIN_PATH`.
 - The API stays at `/api/admin/*` (protected by sign-in either way). If Cloudflare Access is
   used later, protect `/izharuddin*` and `/api/admin/*`.
+
+### Fix: Cloudflare deploy failing with error 10013
+
+- Builds after PR #3 compiled fine but the final upload failed with Cloudflare API error 10013
+  (also on retry). The only deploy setting that changed since the last successful deploy was
+  `keep_vars: true`, so it was removed. Admin settings must be stored as **Secrets** (not Text
+  variables); secrets are always kept when GitHub builds deploy.
