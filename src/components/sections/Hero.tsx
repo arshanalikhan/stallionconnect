@@ -25,7 +25,7 @@ export function Hero() {
       {/* keeps the headline readable over the 3D scene */}
       <div
         aria-hidden="true"
-        className="scene-only pointer-events-none absolute inset-0 bg-linear-to-b from-white/75 via-white/50 to-white/10 lg:bg-linear-to-r lg:from-white/85 lg:via-white/45 lg:to-transparent"
+        className="scene-only pointer-events-none absolute inset-0 bg-linear-to-b from-white/75 via-white/50 to-white/10 lg:bg-linear-to-r lg:from-white/90 lg:via-white/65 lg:to-transparent"
       />
 
       <Container className="relative grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
@@ -41,7 +41,9 @@ export function Hero() {
             {hero.title} <span className="text-brand-green">{hero.highlight}</span>
           </h1>
           <p className="mt-5 text-xl font-semibold text-royal italic">{site.tagline}</p>
-          <p className="mt-4 max-w-xl text-lg text-muted">{hero.intro}</p>
+          <p className="scene-glass-text mt-4 max-w-xl text-lg font-medium text-[#1f3550]">
+            {hero.intro}
+          </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <QuoteButton />
             <ButtonLink href="/#services" variant="secondary">

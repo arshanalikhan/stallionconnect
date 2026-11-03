@@ -289,3 +289,10 @@ recruitment data), and optionally one page per service for SEO.
 - Owner asked to replace the pointing hand with a simple colour change and more glow, and to
   add dots following the cursor. Hover now turns the arrow glowing blue; a trail of nine
   glowing dots follows the cursor and fades out when it stops.
+
+### Fix: hero intro text readability
+
+- The hero intro paragraph was grey text directly over the 3D buildings and hard to read. It
+  is now darker and medium weight, sits on a frosted-glass backdrop when the 3D scene is
+  showing (`.scene-glass-text` in `globals.css`), and the white fade on the left of the hero
+  is stronger. Without 3D the text is unchanged in position.

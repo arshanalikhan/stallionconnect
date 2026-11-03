@@ -105,6 +105,24 @@
   }
 }
 
+/* Frosted backdrop for a block of body text over the 3D scene. Negative
+   margins cancel the padding so nothing moves when it appears. */
+.scene-glass-text {
+  margin-left: -0.875rem;
+  margin-right: -0.875rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 1rem;
+  transition:
+    background-color 0.6s,
+    box-shadow 0.6s;
+}
+html[data-scene] .scene-glass-text {
+  background: rgb(255 255 255 / 0.78);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  box-shadow: 0 12px 40px -24px rgb(0 30 70 / 0.45);
+}
+
 html:not([data-scene]) .scene-only {
   display: none;
 }
