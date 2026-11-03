@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { ADMIN_PATH } from "@/config/site";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import logoFull from "@/assets/brand/logo-full.webp";
@@ -13,13 +14,18 @@ import { AdminLogin } from "./AdminLogin";
 
 const nav: { href: string; label: string; icon: IconName; count?: "enquiries" | "applications" }[] =
   [
-    { href: "/admin", label: "Dashboard", icon: "monitor" },
-    { href: "/admin/enquiries", label: "Enquiries", icon: "chat", count: "enquiries" },
-    { href: "/admin/applications", label: "Applications", icon: "people", count: "applications" },
+    { href: ADMIN_PATH, label: "Dashboard", icon: "monitor" },
+    { href: `${ADMIN_PATH}/enquiries`, label: "Enquiries", icon: "chat", count: "enquiries" },
+    {
+      href: `${ADMIN_PATH}/applications`,
+      label: "Applications",
+      icon: "people",
+      count: "applications",
+    },
   ];
 
 function Shell({ children }: { children: React.ReactNode }) {
-  const path = usePathname().replace(/\/$/, "") || "/admin";
+  const path = usePathname().replace(/\/$/, "") || ADMIN_PATH;
   const data = useAdminData();
 
   if (data.status === "unauthorised") return <AdminLogin onSignedIn={() => void data.refresh()} />;
@@ -38,7 +44,7 @@ function Shell({ children }: { children: React.ReactNode }) {
     <div className="min-h-svh bg-[#f3f6fb] lg:grid lg:grid-cols-[248px_1fr]">
       <aside className="relative border-b border-line bg-white lg:sticky lg:top-0 lg:h-svh lg:border-r lg:border-b-0">
         <div className="flex items-center justify-between gap-3 px-5 py-4 lg:block lg:px-6 lg:py-6">
-          <Link href="/admin" className="flex items-center gap-3">
+          <Link href={ADMIN_PATH} className="flex items-center gap-3">
             <Image src={logoFull} alt="Stallion Connect" className="h-9 w-auto" priority />
           </Link>
           <div className="flex items-center gap-3">

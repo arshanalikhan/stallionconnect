@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ADMIN_PATH } from "@/config/site";
 import { adminClient } from "@/lib/admin/client";
 import { leadStatuses, type Application, type Enquiry } from "@/lib/db/types";
 import { cn } from "@/lib/cn";
@@ -117,7 +118,7 @@ export function Dashboard() {
           title="Latest activity"
           action={
             <Link
-              href="/admin/enquiries"
+              href={`${ADMIN_PATH}/enquiries`}
               className="text-sm font-semibold text-navy hover:underline"
             >
               View all
@@ -131,7 +132,7 @@ export function Dashboard() {
               {all.slice(0, 8).map(({ kind, row }) => (
                 <li key={row.id}>
                   <Link
-                    href={`/admin/${kind}#${row.id}`}
+                    href={`${ADMIN_PATH}/${kind}#${row.id}`}
                     className="-mx-2 flex items-center gap-3 rounded-lg px-2 py-3 hover:bg-surface"
                   >
                     <span

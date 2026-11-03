@@ -34,7 +34,7 @@ preview is published to GitHub Pages. The code is written to stay Cloudflare-com
 4. In `src/lib/db/index.ts`, optionally replace the global-symbol lookup with
    `getCloudflareContext().env.DB` from `@opennextjs/cloudflare`.
 5. Protect the admin with Cloudflare Access (Zero Trust, free up to 50 users):
-   - Create a self-hosted application for `stallionconnect.in/admin*` and
+   - Create a self-hosted application for `stallionconnect.in/izharuddin*` and
      `stallionconnect.in/api/admin/*`, with a policy allowing the team's emails.
    - Set two Worker variables: `CF_ACCESS_TEAM_DOMAIN` (for example
      `stallion.cloudflareaccess.com`) and `CF_ACCESS_AUD` (the application's audience tag).
