@@ -19,14 +19,14 @@ export function Services() {
                   className={
                     custom
                       ? "flex h-full flex-col rounded-card bg-linear-to-br from-navy to-brand-green-dark p-6 text-white shadow-soft"
-                      : "group flex h-full flex-col rounded-card border border-line bg-white/90 p-6 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-brand-green/40 hover:shadow-soft"
+                      : "group flex h-full flex-col rounded-card border border-line/80 bg-white/95 p-6 shadow-soft backdrop-blur-sm transition duration-300 hover:border-navy/20 hover:shadow-lift"
                   }
                 >
                   <span
                     className={
                       custom
-                        ? "grid size-12 place-items-center rounded-xl bg-white/15"
-                        : "grid size-12 place-items-center rounded-xl bg-mint text-navy transition group-hover:bg-brand-green group-hover:text-white"
+                        ? "grid size-11 place-items-center rounded-lg bg-white/15 ring-1 ring-white/20"
+                        : "grid size-11 place-items-center rounded-lg bg-navy/[0.06] text-navy ring-1 ring-navy/10 transition group-hover:bg-navy group-hover:text-white"
                     }
                   >
                     <Icon name={s.icon} />

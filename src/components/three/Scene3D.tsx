@@ -3,10 +3,12 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/cn";
-import { initialSceneState, type Quality, type SceneState } from "./sceneState";
+import { useFormDialog } from "@/components/forms/FormDialogs";
+import { DOCK_AT, initialSceneState, WIDGET, type Quality, type SceneState } from "./sceneState";
 
 // Three.js is only downloaded when the scene is actually going to be shown.
 const SiteScene = dynamic(() => import("./SiteScene"), { ssr: false });
+const CardWidget = dynamic(() => import("./SiteScene").then((m) => m.CardWidget), { ssr: false });
 
 type Nav = Navigator & { deviceMemory?: number; connection?: { saveData?: boolean } };
 
@@ -48,6 +50,8 @@ export function Scene3D() {
   const [ready, setReady] = useState(false);
   const state = useRef<SceneState>(initialSceneState());
   const veil = useRef<HTMLDivElement>(null);
+  const [docked, setDocked] = useState(false);
+  const { open } = useFormDialog();
 
   useEffect(() => {
     const start = () => setQuality(pickQuality());
@@ -87,6 +91,7 @@ export function Scene3D() {
         ];
       }
       // No veil over the hero (it has its own readability gradient), none at night.
+      setDocked(s.hero >= DOCK_AT);
       if (veil.current)
         veil.current.style.opacity = String(Math.min(1, s.hero * 1.6) * (1 - s.night));
     };
@@ -122,16 +127,40 @@ export function Scene3D() {
   if (!quality) return null;
 
   return (
-    <div
-      aria-hidden="true"
-      className={cn(
-        "pointer-events-none fixed inset-0 -z-10 transition-opacity duration-1000",
-        ready ? "opacity-100" : "opacity-0",
+    <>
+      <div
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none fixed inset-0 -z-10 transition-opacity duration-1000",
+          ready ? "opacity-100" : "opacity-0",
+        )}
+      >
+        <SiteScene quality={quality} state={state} onReady={() => setReady(true)} />
+        {/* light veil keeps text readable by day; fades out at night */}
+        <div ref={veil} className="absolute inset-0 bg-white/40" />
+      </div>
+
+      {/* After the hero, the card lives here and keeps turning with the scroll. */}
+      {quality === "high" && ready && (
+        <button
+          type="button"
+          aria-label="Get a quote"
+          tabIndex={docked ? 0 : -1}
+          onClick={() => open({ type: "quote" })}
+          className={cn(
+            "fixed z-40 rounded-2xl transition-opacity duration-200",
+            docked ? "opacity-100" : "pointer-events-none opacity-0",
+          )}
+          style={{
+            right: WIDGET.right,
+            bottom: WIDGET.bottom,
+            width: WIDGET.width,
+            height: WIDGET.height,
+          }}
+        >
+          <CardWidget state={state} active={docked} />
+        </button>
       )}
-    >
-      <SiteScene quality={quality} state={state} onReady={() => setReady(true)} />
-      {/* light veil keeps text readable by day; fades out at night */}
-      <div ref={veil} className="absolute inset-0 bg-white/40" />
-    </div>
+    </>
   );
 }

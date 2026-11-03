@@ -33,20 +33,26 @@ export function Heading({
     >
       <p
         className={cn(
-          "mb-3 text-xs font-bold tracking-[0.16em] uppercase",
+          "mb-4 inline-flex items-center gap-2.5 font-display text-[13px] font-semibold tracking-[0.12em] uppercase",
+          align === "center" && "justify-center",
           dark ? "text-brand-green-light" : "text-brand-green",
         )}
       >
+        <span aria-hidden="true" className="h-px w-6 bg-current" />
         {eyebrow}
       </p>
-      <h2 className={cn("text-3xl font-bold sm:text-4xl", dark && "text-white")}>
+      <h2 className={cn("text-3xl font-bold sm:text-4xl lg:text-[2.6rem]", dark && "text-white")}>
         {title}{" "}
         {highlight && (
           <span className={dark ? "text-brand-green-light" : "text-brand-green"}>{highlight}</span>
         )}
       </h2>
       {intro && (
-        <p className={cn("mt-4 text-lg", dark ? "text-[#c4d6e8]" : "text-muted")}>{intro}</p>
+        <p
+          className={cn("mt-4 text-[17px] leading-relaxed", dark ? "text-[#c4d6e8]" : "text-muted")}
+        >
+          {intro}
+        </p>
       )}
     </header>
   );

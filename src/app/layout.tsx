@@ -1,12 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Syne } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import { site } from "@/config/site";
 import logoFull from "@/assets/brand/logo-full.webp";
 import "./globals.css";
 
-const syne = Syne({
-  variable: "--font-syne",
+/** Body text. */
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
+});
+
+/** Headings, buttons and other display text. */
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
   display: "swap",
 });
 
@@ -32,7 +41,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-IN" className={syne.variable}>
+    <html lang="en-IN" className={`${inter.variable} ${jakarta.variable}`}>
       <body className="flex min-h-svh flex-col">
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>

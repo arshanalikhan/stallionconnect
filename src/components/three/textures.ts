@@ -158,8 +158,8 @@ export function sheenTexture() {
   const grad = g.createLinearGradient(0, 512, 512, 0);
   grad.addColorStop(0, "rgba(255,255,255,0)");
   grad.addColorStop(0.42, "rgba(255,255,255,0)");
-  grad.addColorStop(0.5, "rgba(255,255,255,0.55)");
-  grad.addColorStop(0.53, "rgba(255,255,255,0.15)");
+  grad.addColorStop(0.5, "rgba(255,255,255,0.32)");
+  grad.addColorStop(0.53, "rgba(255,255,255,0.08)");
   grad.addColorStop(0.6, "rgba(255,255,255,0)");
   grad.addColorStop(1, "rgba(255,255,255,0)");
   g.fillStyle = grad;

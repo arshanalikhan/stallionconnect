@@ -28,3 +28,12 @@ export const initialSceneState = (): SceneState => ({
 });
 
 export type Quality = "high" | "low";
+
+/**
+ * Floating card widget (bottom right, above the WhatsApp button). After the
+ * hero, the 3D card shrinks into this spot and keeps turning with the scroll.
+ * CSS pixels.
+ */
+export const WIDGET = { right: 24, bottom: 96, width: 176, height: 124 } as const;
+/** Hero progress at which the big card hands over to the widget. */
+export const DOCK_AT = 0.74;

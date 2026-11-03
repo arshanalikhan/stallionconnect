@@ -18,7 +18,7 @@ export function WhyUs() {
         <ul className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {whyUs.items.map((item, i) => (
             <Reveal as="li" key={item.title} delay={(i % 3) * 80}>
-              <div className="h-full rounded-card border border-white/15 bg-navy-deep/65 p-6 backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:border-brand-green-light/60 hover:bg-white/10">
+              <div className="h-full rounded-card border border-white/15 bg-navy-deep/65 p-6 backdrop-blur-md transition duration-300 hover:border-brand-green-light/50">
                 <span className="text-xs font-bold tracking-[0.14em] text-brand-green-light">
                   {String(i + 1).padStart(2, "0")}
                 </span>

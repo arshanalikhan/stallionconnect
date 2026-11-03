@@ -31,20 +31,20 @@ export function Header() {
       className={cn(
         "sticky top-0 z-50 transition-all duration-300",
         scrolled || open
-          ? "bg-white/90 py-2 shadow-[0_6px_30px_-18px_rgb(1_43_117/0.5)] backdrop-blur-md"
-          : "bg-white/60 py-3 backdrop-blur-sm",
+          ? "border-b border-line/70 bg-white/85 py-2 backdrop-blur-xl"
+          : "border-b border-transparent bg-white/50 py-3 backdrop-blur-md",
       )}
     >
       <Container className="flex items-center justify-between gap-4">
         <Logo priority />
 
         <nav aria-label="Main" className="hidden xl:block">
-          <ul className="flex items-center gap-7 font-medium text-ink">
+          <ul className="flex items-center gap-1 text-[15px] font-medium text-ink/75">
             {site.nav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="relative py-1.5 whitespace-nowrap after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-brand-green after:transition-all hover:text-navy hover:after:w-full"
+                  className="rounded-full px-3.5 py-2 whitespace-nowrap transition-colors hover:bg-navy/[0.06] hover:text-navy"
                 >
                   {item.label}
                 </Link>

@@ -12,15 +12,18 @@
   --color-brand-green-dark: #025924;
   --color-brand-green-light: #2bd66b;
   --color-mint: #e6f6ec;
-  --color-ink: #0b1526;
   --color-muted: #4b5b6b;
   --color-line: #dbe5ee;
   --color-surface: #f5f8fc;
 
-  --font-sans: var(--font-syne), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-ink: #0b1526;
+  --font-sans: var(--font-inter), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), system-ui, sans-serif;
 
-  --shadow-soft: 0 22px 60px -24px rgb(0 30 70 / 0.45);
-  --radius-card: 1.5rem;
+  /* Layered, subtle shadows read as more refined than one big blur. */
+  --shadow-soft: 0 1px 2px rgb(16 24 40 / 0.04), 0 12px 32px -12px rgb(1 43 117 / 0.18);
+  --shadow-lift: 0 1px 2px rgb(16 24 40 / 0.05), 0 20px 48px -16px rgb(1 43 117 / 0.28);
+  --radius-card: 1.25rem;
 }
 
 @layer base {
@@ -35,10 +38,16 @@
 
   h1,
   h2,
-  h3 {
-    @apply text-navy;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
+  h3,
+  h4 {
+    @apply font-display text-navy;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   button:not(:disabled),

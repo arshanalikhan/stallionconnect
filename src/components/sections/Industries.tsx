@@ -12,7 +12,7 @@ export function Industries() {
         <ul className="mt-12 grid grid-cols-2 gap-4 md:grid-cols-4">
           {industries.items.map((item, i) => (
             <Reveal as="li" key={item.name} delay={(i % 4) * 70}>
-              <div className="flex h-full flex-col items-start gap-4 rounded-2xl bg-white p-5 shadow-[0_10px_30px_-24px_rgb(1_43_117/0.6)] sm:flex-row sm:items-center">
+              <div className="flex h-full flex-col items-start gap-4 rounded-card border border-line/80 bg-white/95 p-5 shadow-soft sm:flex-row sm:items-center">
                 <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-navy text-white">
                   <Icon name={item.icon} className="size-5" />
                 </span>

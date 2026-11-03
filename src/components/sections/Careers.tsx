@@ -25,7 +25,7 @@ export function Careers() {
             ))}
           </ul>
           <ApplyButton style={{ className: "mt-8" }} />
-          <div className="mt-6 rounded-2xl border border-line bg-surface p-5">
+          <div className="mt-6 rounded-card border border-line/80 bg-surface p-5">
             <p className="text-sm text-muted">Then email your CV to</p>
             <a
               href={applyHref("General application")}
@@ -40,7 +40,7 @@ export function Careers() {
         <ul className="grid gap-4 sm:grid-cols-2">
           {careers.openings.map((job, i) => (
             <Reveal as="li" key={job.title} delay={(i % 2) * 80}>
-              <article className="flex h-full flex-col rounded-2xl border border-line bg-white/90 p-5 transition hover:border-brand-green/40 hover:shadow-soft">
+              <article className="flex h-full flex-col rounded-card border border-line/80 bg-white/95 p-5 shadow-soft transition duration-300 hover:border-navy/20 hover:shadow-lift">
                 <span className="grid size-10 place-items-center rounded-xl bg-mint text-brand-green">
                   <Icon name="briefcase" className="size-5" />
                 </span>

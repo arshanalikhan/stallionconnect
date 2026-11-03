@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import logoFull from "@/assets/brand/logo-full.webp";
 import { site } from "@/config/site";
-import type { Quality, SceneState } from "./sceneState";
+import { WIDGET, type Quality, type SceneState } from "./sceneState";
 import { callCardTexture, logoCardTexture, sheenTexture, windowTexture } from "./textures";
 
 type Props = {
@@ -27,7 +27,7 @@ const DAY = new THREE.Color("#e3eefa");
 const NIGHT = new THREE.Color("#06173a");
 const GROUND_DAY = new THREE.Color("#e6eff9");
 const GROUND_NIGHT = new THREE.Color("#0a1f45");
-const BUILDING = new THREE.Color("#b7d1ec");
+const BUILDING = new THREE.Color("#c9d6e6");
 /** Live sky colour; also used by the fog, so both shift together. */
 const SKY = DAY.clone();
 /** Scratch vectors reused every frame to avoid allocations. */
@@ -92,13 +92,13 @@ function Skyline({ quality }: { quality: Quality }) {
     return kinds.map((k, idx) => {
       const map = tex.clone();
       map.needsUpdate = true;
-      map.repeat.set(k.w / 2.4, k.h / 3.2);
+      map.repeat.set(k.w / 1.3, k.h / 1.7);
       const mat = new THREE.MeshStandardMaterial({
-        color: "#b7d1ec",
+        color: "#c9d6e6",
         map,
         emissive: "#ffffff",
         emissiveMap: map,
-        emissiveIntensity: 0.22,
+        emissiveIntensity: 0.15,
         metalness: 0.3,
         roughness: 0.4,
       });
@@ -240,6 +240,8 @@ function Particles({ count }: { count: number }) {
 const CARD_W = 3.4;
 const CARD_H = 2.12;
 const CARD_R = 0.22;
+/** Hero progress over which the card travels from the hero to the widget. */
+const DOCK_RANGE = 0.72;
 
 function roundedRect(w: number, h: number, r: number) {
   const s = new THREE.Shape();
@@ -277,7 +279,7 @@ const coat = {
   color: "#000000",
   metalness: 1,
   roughness: 0.12,
-  envMapIntensity: 1.1,
+  envMapIntensity: 0.55,
   transparent: true,
   blending: THREE.AdditiveBlending,
   depthWrite: false,
@@ -294,10 +296,21 @@ const streak = {
 /**
  * The live-call card: rounded glossy body with a curved rim, clear-coated faces
  * that reflect the environment, and a light streak that sweeps across.
- * Attached to the camera. In the hero it sits in the right column; as the hero
- * scrolls away it flips to the logo and flies off down the avenue.
+ * Attached to the camera. In the hero it sits in the right column; after that it
+ * docks at the right edge and keeps turning with the scroll for the whole page.
  */
-function GlossyCard({ state }: { state: React.RefObject<SceneState> }) {
+type CardVariant = "hero" | "widget";
+
+/** Width of the card inside the widget canvas, as a share of the widget width. */
+const WIDGET_FILL = 0.74;
+
+function GlossyCard({
+  state,
+  variant,
+}: {
+  state: React.RefObject<SceneState>;
+  variant: CardVariant;
+}) {
   const holder = useRef<THREE.Group>(null);
   const card = useRef<THREE.Group>(null);
   const nodes = useRef<THREE.Group>(null);
@@ -356,12 +369,12 @@ function GlossyCard({ state }: { state: React.RefObject<SceneState> }) {
 
   useEffect(() => {
     const h = holder.current;
-    if (!h) return;
+    if (!h || variant !== "hero") return;
     camera.add(h);
     return () => {
       camera.remove(h);
     };
-  }, [camera]);
+  }, [camera, variant]);
 
   useFrame(({ clock, camera: cam }, dt) => {
     const h = holder.current;
@@ -369,31 +382,42 @@ function GlossyCard({ state }: { state: React.RefObject<SceneState> }) {
     if (!h || !c) return;
     const s = state.current;
     const t = clock.elapsedTime;
-    const k = smooth(s.hero * 1.5); // 0 in the hero, 1 once it has flown away
+    const spin = s.page * Math.PI * 6; // turns as the whole page scrolls
 
-    // Convert the hero layout (CSS pixels) into world units at the card's depth.
-    const dist = 7 + k * 26;
-    const fov = THREE.MathUtils.degToRad((cam as THREE.PerspectiveCamera).fov);
-    const halfH = Math.tan(fov / 2) * dist;
-    const halfW = halfH * (s.vw / s.vh);
-    const container = Math.min(s.vw, 1280) - 64;
-    const cx = s.vw / 2 + container * 0.27; // centre of the hero's right column
-    const cy = s.vh * 0.52;
-    const widthPx = Math.min(container * 0.4, 540);
+    if (variant === "widget") {
+      // The widget canvas is sized so the card simply sits in the middle.
+      h.position.set(0, 0, 0);
+      h.scale.setScalar(1);
+      c.rotation.y = damp(c.rotation.y, -0.3 + spin + s.mx * 0.15, 5, dt);
+    } else {
+      const k = smooth(s.hero / DOCK_RANGE); // 0 in the hero, 1 when it reaches the widget
 
-    const heroX = (cx / s.vw - 0.5) * 2 * halfW;
-    const heroY = (0.5 - cy / s.vh) * 2 * halfH;
-    h.position.set(
-      THREE.MathUtils.lerp(heroX, 0, k),
-      THREE.MathUtils.lerp(heroY, halfH * 0.35, k),
-      -dist,
-    );
-    h.scale.setScalar(((widthPx / s.vw) * 2 * halfW) / CARD_W);
-    h.visible = k < 0.999;
+      // Work in CSS pixels, then convert to world units at the card's depth.
+      const dist = 7;
+      const fov = THREE.MathUtils.degToRad((cam as THREE.PerspectiveCamera).fov);
+      const halfH = Math.tan(fov / 2) * dist;
+      const halfW = halfH * (s.vw / s.vh);
+      const container = Math.min(s.vw, 1280) - 64;
 
-    // Tilt with the mouse, float, and flip to the logo as the hero scrolls away.
-    const flip = smooth(s.hero * 2.2) * Math.PI;
-    c.rotation.y = damp(c.rotation.y, -0.3 + s.mx * 0.3 + flip, 5, dt);
+      // Hero: large, in the right column.
+      const heroW = Math.min(container * 0.4, 540);
+      const heroX = s.vw / 2 + container * 0.27;
+      const heroY = s.vh * 0.52;
+      // Then: shrink into the floating widget at the bottom right.
+      const dockW = WIDGET.width * WIDGET_FILL;
+      const dockX = s.vw - WIDGET.right - WIDGET.width / 2;
+      const dockY = s.vh - WIDGET.bottom - WIDGET.height / 2;
+
+      const px = THREE.MathUtils.lerp(heroX, dockX, k);
+      const py = THREE.MathUtils.lerp(heroY, dockY, k);
+      const pw = THREE.MathUtils.lerp(heroW, dockW, k);
+      h.position.set((px / s.vw - 0.5) * 2 * halfW, (0.5 - py / s.vh) * 2 * halfH, -dist);
+      h.scale.setScalar(((pw / s.vw) * 2 * halfW) / CARD_W);
+      // Hidden once the widget (drawn above the page) has taken over.
+      h.visible = k < 0.999;
+
+      c.rotation.y = damp(c.rotation.y, -0.3 + s.mx * 0.3 * (1 - k) + spin * k, 5, dt);
+    }
     c.rotation.x = damp(c.rotation.x, 0.08 - s.my * 0.2 + Math.sin(t * 0.8) * 0.03, 5, dt);
     c.rotation.z = Math.sin(t * 0.6) * 0.02;
     c.position.y = Math.sin(t * 1.1) * 0.07;
@@ -407,7 +431,12 @@ function GlossyCard({ state }: { state: React.RefObject<SceneState> }) {
     nodes.current?.children.forEach((n, i) => {
       const d = assets.nodeData[i];
       const a = d.a + t * d.s;
-      n.position.set(Math.cos(a) * d.r, d.y + Math.sin(t + i) * 0.1, Math.sin(a) * d.r * 0.35);
+      // Always behind the card so the dots never cover its text.
+      n.position.set(
+        Math.cos(a) * d.r,
+        d.y + Math.sin(t + i) * 0.1,
+        -0.35 - Math.abs(Math.sin(a)) * d.r * 0.3,
+      );
     });
   });
 
@@ -448,7 +477,7 @@ function GlossyCard({ state }: { state: React.RefObject<SceneState> }) {
           </mesh>
         </group>
       </group>
-      <group ref={nodes}>
+      <group ref={nodes} visible={variant === "hero"}>
         {assets.nodeData.map((d, i) => (
           <mesh key={i}>
             <sphereGeometry args={[d.size, 20, 14]} />
@@ -487,7 +516,7 @@ function Director({ state }: { state: React.RefObject<SceneState> }) {
     (scene.fog as THREE.Fog | null)?.color.copy(SKY);
     registry.ground?.color.copy(GROUND_DAY).lerp(GROUND_NIGHT, n);
     for (const m of registry.buildings) {
-      m.emissiveIntensity = 0.22 + n * 1.1;
+      m.emissiveIntensity = 0.15 + n * 1.1;
       m.color.copy(BUILDING).multiplyScalar(1 - n * 0.55);
     }
     if (registry.hemi) registry.hemi.intensity = 1.1 - n * 0.7;
@@ -510,6 +539,48 @@ function Ready({ onReady }: { onReady: () => void }) {
   return null;
 }
 
+/** Tone mapping and soft studio reflections for the glossy card and buildings. */
+function setupRenderer(gl: THREE.WebGLRenderer, scene: THREE.Scene) {
+  gl.toneMapping = THREE.ACESFilmicToneMapping;
+  gl.toneMappingExposure = 1.05;
+  const pmrem = new THREE.PMREMGenerator(gl);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environmentIntensity = 0.55;
+  pmrem.dispose();
+}
+
+/**
+ * Small transparent canvas drawn above the page (bottom right) that shows the
+ * card for the rest of the page, turning as you scroll.
+ */
+export function CardWidget({
+  state,
+  active,
+}: {
+  state: React.RefObject<SceneState>;
+  active: boolean;
+}) {
+  // Camera distance chosen so the card fills WIDGET_FILL of the widget width.
+  const fov = 30;
+  const visibleW = CARD_W / WIDGET_FILL;
+  const visibleH = visibleW / (WIDGET.width / WIDGET.height);
+  const z = visibleH / 2 / Math.tan(THREE.MathUtils.degToRad(fov / 2));
+  return (
+    <Canvas
+      aria-hidden="true"
+      frameloop={active ? "always" : "never"}
+      dpr={[1, 2]}
+      gl={{ antialias: true, alpha: true }}
+      camera={{ fov, near: 0.1, far: 50, position: [0, 0, z] }}
+      onCreated={({ gl, scene }) => setupRenderer(gl, scene)}
+    >
+      <hemisphereLight args={["#ffffff", "#8fb8d8", 1.1]} />
+      <directionalLight position={[-3, 5, 4]} intensity={1.6} color="#fff4e0" />
+      <GlossyCard state={state} variant="widget" />
+    </Canvas>
+  );
+}
+
 export default function SiteScene({ quality, state, onReady }: Props) {
   const high = quality === "high";
   return (
@@ -519,13 +590,7 @@ export default function SiteScene({ quality, state, onReady }: Props) {
       gl={{ antialias: high, powerPreference: "high-performance", alpha: false }}
       camera={{ fov: 50, near: 0.1, far: 280, position: [0, 3.2, 14] }}
       onCreated={({ gl, scene, camera }) => {
-        gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = 1.05;
-        // Soft studio reflections for the glossy card and buildings.
-        const pmrem = new THREE.PMREMGenerator(gl);
-        scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-        scene.environmentIntensity = 0.55;
-        pmrem.dispose();
+        setupRenderer(gl, scene);
         scene.background = SKY;
         scene.fog = new THREE.Fog(SKY, 30, 125);
         // The card is attached to the camera, so the camera must be in the scene.
@@ -550,8 +615,8 @@ export default function SiteScene({ quality, state, onReady }: Props) {
       <Ground />
       <Skyline quality={quality} />
       <Gates state={state} />
-      <Particles count={high ? 800 : 300} />
-      {high && <GlossyCard state={state} />}
+      <Particles count={high ? 500 : 220} />
+      {high && <GlossyCard state={state} variant="hero" />}
       <Ready onReady={onReady} />
     </Canvas>
   );

@@ -24,7 +24,7 @@ export function About() {
         <dl className="grid grid-cols-2 gap-4">
           {about.stats.map((s, i) => (
             <Reveal key={s.label} delay={i * 80}>
-              <div className="h-full rounded-card border border-line bg-white p-6 shadow-[0_10px_30px_-24px_rgb(1_43_117/0.6)]">
+              <div className="h-full rounded-card border border-line/80 bg-white/95 p-6 shadow-soft">
                 <dd className="text-4xl font-bold text-navy sm:text-5xl">
                   <CountUp value={s.value} suffix={s.suffix} />
                 </dd>
