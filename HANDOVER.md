@@ -446,3 +446,16 @@ recruitment data), and optionally one page per service for SEO.
 - On shorter screens the chat panel reached the top and the navbar's Get a Quote button showed
   over its header. The chat now sits above the navbar layer and its height is capped so it
   always opens below the navbar (checked at 1366x640, 1440x900 and 390x700).
+
+### Cleanup: unused code removed, no visual or behaviour change
+
+- Quote and application forms now share one submit hook (`src/components/forms/useFormSubmit.ts`)
+  instead of two copies of the same logic; removed the unused `idPrefix` prop.
+- Removed unused content (`hero.points`), unexported internal helpers and types, stale CSS
+  comments, an obsolete iOS scroll property and a needlessly complex selector.
+- Fonts: stopped loading three font files that were never used (Tinos italic, upright
+  Instrument Serif, Dancing Script 600), so pages download less.
+- Verified: TypeScript with unused-code checks, lint, both builds, a dead-code scan, and a
+  pixel comparison of 14 screenshots (home, privacy, admin pages, quote card and chat on
+  desktop and phone) before and after: all identical. 3D scene, form validation, submission
+  and the admin panel re-tested.

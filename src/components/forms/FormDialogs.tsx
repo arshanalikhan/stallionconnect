@@ -136,7 +136,7 @@ export function FormDialogProvider({ children }: { children: React.ReactNode }) 
                   className="mt-3 mb-6 block h-[3px] w-12 rounded-full bg-linear-to-r from-brand-green to-brand-green-light"
                 />
                 {current.type === "quote" ? (
-                  <QuoteForm defaultService={current.service} idPrefix="dialog-" />
+                  <QuoteForm defaultService={current.service} />
                 ) : (
                   <ApplicationForm defaultRole={current.role} />
                 )}

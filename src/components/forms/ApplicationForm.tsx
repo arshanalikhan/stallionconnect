@@ -1,78 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { site } from "@/config/site";
 import { Button } from "@/components/ui/Button";
-import {
-  applicationSchema,
-  experienceOptions,
-  roleOptions,
-  type FieldErrors,
-} from "@/lib/forms/schemas";
-import { submitForm, type SubmitSuccess } from "@/lib/forms/submit";
+import { applicationSchema, experienceOptions, roleOptions } from "@/lib/forms/schemas";
 import { ConsentField, Honeypot, SelectField, TextAreaField, TextField } from "./fields";
 import { FormError, FormSuccess } from "./FormStatus";
-
-type State =
-  | { kind: "idle" | "sending" }
-  | { kind: "done"; result: SubmitSuccess }
-  | { kind: "error"; message?: string };
+import { useFormSubmit } from "./useFormSubmit";
 
 export function ApplicationForm({ defaultRole }: { defaultRole?: string }) {
-  const [errors, setErrors] = useState<FieldErrors>({});
-  const [state, setState] = useState<State>({ kind: "idle" });
+  const { errors, state, onSubmit, reset } = useFormSubmit({
+    schema: applicationSchema,
+    endpoint: "/api/applications",
+    kind: "applications",
+    email: {
+      to: site.contact.careersEmail,
+      subject: (d) => `Application: ${d.role} - ${d.name}`,
+      labels: {
+        name: "Name",
+        email: "Email",
+        phone: "Phone",
+        role: "Role",
+        experience: "Experience",
+        city: "City",
+        languages: "Languages",
+        message: "About me",
+      },
+    },
+  });
 
   if (state.kind === "done") {
     return (
-      <FormSuccess
-        title="Thank you for applying."
-        result={state.result}
-        onReset={() => setState({ kind: "idle" })}
-      >
+      <FormSuccess title="Thank you for applying." result={state.result} onReset={reset}>
         Please email your CV to <strong className="text-navy">{site.contact.careersEmail}</strong>{" "}
         with your name and the role in the subject line. Our HR team will be in touch.
       </FormSuccess>
     );
-  }
-
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    setState({ kind: "sending" });
-    const result = await submitForm({
-      form,
-      schema: applicationSchema,
-      endpoint: "/api/applications",
-      kind: "applications",
-      email: {
-        to: site.contact.careersEmail,
-        subject: (d) => `Application: ${d.role} - ${d.name}`,
-        labels: {
-          name: "Name",
-          email: "Email",
-          phone: "Phone",
-          role: "Role",
-          experience: "Experience",
-          city: "City",
-          languages: "Languages",
-          message: "About me",
-        },
-      },
-    });
-    if (result.ok) {
-      setErrors({});
-      setState({ kind: "done", result });
-      return;
-    }
-    setErrors(result.errors ?? {});
-    if (result.errors) {
-      setState({ kind: "idle" });
-      const first = Object.keys(result.errors)[0];
-      form.querySelector<HTMLElement>(`[name="${first}"]`)?.focus();
-    } else {
-      setState({ kind: "error", message: result.message });
-    }
   }
 
   return (

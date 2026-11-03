@@ -238,11 +238,6 @@ html[data-scene] .scene-hide-card {
   pointer-events: none;
 }
 
-/*
- * Phones and tablets with the 3D scene: each section opens with an empty
- * window where the 3D card and city show, and long lists become swipeable
- * rows so sections stay short and the scene stays visible.
- */
 @media (max-width: 1023px) {
   html[data-scene] .scene-hide-card {
     display: none;
@@ -458,7 +453,6 @@ html.custom-cursor :is(input:not([type="checkbox"]):not([type="radio"]), textare
   overflow-x: hidden;
   border-radius: 2rem;
   border: 1px solid rgb(255 255 255 / 0.7);
-  -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
   background: linear-gradient(160deg, rgb(255 255 255 / 0.95), rgb(244 248 253 / 0.92));
   box-shadow:
@@ -554,7 +548,7 @@ html.custom-cursor :is(input:not([type="checkbox"]):not([type="radio"]), textare
 }
 
 /* Switching inside the card: the form fades through while the blade glides. */
-.fd[data-mode]:not([data-mode=""]) .fd-form-inner > * {
+.fd .fd-form-inner > * {
   animation: fd-fade 0.6s ease-out;
 }
 

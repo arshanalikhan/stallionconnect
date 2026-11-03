@@ -1,91 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { site } from "@/config/site";
 import { Button } from "@/components/ui/Button";
-import {
-  enquirySchema,
-  serviceOptions,
-  teamSizeOptions,
-  type FieldErrors,
-} from "@/lib/forms/schemas";
-import { submitForm, type SubmitSuccess } from "@/lib/forms/submit";
+import { enquirySchema, serviceOptions, teamSizeOptions } from "@/lib/forms/schemas";
 import { ConsentField, Honeypot, SelectField, TextAreaField, TextField } from "./fields";
 import { FormError, FormSuccess } from "./FormStatus";
+import { useFormSubmit } from "./useFormSubmit";
 
-type State =
-  | { kind: "idle" | "sending" }
-  | { kind: "done"; result: SubmitSuccess }
-  | { kind: "error"; message?: string };
-
-export function QuoteForm({
-  defaultService,
-  idPrefix = "",
-}: {
-  defaultService?: string;
-  idPrefix?: string;
-}) {
-  const [errors, setErrors] = useState<FieldErrors>({});
-  const [state, setState] = useState<State>({ kind: "idle" });
+export function QuoteForm({ defaultService }: { defaultService?: string }) {
+  const { errors, state, onSubmit, reset } = useFormSubmit({
+    schema: enquirySchema,
+    endpoint: "/api/enquiries",
+    kind: "enquiries",
+    email: {
+      to: site.contact.email,
+      subject: (d) => `Quote request: ${d.service}`,
+      labels: {
+        name: "Name",
+        company: "Company",
+        email: "Email",
+        phone: "Phone",
+        service: "Service",
+        teamSize: "Team size",
+        message: "Requirements",
+      },
+    },
+  });
 
   if (state.kind === "done") {
     return (
-      <FormSuccess
-        title="Thank you, we have your enquiry."
-        result={state.result}
-        onReset={() => setState({ kind: "idle" })}
-      >
+      <FormSuccess title="Thank you, we have your enquiry." result={state.result} onReset={reset}>
         Our team will get back to you within one working day.
       </FormSuccess>
     );
   }
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const form = e.currentTarget;
-    setState({ kind: "sending" });
-    const result = await submitForm({
-      form,
-      schema: enquirySchema,
-      endpoint: "/api/enquiries",
-      kind: "enquiries",
-      email: {
-        to: site.contact.email,
-        subject: (d) => `Quote request: ${d.service}`,
-        labels: {
-          name: "Name",
-          company: "Company",
-          email: "Email",
-          phone: "Phone",
-          service: "Service",
-          teamSize: "Team size",
-          message: "Requirements",
-        },
-      },
-    });
-    if (result.ok) {
-      setErrors({});
-      setState({ kind: "done", result });
-      return;
-    }
-    setErrors(result.errors ?? {});
-    if (result.errors) {
-      setState({ kind: "idle" });
-      const first = Object.keys(result.errors)[0];
-      form.querySelector<HTMLElement>(`[name="${first}"]`)?.focus();
-    } else {
-      setState({ kind: "error", message: result.message });
-    }
-  }
-
   return (
-    <form
-      noValidate
-      onSubmit={onSubmit}
-      className="relative grid gap-4 sm:grid-cols-2"
-      data-form={`${idPrefix}quote`}
-    >
+    <form noValidate onSubmit={onSubmit} className="relative grid gap-4 sm:grid-cols-2">
       <TextField name="name" label="Full name" required autoComplete="name" error={errors.name} />
       <TextField
         name="company"

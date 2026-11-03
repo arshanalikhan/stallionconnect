@@ -9,7 +9,6 @@ const tinos = Tinos({
   variable: "--font-tinos",
   subsets: ["latin"],
   weight: ["400", "700"],
-  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -18,7 +17,7 @@ const serif = Instrument_Serif({
   variable: "--font-instrument",
   subsets: ["latin"],
   weight: "400",
-  style: ["normal", "italic"],
+  style: "italic",
   display: "swap",
 });
 
@@ -26,7 +25,7 @@ const serif = Instrument_Serif({
 const script = Dancing_Script({
   variable: "--font-dancing",
   subsets: ["latin"],
-  weight: ["600", "700"],
+  weight: "700",
   display: "swap",
 });
 

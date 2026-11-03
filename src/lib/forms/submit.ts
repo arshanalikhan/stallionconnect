@@ -7,13 +7,13 @@ export type EmailDraft = { to: string; subject: string; body: string; href: stri
 export type SubmitSuccess =
   { ok: true; via: "api" } | { ok: true; via: "email"; draft: EmailDraft };
 
-export type SubmitResult = SubmitSuccess | { ok: false; errors?: FieldErrors; message?: string };
+type SubmitResult = SubmitSuccess | { ok: false; errors?: FieldErrors; message?: string };
 
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 export const isStaticPreview = process.env.NEXT_PUBLIC_STATIC_PREVIEW === "true";
 
 /** Reads a form into a plain object; checkboxes become booleans. */
-export function readForm(form: HTMLFormElement) {
+function readForm(form: HTMLFormElement) {
   const data: Record<string, unknown> = {};
   for (const el of Array.from(form.elements) as HTMLInputElement[]) {
     if (!el.name) continue;

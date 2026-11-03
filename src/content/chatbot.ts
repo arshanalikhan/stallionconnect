@@ -7,7 +7,7 @@
  * - `next` lists follow-up buttons shown after the answer (FAQ ids or actions).
  */
 export type ChatAction = "quote" | "apply" | "human" | "menu" | "form";
-export type ChatFaq = {
+type ChatFaq = {
   id: string;
   label: string;
   keywords: string[];

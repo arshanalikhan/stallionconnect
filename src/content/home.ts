@@ -10,7 +10,6 @@ export const hero = {
   highlight: "grow business.",
   intro:
     "Stallion Connect runs call centre, sales, customer support and back-office operations for banks, financial services firms and growing brands in India and overseas, so your team can focus on what it does best.",
-  points: ["Domestic and international", "Inbound and outbound", "BFSI specialists"],
   // TODO: confirm figures before launch.
   stats: [
     { value: "24x7", label: "Support coverage" },
@@ -19,7 +18,7 @@ export const hero = {
   ],
 };
 
-export type Service = {
+type Service = {
   id: string;
   tag: string;
   title: string;
