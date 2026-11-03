@@ -463,7 +463,7 @@ export function ChatBot() {
   return (
     <>
       {/* Launcher */}
-      <div className="fixed right-4 bottom-4 z-40 flex items-end gap-3 sm:right-6 sm:bottom-6">
+      <div className="fixed right-4 bottom-4 z-[60] flex items-end gap-3 sm:right-6 sm:bottom-6">
         {teaser && !open && (
           <div className="chat-pop relative mb-2 max-w-[220px] rounded-2xl rounded-br-sm border border-white/80 bg-white/95 px-4 py-3 text-sm text-ink shadow-lift backdrop-blur">
             <button
@@ -502,7 +502,7 @@ export function ChatBot() {
           id="chatbot"
           role="dialog"
           aria-label="Chat with Stallion Connect"
-          className="chat-pop fixed inset-x-3 bottom-22 z-40 flex h-[min(620px,calc(100svh-7rem))] flex-col overflow-hidden rounded-[1.75rem] border border-white/80 bg-linear-to-b from-white/95 to-[#f4f8fd]/95 shadow-[inset_0_1px_0_#fff,0_40px_80px_-24px_rgb(0_20_60/0.5)] backdrop-blur-xl sm:inset-x-auto sm:right-6 sm:bottom-24 sm:w-[380px]"
+          className="chat-pop fixed inset-x-3 bottom-22 z-[60] flex h-[min(620px,calc(100svh-12rem))] flex-col overflow-hidden rounded-[1.75rem] border border-white/80 bg-linear-to-b from-white/95 to-[#f4f8fd]/95 shadow-[inset_0_1px_0_#fff,0_40px_80px_-24px_rgb(0_20_60/0.5)] backdrop-blur-xl sm:inset-x-auto sm:right-6 sm:bottom-24 sm:w-[380px]"
         >
           <header className="relative flex items-center gap-3 overflow-hidden bg-linear-to-br from-[#0a3f95] via-navy to-[#04402a] px-5 py-4 text-white">
             <span

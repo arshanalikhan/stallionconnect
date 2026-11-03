@@ -440,3 +440,9 @@ recruitment data), and optionally one page per service for SEO.
   coat is softer.
 - In Services and How we work the heading panel leaves room on the right on desktop
   (`.heading-lane`), so the card sits beside the glass instead of behind it.
+
+### Fix: chat panel under the navbar
+
+- On shorter screens the chat panel reached the top and the navbar's Get a Quote button showed
+  over its header. The chat now sits above the navbar layer and its height is capped so it
+  always opens below the navbar (checked at 1366x640, 1440x900 and 390x700).
