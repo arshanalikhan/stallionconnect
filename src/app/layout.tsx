@@ -1,13 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Dancing_Script, Instrument_Serif, Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Dancing_Script, Instrument_Serif, Tinos } from "next/font/google";
 import { site } from "@/config/site";
 import logoFull from "@/assets/brand/logo-full.webp";
 import "./globals.css";
 
-/** Body text. */
-const inter = Inter({
-  variable: "--font-inter",
+/** Body and headings: Times New Roman style. */
+const tinos = Tinos({
+  variable: "--font-tinos",
   subsets: ["latin"],
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -25,14 +27,6 @@ const script = Dancing_Script({
   variable: "--font-dancing",
   subsets: ["latin"],
   weight: ["600", "700"],
-  display: "swap",
-});
-
-/** Headings, buttons and other display text. */
-const jakarta = Plus_Jakarta_Sans({
-  variable: "--font-jakarta",
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
   display: "swap",
 });
 
@@ -58,10 +52,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en-IN"
-      className={`${inter.variable} ${jakarta.variable} ${serif.variable} ${script.variable}`}
-    >
+    <html lang="en-IN" className={`${tinos.variable} ${serif.variable} ${script.variable}`}>
       <body className="flex min-h-svh flex-col">
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>

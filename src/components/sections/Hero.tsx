@@ -36,7 +36,7 @@ export function Hero() {
             </span>
             {hero.badge}
           </p>
-          <h1 className="text-[2.6rem] leading-[1.05] font-extrabold tracking-[-0.035em] sm:text-6xl lg:text-[4.25rem]">
+          <h1 className="text-[2.6rem] leading-[1.05] font-bold tracking-[-0.015em] sm:text-6xl lg:text-[4.25rem]">
             {hero.title} <span className="accent-serif text-brand-green">{hero.highlight}</span>
           </h1>
           <p className="accent-script mt-4 text-[1.75rem] leading-tight text-royal">
