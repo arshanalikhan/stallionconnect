@@ -339,3 +339,8 @@ recruitment data), and optionally one page per service for SEO.
   (`.gloss`), glass panels have a sheen, buttons have a glossy gradient.
 - Accent fonts: highlighted words in headings use Instrument Serif italic; the tagline uses
   Dancing Script (cursive).
+
+### Update: navbar always visible
+
+- The navbar no longer hides when scrolling down; it stays at the top for the whole page.
+  Its look and transitions are unchanged.

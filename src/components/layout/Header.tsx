@@ -10,20 +10,10 @@ import { Logo } from "./Logo";
 export function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const [active, setActive] = useState("#home");
 
   useEffect(() => {
-    let last = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 24);
-      // Tuck away while scrolling down through content, return on any scroll up.
-      if (Math.abs(y - last) > 6) {
-        setHidden(y > last && y > 400);
-        last = y;
-      }
-    };
+    const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -67,7 +57,6 @@ export function Header() {
   }, [active, scrolled]);
 
   const solid = scrolled || open;
-  const tucked = hidden && !open;
   /** Frosted, glossy pill used once the page has scrolled. */
   const glass =
     "border-white/80 bg-linear-to-b from-white/85 to-white/60 shadow-[0_12px_40px_-14px_rgb(1_43_117/0.32),inset_0_1px_0_rgb(255_255_255/0.95),inset_0_-1px_0_rgb(1_43_117/0.04)] backdrop-blur-2xl backdrop-saturate-[1.8]";
@@ -77,7 +66,6 @@ export function Header() {
       className={cn(
         "nav-ease pointer-events-none fixed inset-x-0 top-0 z-50 px-3 sm:px-4",
         solid ? "pt-3" : "pt-5",
-        tucked ? "-translate-y-[130%]" : "translate-y-0",
       )}
     >
       <div
