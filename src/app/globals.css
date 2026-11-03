@@ -629,3 +629,42 @@ html:has(dialog[open]) {
     direction: ltr;
   }
 }
+
+/* Chatbot */
+.chat-pop {
+  animation: chat-pop 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transform-origin: bottom right;
+}
+@keyframes chat-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.chat-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: rgb(1 43 117 / 0.45);
+  animation: chat-dot 1s infinite ease-in-out;
+}
+@keyframes chat-dot {
+  0%,
+  80%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+.chat-log {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(1 43 117 / 0.2) transparent;
+}

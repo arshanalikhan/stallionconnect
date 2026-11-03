@@ -31,6 +31,7 @@ export async function submitForm<S extends z.ZodType>(opts: {
   form: HTMLFormElement;
   schema: S;
   endpoint: string;
+  kind: "enquiries" | "applications";
   email: { to: string; subject: (d: z.infer<S>) => string; labels: Record<string, string> };
 }): Promise<SubmitResult> {
   const raw = readForm(opts.form);
@@ -46,6 +47,9 @@ export async function submitForm<S extends z.ZodType>(opts: {
     const href = `mailto:${opts.email.to}?subject=${encodeURIComponent(
       subject,
     )}&body=${encodeURIComponent(body)}`;
+    // Also kept in this browser's demo store so the preview admin panel shows it.
+    const { demoStore } = await import("@/lib/admin/demo");
+    demoStore.add(opts.kind, data);
     return { ok: true, via: "email", draft: { to: opts.email.to, subject, body, href } };
   }
 

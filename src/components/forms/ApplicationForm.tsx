@@ -44,6 +44,7 @@ export function ApplicationForm({ defaultRole }: { defaultRole?: string }) {
       form,
       schema: applicationSchema,
       endpoint: "/api/applications",
+      kind: "applications",
       email: {
         to: site.contact.careersEmail,
         subject: (d) => `Application: ${d.role} - ${d.name}`,

@@ -1,5 +1,5 @@
 import type { ApplicationInput, EnquiryInput } from "@/lib/forms/schemas";
-import { leadKinds, leadStatuses, type LeadKind, type LeadMap, type LeadStore } from "./types";
+import type { LeadKind, LeadMap, LeadStore } from "./types";
 
 type Tables = { [K in LeadKind]: LeadMap[K][] };
 
@@ -34,9 +34,8 @@ export const memoryStore: LeadStore = {
     tables.applications.unshift(row);
     return { id: row.id };
   },
-  async list(kind, opts) {
-    const rows = tables[kind] as LeadMap[typeof kind][];
-    return opts?.status ? rows.filter((r) => r.status === opts.status) : [...rows];
+  async list(kind) {
+    return [...tables[kind]] as never;
   },
   async update(kind, id, patch) {
     const row = (tables[kind] as { id: string; status: string; note: string }[]).find(
@@ -47,15 +46,11 @@ export const memoryStore: LeadStore = {
     if (patch.note !== undefined) row.note = patch.note;
     return true;
   },
-  async counts() {
-    const out = {} as Awaited<ReturnType<LeadStore["counts"]>>;
-    for (const k of leadKinds) {
-      out[k] = Object.fromEntries(leadStatuses.map((s) => [s, 0])) as Record<
-        (typeof leadStatuses)[number],
-        number
-      >;
-      for (const r of tables[k]) out[k][r.status]++;
-    }
-    return out;
+  async remove(kind, id) {
+    const rows = tables[kind] as { id: string }[];
+    const i = rows.findIndex((r) => r.id === id);
+    if (i < 0) return false;
+    rows.splice(i, 1);
+    return true;
   },
 };

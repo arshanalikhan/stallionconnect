@@ -28,6 +28,11 @@ export const experienceOptions = [
   "5+ years",
 ] as const;
 
+/** Where a lead came from. Set by the website form or the chatbot. */
+export const leadSources = ["website", "chatbot"] as const;
+export type LeadSource = (typeof leadSources)[number];
+const source = z.enum(leadSources).optional().default("website");
+
 const name = z.string().trim().min(2, { error: "Please enter your full name." }).max(100);
 const email = z
   .string()
@@ -56,6 +61,7 @@ export const enquirySchema = z.object({
     .min(10, { error: "Please tell us a little about your requirements." })
     .max(3000),
   consent,
+  source,
 });
 
 export const applicationSchema = z.object({
@@ -68,6 +74,7 @@ export const applicationSchema = z.object({
   languages: optional(200),
   message: optional(2000),
   consent,
+  source,
 });
 
 export type EnquiryInput = z.infer<typeof enquirySchema>;

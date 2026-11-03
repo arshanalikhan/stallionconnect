@@ -1,12 +1,5 @@
 import type { ApplicationInput, EnquiryInput } from "@/lib/forms/schemas";
-import {
-  leadKinds,
-  leadStatuses,
-  type Application,
-  type Enquiry,
-  type LeadKind,
-  type LeadStore,
-} from "./types";
+import type { Application, Enquiry, LeadKind, LeadStore } from "./types";
 
 /**
  * Minimal shape of the Cloudflare D1 binding we use. Avoids a dependency on
@@ -36,6 +29,7 @@ const toEnquiry = (r: Row): Enquiry => ({
   service: r.service as Enquiry["service"],
   teamSize: r.team_size as Enquiry["teamSize"],
   message: r.message,
+  source: (r.source as Enquiry["source"]) ?? "website",
 });
 
 const toApplication = (r: Row): Application => ({
@@ -51,6 +45,7 @@ const toApplication = (r: Row): Application => ({
   city: r.city ?? "",
   languages: r.languages ?? "",
   message: r.message ?? "",
+  source: (r.source as Application["source"]) ?? "website",
 });
 
 /** Table names come from this fixed map only, never from user input. */
@@ -64,10 +59,21 @@ export function createD1Store(db: D1Like): LeadStore {
       const id = crypto.randomUUID();
       await db
         .prepare(
-          `INSERT INTO enquiries (id, created_at, status, name, company, email, phone, service, team_size, message)
-           VALUES (?, ?, 'new', ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO enquiries (id, created_at, status, name, company, email, phone, service, team_size, message, source)
+           VALUES (?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?)`,
         )
-        .bind(id, now(), i.name, i.company, i.email, i.phone, i.service, i.teamSize, i.message)
+        .bind(
+          id,
+          now(),
+          i.name,
+          i.company,
+          i.email,
+          i.phone,
+          i.service,
+          i.teamSize,
+          i.message,
+          i.source,
+        )
         .run();
       return { id };
     },
@@ -76,8 +82,8 @@ export function createD1Store(db: D1Like): LeadStore {
       const id = crypto.randomUUID();
       await db
         .prepare(
-          `INSERT INTO applications (id, created_at, status, name, email, phone, role, experience, city, languages, message)
-           VALUES (?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO applications (id, created_at, status, name, email, phone, role, experience, city, languages, message, source)
+           VALUES (?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         )
         .bind(
           id,
@@ -90,19 +96,16 @@ export function createD1Store(db: D1Like): LeadStore {
           i.city,
           i.languages,
           i.message,
+          i.source,
         )
         .run();
       return { id };
     },
 
-    async list(kind, opts) {
-      const base = `SELECT * FROM ${table[kind]}`;
-      const stmt = opts?.status
-        ? db
-            .prepare(`${base} WHERE status = ? ORDER BY created_at DESC LIMIT 1000`)
-            .bind(opts.status)
-        : db.prepare(`${base} ORDER BY created_at DESC LIMIT 1000`);
-      const { results } = await stmt.all<Row>();
+    async list(kind) {
+      const { results } = await db
+        .prepare(`SELECT * FROM ${table[kind]} ORDER BY created_at DESC LIMIT 1000`)
+        .all<Row>();
       return (kind === "enquiries" ? results.map(toEnquiry) : results.map(toApplication)) as never;
     },
 
@@ -125,21 +128,9 @@ export function createD1Store(db: D1Like): LeadStore {
       return (res.meta?.changes ?? 0) > 0;
     },
 
-    async counts() {
-      const out = {} as Awaited<ReturnType<LeadStore["counts"]>>;
-      for (const k of leadKinds) {
-        out[k] = Object.fromEntries(leadStatuses.map((s) => [s, 0])) as Record<
-          (typeof leadStatuses)[number],
-          number
-        >;
-        const { results } = await db
-          .prepare(`SELECT status, COUNT(*) AS n FROM ${table[k]} GROUP BY status`)
-          .all<{ status: string; n: number }>();
-        for (const r of results) {
-          if (r.status in out[k]) out[k][r.status as (typeof leadStatuses)[number]] = r.n;
-        }
-      }
-      return out;
+    async remove(kind, id) {
+      const res = await db.prepare(`DELETE FROM ${table[kind]} WHERE id = ?`).bind(id).run();
+      return (res.meta?.changes ?? 0) > 0;
     },
   };
 }

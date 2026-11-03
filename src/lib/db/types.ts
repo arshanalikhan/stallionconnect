@@ -16,13 +16,14 @@ export type LeadMap = { enquiries: Enquiry; applications: Application };
 export interface LeadStore {
   createEnquiry(input: EnquiryInput): Promise<{ id: string }>;
   createApplication(input: ApplicationInput): Promise<{ id: string }>;
-  list<K extends LeadKind>(kind: K, opts?: { status?: LeadStatus }): Promise<LeadMap[K][]>;
+  /** Newest first, up to 1000 rows. */
+  list<K extends LeadKind>(kind: K): Promise<LeadMap[K][]>;
   update(
     kind: LeadKind,
     id: string,
     patch: { status?: LeadStatus; note?: string },
   ): Promise<boolean>;
-  counts(): Promise<Record<LeadKind, Record<LeadStatus, number>>>;
+  remove(kind: LeadKind, id: string): Promise<boolean>;
 }
 
 export const isLeadKind = (v: unknown): v is LeadKind => leadKinds.includes(v as LeadKind);

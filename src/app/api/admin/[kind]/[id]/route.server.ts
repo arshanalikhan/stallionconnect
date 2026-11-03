@@ -30,3 +30,21 @@ export async function PATCH(
     return serverError(err);
   }
 }
+
+/** DELETE /api/admin/{enquiries|applications}/{id}: remove a lead (spam, test, duplicate). */
+export async function DELETE(
+  request: Request,
+  ctx: { params: Promise<{ kind: string; id: string }> },
+) {
+  if (!(await getAdmin(request.headers))) return json({ ok: false, error: "Unauthorised" }, 401);
+
+  const { kind, id } = await ctx.params;
+  if (!isLeadKind(kind)) return json({ ok: false, error: "Not found" }, 404);
+
+  try {
+    const removed = await getStore().remove(kind, id);
+    return removed ? json({ ok: true }) : json({ ok: false, error: "Not found" }, 404);
+  } catch (err) {
+    return serverError(err);
+  }
+}

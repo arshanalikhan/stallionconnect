@@ -74,15 +74,18 @@ One-time setting (done by the owner): repository **Settings > Pages > Deploy fro
 ```
 src/app/layout.tsx       root html, fonts, metadata
 src/app/(site)/          public pages with header, footer and form dialogs
-src/app/admin/           admin panel (page.server.tsx)
-src/app/api/             API routes (route.server.ts): enquiries, applications, admin
+src/app/admin/           admin pages: dashboard, enquiries, applications
+src/app/api/             API routes (route.server.ts): enquiries, applications, admin list/update/delete/export
 src/components/layout/   Header (glossy pill navbar), Footer, Logo, WhatsAppButton, CustomCursor
 src/components/ui/       Button, Container, Section, Heading, Icon, Reveal
 src/components/sections/ homepage sections (Hero, Services, About, WhyUs, Process,
                          Industries, Careers, Faq, Contact, plus CallCard and CountUp)
 src/content/home.ts      all homepage text, lists and numbers
 src/components/forms/    quote form, application form, dialogs, field components
-src/components/admin/    admin lead list
+src/components/admin/    admin panel: AdminShell, AdminData, Dashboard, LeadsView
+src/components/chat/     ChatBot.tsx (widget and guided flows)
+src/content/chatbot.ts   chatbot questions, answers and keywords (edit here)
+src/lib/admin/           admin client (API or preview demo) and demo store
 src/components/three/    3D: Scene3D.tsx (loader, device checks, scroll tracking),
                          SiteScene.tsx (scene), sceneState.ts, textures.ts
 src/lib/forms/           shared validation (schemas.ts) and submit logic
@@ -103,20 +106,32 @@ docs/                    Cloudflare deployment steps
 
 ## 7. Forms and admin
 
-| Item                 | How it works                                                                                                                                                                                                                     |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Quote form           | On the Contact section and in a pop-up from every "Get a Quote" and "Enquire" button (service pre-selected)                                                                                                                      |
-| Application form     | Pop-up from "Apply" buttons in Careers (role pre-selected). No CV upload; applicants email CVs to careers@                                                                                                                       |
-| Validation           | Same rules in the browser and on the server (`src/lib/forms/schemas.ts`)                                                                                                                                                         |
-| Spam                 | Hidden honeypot field now; Turnstile later                                                                                                                                                                                       |
-| Storage              | Cloudflare D1 in production; in-memory while running `npm run dev` (resets on restart)                                                                                                                                           |
-| Admin                | `/admin`: two tabs, filter by status, change status (new, contacted, closed), private notes, CSV download, quick email/call/WhatsApp links                                                                                       |
-| Admin login          | Cloudflare Access in production. Open without login only in `npm run dev`. Locked everywhere else                                                                                                                                |
-| GitHub Pages preview | No server or database there, so nothing is saved. After submitting, the visitor sees "One more step: send it by email" with their details, an "Open email app" button and a "Copy details" button. `/admin` does not exist there |
+| Item                 | How it works                                                                                                                                                                                                                                                                                                                                                                                 |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Quote form           | On the Contact section and in a pop-up from every "Get a Quote" and "Enquire" button (service pre-selected)                                                                                                                                                                                                                                                                                  |
+| Application form     | Pop-up from "Apply" buttons in Careers (role pre-selected). No CV upload; applicants email CVs to careers@                                                                                                                                                                                                                                                                                   |
+| Validation           | Same rules in the browser and on the server (`src/lib/forms/schemas.ts`)                                                                                                                                                                                                                                                                                                                     |
+| Spam                 | Hidden honeypot field now; Turnstile later                                                                                                                                                                                                                                                                                                                                                   |
+| Storage              | Cloudflare D1 in production; in-memory while running `npm run dev` (resets on restart)                                                                                                                                                                                                                                                                                                       |
+| Admin                | `/admin` with a sidebar: **Dashboard** (new leads, this week, chatbot vs form, latest activity, pipeline by status, most requested services, roles applied for, quick CSV downloads), **Enquiries** and **Applications** (search, filter by status and source, sort, expand a lead for contact buttons and details, change status, private notes, delete, download the filtered list as CSV) |
+| Admin login          | Cloudflare Access in production. Open without login only in `npm run dev`. Locked everywhere else                                                                                                                                                                                                                                                                                            |
+| GitHub Pages preview | No server or database. Forms show "One more step: send it by email". The admin panel runs as a **demo** with sample data stored only in that browser; forms and chatbot enquiries sent on the preview also appear there. "Reset demo data" restores the samples                                                                                                                              |
 
 To try it locally: `npm run dev`, submit a form, then open http://localhost:3000/admin.
 
-## 8. 3D scene
+## 8. Chatbot
+
+| Item             | How it works                                                                                                                                                                                                                                                                                          |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Where            | Round chat button at the bottom right on every public page (WhatsApp button sits above it). A small hello bubble appears once per visit after about 9 seconds; the chat never opens by itself                                                                                                         |
+| Answers          | 13 drafted questions and answers in `src/content/chatbot.ts`: services, pricing, pilot, go-live time, international, languages, industries, data security, reporting, 24x7, hiring, CVs, contact. Visitors tap buttons or type; typed text is matched by keywords. No AI, so it never makes things up |
+| Get a quote      | Asks one thing at a time: name, company (skippable), email, phone, service, team size, requirements, consent. Each answer is checked with the same rules as the website form. Shows a summary, then sends                                                                                             |
+| Apply for a job  | Name, email, phone, role, experience, city and languages (skippable), consent, then reminds them to email their CV                                                                                                                                                                                    |
+| Talk to a person | WhatsApp, call and email links                                                                                                                                                                                                                                                                        |
+| Saving           | Same API and database as the forms, marked source = chatbot, so leads appear in the admin panel with a Chatbot badge                                                                                                                                                                                  |
+| Editing          | Change wording, add questions or keywords in `src/content/chatbot.ts`; the flow questions are at the top of `ChatBot.tsx`                                                                                                                                                                             |
+
+## 9. 3D scene
 
 | Item                                      | How it works                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -133,7 +148,7 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 | How the page adapts                       | `<html data-scene="high                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | low">`is set when the scene is showing. CSS classes in`globals.css`: `scene-clear`(see-through section),`scene-panel`(glass panel),`scene-night`, `scene-hide`, `scene-only`, `scene-hide-card` |
 | Tuning                                    | Camera route (`PATH`), colours, building density and card behaviour are at the top of each component in `SiteScene.tsx`                                                                                                                                                                                                                                                                                                                                                                                                          |
 
-## 9. Custom cursor
+## 10. Custom cursor
 
 | Item                  | How it works                                                                                                               |
 | --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
@@ -147,7 +162,7 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 | Off completely        | Phones, tablets, touch screens and reduced-motion users                                                                    |
 | Code                  | `src/components/layout/CustomCursor.tsx` (artwork and behaviour); styles at the end of `src/app/globals.css` (`.cursor-*`) |
 
-## 10. Placeholders to replace before launch
+## 11. Placeholders to replace before launch
 
 | Item              | Where                              | Current value                                                          |
 | ----------------- | ---------------------------------- | ---------------------------------------------------------------------- |
@@ -158,7 +173,7 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 | Logo              | `src/assets/brand/`                | Raster cut from the supplied JPEG; replace with SVG or transparent PNG |
 | Privacy and Terms | `src/app/privacy`, `src/app/terms` | Placeholder text                                                       |
 
-## 11. Known issues
+## 12. Known issues
 
 - The logo only works on light backgrounds (its navy text disappears on dark). A white or
   single-colour version is needed if we ever place it on a dark section.
@@ -171,12 +186,12 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 - The browser console shows a harmless `THREE.Clock` deprecation warning from React Three
   Fiber. It goes away when the library updates.
 
-## 12. Next up
+## 13. Next up
 
 Phase 5: content pages. Privacy Policy and Terms (with DPDP Act coverage for form and
 recruitment data), and optionally one page per service for SEO.
 
-## 13. Phase log
+## 14. Phase log
 
 ### Phase 1: Foundation (done)
 
@@ -385,3 +400,17 @@ recruitment data), and optionally one page per service for SEO.
   the full content width, so the left and right edges line up with the cards and grids in
   every section (checked by measuring edges in Services, About, How we work, Industries,
   Careers and FAQ). Panels also look like cards without the 3D scene, so nothing shifts.
+
+### Update: chatbot (option B) and full admin panel
+
+- Chatbot with drafted FAQ, keyword matching for typed questions, and guided quote and job
+  application flows that validate every answer and register the lead (source = chatbot).
+- Admin panel rebuilt as Dashboard, Enquiries and Applications with search, filters, sort,
+  status, notes, delete and CSV export of the filtered list.
+- Data: leads now record their source (website or chatbot); new migration
+  `migrations/0002_lead_source.sql`; new admin API routes for listing and deleting.
+- Preview: admin runs in demo mode with sample data stored in the browser, so it can be tried
+  on the GitHub Pages link. Production uses the real API behind Cloudflare Access.
+- Verified: lint, typecheck, both builds; browser tests of FAQ buttons, typed questions,
+  fallback, full quote and apply flows including invalid email and phone, demo admin and real
+  dev-server admin (status change, search, source filter, delete), phone layouts.

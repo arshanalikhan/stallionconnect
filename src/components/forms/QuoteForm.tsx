@@ -49,6 +49,7 @@ export function QuoteForm({
       form,
       schema: enquirySchema,
       endpoint: "/api/enquiries",
+      kind: "enquiries",
       email: {
         to: site.contact.email,
         subject: (d) => `Quote request: ${d.service}`,

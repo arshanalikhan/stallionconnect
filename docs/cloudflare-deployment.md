@@ -30,6 +30,7 @@ preview is published to GitHub Pages. The code is written to stay Cloudflare-com
    ```bash
    npx wrangler d1 migrations apply stallionconnect --remote
    ```
+   This applies every file in `migrations/` in order (`0001_init.sql`, `0002_lead_source.sql`).
 4. In `src/lib/db/index.ts`, optionally replace the global-symbol lookup with
    `getCloudflareContext().env.DB` from `@opennextjs/cloudflare`.
 5. Protect the admin with Cloudflare Access (Zero Trust, free up to 50 users):
