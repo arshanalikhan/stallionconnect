@@ -472,3 +472,16 @@ recruitment data), and optionally one page per service for SEO.
   `data-phase` in `globals.css`.
 - Verified by recording positions and opacity every 30-60 ms through the switch in both
   directions: continuous glide, constant height, no replayed animation.
+
+### Cloudflare deployment set up (in progress)
+
+- Added back the OpenNext adapter (`@opennextjs/cloudflare`), `wrangler`, `wrangler.jsonc`
+  (Worker name `stallionconnect`), `open-next.config.ts`, `public/_headers` and scripts
+  `cf:build`, `preview`, `deploy`. Bundle: 1.35 MB gzip (free plan limit 3 MB).
+- Cloudflare Workers Builds settings: build command `npx opennextjs-cloudflare build`,
+  deploy command `npx opennextjs-cloudflare deploy`, production branch
+  `claude/modest-euler-dz9n9e` (or merge it into `main`).
+- Still to do: create the D1 database and add its binding (forms and admin need it), apply
+  `migrations/`, set up Cloudflare Access for `/admin*` and `/api/admin/*` plus the two
+  Worker variables, attach `stallionconnect.in`.
+- The GitHub Pages preview keeps working alongside.

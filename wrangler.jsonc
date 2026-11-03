@@ -1,0 +1,24 @@
+{
+  // Cloudflare Workers config. Built by OpenNext: `npx opennextjs-cloudflare build`.
+  // The name must match the Worker/project name in the Cloudflare dashboard.
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "stallionconnect",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-11-02",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "services": [
+    {
+      // Self-reference binding; the service name must match "name" above.
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "stallionconnect",
+    },
+  ],
+  "observability": { "enabled": true },
+  // Next step (forms and admin): add the D1 database binding here, for example
+  // "d1_databases": [{ "binding": "DB", "database_name": "stallionconnect",
+  //   "database_id": "<id from the dashboard>", "migrations_dir": "migrations" }]
+}
