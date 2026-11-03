@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import logoFull from "@/assets/brand/logo-full.webp";
 import { site } from "@/config/site";
-import { WIDGET, type Quality, type SceneState } from "./sceneState";
+import type { Quality, SceneState } from "./sceneState";
 import { callCardTexture, logoCardTexture, sheenTexture, windowTexture } from "./textures";
 
 type Props = {
@@ -240,8 +240,6 @@ function Particles({ count }: { count: number }) {
 const CARD_W = 3.4;
 const CARD_H = 2.12;
 const CARD_R = 0.22;
-/** Hero progress over which the card travels from the hero to the widget. */
-const DOCK_RANGE = 0.72;
 
 function roundedRect(w: number, h: number, r: number) {
   const s = new THREE.Shape();
@@ -296,21 +294,36 @@ const streak = {
 /**
  * The live-call card: rounded glossy body with a curved rim, clear-coated faces
  * that reflect the environment, and a light streak that sweeps across.
- * Attached to the camera. In the hero it sits in the right column; after that it
- * docks at the right edge and keeps turning with the scroll for the whole page.
+ * Attached to the camera, so it stays on screen and glides between per-section
+ * resting places as the page scrolls (see `stops`).
  */
-type CardVariant = "hero" | "widget";
+/**
+ * Where the card rests in each section, in CSS pixels relative to the screen
+ * and the page container, plus its turn (yaw). Between sections it glides from
+ * one resting place to the next, turning as it goes, so the call side and the
+ * logo side take turns facing you. Sections leave room for it on that side.
+ */
+type Stop = { x: number; y: number; w: number; yaw: number };
+function stops(vw: number, vh: number): Stop[] {
+  const c = Math.min(vw, 1280) - 64; // container width
+  const left = (vw - c) / 2;
+  const right = left + c;
+  const PI = Math.PI;
+  const big = (share: number, max: number) => Math.min(c * share, max);
+  return [
+    { x: vw / 2 + c * 0.27, y: vh * 0.52, w: big(0.4, 540), yaw: -0.3 }, // home: right column
+    { x: right - c * 0.13, y: vh * 0.3, w: c * 0.2, yaw: PI + 0.35 }, // services: small, top right
+    { x: left + c * 0.22, y: vh * 0.52, w: big(0.36, 480), yaw: 2 * PI - 0.35 }, // about: large, left
+    { x: right - c * 0.13, y: vh * 0.28, w: c * 0.2, yaw: 3 * PI + 0.35 }, // why us: small, top right
+    { x: right - c * 0.12, y: vh * 0.26, w: c * 0.18, yaw: 4 * PI - 0.35 }, // process: small, top right
+    { x: right - c * 0.2, y: vh * 0.52, w: big(0.34, 460), yaw: 5 * PI + 0.35 }, // industries: large, right
+    { x: right - c * 0.13, y: vh * 0.3, w: c * 0.2, yaw: 6 * PI - 0.35 }, // careers: small, top right
+    { x: right - c * 0.2, y: vh * 0.52, w: big(0.32, 440), yaw: 7 * PI + 0.35 }, // faq: large, right
+    { x: right - c * 0.2, y: vh * 0.52, w: big(0.32, 440), yaw: 8 * PI - 0.35 }, // contact
+  ];
+}
 
-/** Width of the card inside the widget canvas, as a share of the widget width. */
-const WIDGET_FILL = 0.74;
-
-function GlossyCard({
-  state,
-  variant,
-}: {
-  state: React.RefObject<SceneState>;
-  variant: CardVariant;
-}) {
+function GlossyCard({ state }: { state: React.RefObject<SceneState> }) {
   const holder = useRef<THREE.Group>(null);
   const card = useRef<THREE.Group>(null);
   const nodes = useRef<THREE.Group>(null);
@@ -369,12 +382,12 @@ function GlossyCard({
 
   useEffect(() => {
     const h = holder.current;
-    if (!h || variant !== "hero") return;
+    if (!h) return;
     camera.add(h);
     return () => {
       camera.remove(h);
     };
-  }, [camera, variant]);
+  }, [camera]);
 
   useFrame(({ clock, camera: cam }, dt) => {
     const h = holder.current;
@@ -382,42 +395,27 @@ function GlossyCard({
     if (!h || !c) return;
     const s = state.current;
     const t = clock.elapsedTime;
-    const spin = s.page * Math.PI * 6; // turns as the whole page scrolls
+    // Blend between this section's resting place and the next one.
+    const list = stops(s.vw, s.vh);
+    const i = Math.min(list.length - 2, Math.floor(s.sec));
+    const e = smooth(s.sec - i);
+    const a = list[i];
+    const b = list[i + 1];
+    const mix = (k: keyof Stop) => a[k] + (b[k] - a[k]) * e;
 
-    if (variant === "widget") {
-      // The widget canvas is sized so the card simply sits in the middle.
-      h.position.set(0, 0, 0);
-      h.scale.setScalar(1);
-      c.rotation.y = damp(c.rotation.y, -0.3 + spin + s.mx * 0.15, 5, dt);
-    } else {
-      const k = smooth(s.hero / DOCK_RANGE); // 0 in the hero, 1 when it reaches the widget
+    // CSS pixels to world units at the card's depth.
+    const dist = 7;
+    const fov = THREE.MathUtils.degToRad((cam as THREE.PerspectiveCamera).fov);
+    const halfH = Math.tan(fov / 2) * dist;
+    const halfW = halfH * (s.vw / s.vh);
+    const tx = (mix("x") / s.vw - 0.5) * 2 * halfW;
+    const ty = (0.5 - mix("y") / s.vh) * 2 * halfH;
+    const ts = ((mix("w") / s.vw) * 2 * halfW) / CARD_W;
 
-      // Work in CSS pixels, then convert to world units at the card's depth.
-      const dist = 7;
-      const fov = THREE.MathUtils.degToRad((cam as THREE.PerspectiveCamera).fov);
-      const halfH = Math.tan(fov / 2) * dist;
-      const halfW = halfH * (s.vw / s.vh);
-      const container = Math.min(s.vw, 1280) - 64;
-
-      // Hero: large, in the right column.
-      const heroW = Math.min(container * 0.4, 540);
-      const heroX = s.vw / 2 + container * 0.27;
-      const heroY = s.vh * 0.52;
-      // Then: shrink into the floating widget at the bottom right.
-      const dockW = WIDGET.width * WIDGET_FILL;
-      const dockX = s.vw - WIDGET.right - WIDGET.width / 2;
-      const dockY = s.vh - WIDGET.bottom - WIDGET.height / 2;
-
-      const px = THREE.MathUtils.lerp(heroX, dockX, k);
-      const py = THREE.MathUtils.lerp(heroY, dockY, k);
-      const pw = THREE.MathUtils.lerp(heroW, dockW, k);
-      h.position.set((px / s.vw - 0.5) * 2 * halfW, (0.5 - py / s.vh) * 2 * halfH, -dist);
-      h.scale.setScalar(((pw / s.vw) * 2 * halfW) / CARD_W);
-      // Hidden once the widget (drawn above the page) has taken over.
-      h.visible = k < 0.999;
-
-      c.rotation.y = damp(c.rotation.y, -0.3 + s.mx * 0.3 * (1 - k) + spin * k, 5, dt);
-    }
+    // Glide rather than snap.
+    h.position.set(damp(h.position.x, tx, 4, dt), damp(h.position.y, ty, 4, dt), -dist);
+    h.scale.setScalar(damp(h.scale.x || ts, ts, 4, dt));
+    c.rotation.y = damp(c.rotation.y, mix("yaw") + s.mx * 0.3, 4, dt);
     c.rotation.x = damp(c.rotation.x, 0.08 - s.my * 0.2 + Math.sin(t * 0.8) * 0.03, 5, dt);
     c.rotation.z = Math.sin(t * 0.6) * 0.02;
     c.position.y = Math.sin(t * 1.1) * 0.07;
@@ -477,7 +475,7 @@ function GlossyCard({
           </mesh>
         </group>
       </group>
-      <group ref={nodes} visible={variant === "hero"}>
+      <group ref={nodes}>
         {assets.nodeData.map((d, i) => (
           <mesh key={i}>
             <sphereGeometry args={[d.size, 20, 14]} />
@@ -549,38 +547,6 @@ function setupRenderer(gl: THREE.WebGLRenderer, scene: THREE.Scene) {
   pmrem.dispose();
 }
 
-/**
- * Small transparent canvas drawn above the page (bottom right) that shows the
- * card for the rest of the page, turning as you scroll.
- */
-export function CardWidget({
-  state,
-  active,
-}: {
-  state: React.RefObject<SceneState>;
-  active: boolean;
-}) {
-  // Camera distance chosen so the card fills WIDGET_FILL of the widget width.
-  const fov = 30;
-  const visibleW = CARD_W / WIDGET_FILL;
-  const visibleH = visibleW / (WIDGET.width / WIDGET.height);
-  const z = visibleH / 2 / Math.tan(THREE.MathUtils.degToRad(fov / 2));
-  return (
-    <Canvas
-      aria-hidden="true"
-      frameloop={active ? "always" : "never"}
-      dpr={[1, 2]}
-      gl={{ antialias: true, alpha: true }}
-      camera={{ fov, near: 0.1, far: 50, position: [0, 0, z] }}
-      onCreated={({ gl, scene }) => setupRenderer(gl, scene)}
-    >
-      <hemisphereLight args={["#ffffff", "#8fb8d8", 1.1]} />
-      <directionalLight position={[-3, 5, 4]} intensity={1.6} color="#fff4e0" />
-      <GlossyCard state={state} variant="widget" />
-    </Canvas>
-  );
-}
-
 export default function SiteScene({ quality, state, onReady }: Props) {
   const high = quality === "high";
   return (
@@ -616,7 +582,7 @@ export default function SiteScene({ quality, state, onReady }: Props) {
       <Skyline quality={quality} />
       <Gates state={state} />
       <Particles count={high ? 500 : 220} />
-      {high && <GlossyCard state={state} variant="hero" />}
+      {high && <GlossyCard state={state} />}
       <Ready onReady={onReady} />
     </Canvas>
   );

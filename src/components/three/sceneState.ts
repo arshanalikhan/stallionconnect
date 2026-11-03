@@ -8,6 +8,11 @@ export type SceneState = {
   night: number;
   /** Page-progress range covered by the "How we work" section; the gates sit here. */
   gates: [number, number];
+  /**
+   * Position between sections: 2.4 means 40% of the way from the third section
+   * (index 2) to the fourth, measured by section centres crossing mid-screen.
+   */
+  sec: number;
   /** Mouse position, -1 to 1 on each axis. */
   mx: number;
   my: number;
@@ -21,6 +26,7 @@ export const initialSceneState = (): SceneState => ({
   hero: 0,
   night: 0,
   gates: [0.4, 0.55],
+  sec: 0,
   mx: 0,
   my: 0,
   vw: 1280,
@@ -29,11 +35,15 @@ export const initialSceneState = (): SceneState => ({
 
 export type Quality = "high" | "low";
 
-/**
- * Floating card widget (bottom right, above the WhatsApp button). After the
- * hero, the 3D card shrinks into this spot and keeps turning with the scroll.
- * CSS pixels.
- */
-export const WIDGET = { right: 24, bottom: 96, width: 176, height: 124 } as const;
-/** Hero progress at which the big card hands over to the widget. */
-export const DOCK_AT = 0.74;
+/** Page sections in order; the 3D card has one resting place per section. */
+export const SECTION_IDS = [
+  "home",
+  "services",
+  "about",
+  "why-us",
+  "process",
+  "industries",
+  "careers",
+  "faq",
+  "contact",
+] as const;

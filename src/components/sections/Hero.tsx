@@ -25,7 +25,7 @@ export function Hero() {
       {/* keeps the headline readable over the 3D scene */}
       <div
         aria-hidden="true"
-        className="scene-only pointer-events-none absolute inset-0 bg-linear-to-b from-white/75 via-white/50 to-white/10 lg:bg-linear-to-r lg:from-white/90 lg:via-white/65 lg:to-transparent"
+        className="scene-only hero-fade pointer-events-none absolute inset-0 bg-linear-to-b from-white/75 via-white/50 to-white/10 lg:bg-linear-to-r lg:from-white/90 lg:via-white/65 lg:to-transparent"
       />
 
       <Container className="relative grid items-center gap-14 lg:grid-cols-[1.15fr_0.85fr]">
