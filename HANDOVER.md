@@ -344,3 +344,14 @@ recruitment data), and optionally one page per service for SEO.
 
 - The navbar no longer hides when scrolling down; it stays at the top for the whole page.
   Its look and transitions are unchanged.
+
+### Update: quote and apply card redesign
+
+- The pop-up forms are now one glossy split card: a brand side (navy-to-green glass with a
+  diagonal blade edge, logo, serif-italic accent headline, three points) and a form side.
+- Get a Quote: brand side on the left, form slides in from the right. Apply: mirrored, form
+  slides in from the left. A link at the bottom switches between them inside the card, and
+  the brand side glides across to the other side.
+- Phones: the brand side stacks on top as a compact header.
+- Code: `src/components/forms/FormDialogs.tsx` (content in `brandCopy`), styles `.fd-*` in
+  `globals.css`. The forms themselves, validation and saving are unchanged.
