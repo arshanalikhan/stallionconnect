@@ -459,3 +459,16 @@ recruitment data), and optionally one page per service for SEO.
   pixel comparison of 14 screenshots (home, privacy, admin pages, quote card and chat on
   desktop and phone) before and after: all identical. 3D scene, form validation, submission
   and the admin panel re-tested.
+
+### Fix: smooth switch between Get a quote and Apply in the form card
+
+- Causes: switching re-ran the opening slide animation on top of the glide, the form side's
+  right margin jumped instead of animating, text and fields swapped in one frame, and the card
+  height jumped because the two forms differ in length.
+- Now: the text and form fade out, the content swaps while the brand side glides across, the
+  new form slides in from its own side and the brand text fades in after the glide. The card
+  keeps one height on desktop (`min(800px, 94svh)`, form side scrolls inside) and scrolls back
+  to the top on phones. Logic in `switchTo` in `FormDialogs.tsx`; styles under
+  `data-phase` in `globals.css`.
+- Verified by recording positions and opacity every 30-60 ms through the switch in both
+  directions: continuous glide, constant height, no replayed animation.

@@ -58,11 +58,37 @@ export function FormDialogProvider({ children }: { children: React.ReactNode }) 
   const ref = useRef<HTMLDialogElement>(null);
   const [current, setCurrent] = useState<Open | null>(null);
   const [version, setVersion] = useState(0);
+  /** Which way the card entered when opened (kept while switching inside it). */
+  const [enter, setEnter] = useState<Open["type"] | "none">("quote");
+  /** Switching between quote and apply: fade out, swap and glide, slide in. */
+  const [phase, setPhase] = useState<"idle" | "out" | "in">("idle");
+  const formSide = useRef<HTMLDivElement>(null);
+  const timers = useRef<number[]>([]);
 
   const open = useCallback((o: Open) => {
+    timers.current.forEach(clearTimeout);
+    setPhase("idle");
+    setEnter(o.type);
     setCurrent(o);
     setVersion((v) => v + 1); // fresh form and entrance animation each time
   }, []);
+
+  const switchTo = (next: Open) => {
+    if (phase !== "idle") return;
+    // The opening animation has done its job; switching uses its own motion.
+    setEnter("none");
+    setPhase("out");
+    // Phones scroll the whole card: glide back to the top while fading out.
+    formSide.current?.closest(".fd")?.scrollTo({ top: 0, behavior: "smooth" });
+    timers.current = [
+      window.setTimeout(() => {
+        setCurrent(next);
+        formSide.current?.scrollTo({ top: 0 });
+        setPhase("in");
+      }, 240),
+      window.setTimeout(() => setPhase("idle"), 1200),
+    ];
+  };
 
   useEffect(() => {
     const d = ref.current;
@@ -84,7 +110,7 @@ export function FormDialogProvider({ children }: { children: React.ReactNode }) 
         className="fd-dialog m-auto max-h-[94svh] w-[min(1060px,calc(100%-1.5rem))] overflow-hidden rounded-[2rem] bg-transparent p-0 backdrop:bg-navy-deep/60 backdrop:backdrop-blur-md"
       >
         {current && (
-          <div key={version} className="fd" data-mode={mode} data-enter={current.type}>
+          <div key={version} className="fd" data-mode={mode} data-enter={enter} data-phase={phase}>
             <button
               type="button"
               onClick={close}
@@ -123,7 +149,7 @@ export function FormDialogProvider({ children }: { children: React.ReactNode }) 
             </aside>
 
             {/* Form side */}
-            <div className="fd-form">
+            <div className="fd-form" ref={formSide}>
               <div className="fd-form-inner">
                 <p className="font-display text-[12px] font-semibold tracking-[0.18em] text-brand-green uppercase">
                   {copy.formEyebrow}
@@ -145,7 +171,7 @@ export function FormDialogProvider({ children }: { children: React.ReactNode }) 
                   <button
                     type="button"
                     onClick={() =>
-                      setCurrent(current.type === "quote" ? { type: "apply" } : { type: "quote" })
+                      switchTo(current.type === "quote" ? { type: "apply" } : { type: "quote" })
                     }
                     className="font-semibold text-navy underline decoration-brand-green decoration-2 underline-offset-4 hover:text-brand-green"
                   >

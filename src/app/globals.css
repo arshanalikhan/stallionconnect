@@ -499,13 +499,18 @@ html.custom-cursor :is(input:not([type="checkbox"]):not([type="radio"]), textare
     top: 0;
     padding: 3rem 2.75rem;
   }
+  /* Same height for both forms, so switching never makes the card jump;
+     the form side scrolls inside when needed. */
   .fd {
     overflow: hidden;
+    height: min(800px, 94svh);
   }
   .fd-form {
-    max-height: 94svh;
+    height: 100%;
     overflow-y: auto;
-    transition: margin-left 0.9s var(--ease);
+    transition:
+      margin-left 0.9s var(--ease),
+      margin-right 0.9s var(--ease);
   }
   .fd-form-inner {
     padding: 2.5rem 2.75rem 2rem;
@@ -547,9 +552,28 @@ html.custom-cursor :is(input:not([type="checkbox"]):not([type="radio"]), textare
   }
 }
 
-/* Switching inside the card: the form fades through while the blade glides. */
-.fd .fd-form-inner > * {
-  animation: fd-fade 0.6s ease-out;
+/*
+ * Switching inside the card (data-phase): the text and form fade out, the
+ * content swaps while the brand side glides across, then the new form slides
+ * in from its own side and the new brand text fades in.
+ */
+.fd[data-phase="out"] :is(.fd-form-inner, .fd-brand-inner) {
+  animation: fd-out 0.22s ease-in forwards;
+}
+@keyframes fd-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.fd[data-phase="in"][data-mode="quote"] .fd-form-inner {
+  animation: fd-in-right 0.7s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.fd[data-phase="in"][data-mode="apply"] .fd-form-inner {
+  animation: fd-in-left 0.7s 0.15s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.fd[data-phase="in"] .fd-brand-inner {
+  animation: fd-fade 0.5s 0.45s ease-out both;
 }
 
 @keyframes fd-pop {
