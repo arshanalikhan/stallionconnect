@@ -18,7 +18,13 @@
     },
   ],
   "observability": { "enabled": true },
-  // Next step (forms and admin): add the D1 database binding here, for example
-  // "d1_databases": [{ "binding": "DB", "database_name": "stallionconnect",
-  //   "database_id": "<id from the dashboard>", "migrations_dir": "migrations" }]
+  // Database for enquiries and job applications (forms, chatbot, admin panel).
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "stallionconnect",
+      "database_id": "58bc1a20-34d0-4110-89e0-3a92d0a41c17",
+      "migrations_dir": "migrations",
+    },
+  ],
 }

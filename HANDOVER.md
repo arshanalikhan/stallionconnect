@@ -485,3 +485,10 @@ recruitment data), and optionally one page per service for SEO.
   `migrations/`, set up Cloudflare Access for `/admin*` and `/api/admin/*` plus the two
   Worker variables, attach `stallionconnect.in`.
 - The GitHub Pages preview keeps working alongside.
+
+### Cloudflare: D1 database connected
+
+- D1 database `stallionconnect` (ID `58bc1a20-34d0-4110-89e0-3a92d0a41c17`) bound as `DB` in
+  `wrangler.jsonc`. Tested in the local Workers runtime: enquiries and applications save.
+- Tables are created once by pasting `docs/d1-setup.sql` into the D1 Console (same schema as
+  `migrations/0001` + `0002` combined).
