@@ -94,27 +94,58 @@ export function callCardTexture() {
   return finish(c);
 }
 
-/** Back of the card: white with the logo and tagline. */
-export function logoCardTexture(logo: HTMLImageElement, tagline: string) {
+/**
+ * Back of the card: the logo on a bright, lightly tinted face, with a solid
+ * navy band along the bottom edge carrying the service line. The logo image
+ * already contains the tagline, so it is not repeated.
+ */
+export function logoCardTexture(logo: HTMLImageElement, serviceLine: string) {
   const c = document.createElement("canvas");
   c.width = 1024;
   c.height = 640;
   const g = c.getContext("2d")!;
+  const F = pageFont();
+  const BAND = 150; // height of the bottom band
+
+  // Face: white with soft brand-coloured glows so it never reads as grey.
   g.fillStyle = "#ffffff";
   g.fillRect(0, 0, 1024, 640);
-  const bar = g.createLinearGradient(0, 0, 1024, 0);
-  bar.addColorStop(0, "#012b75");
-  bar.addColorStop(1, "#139528");
-  g.fillStyle = bar;
-  g.fillRect(0, 600, 1024, 40);
+  const glowBlue = g.createRadialGradient(80, 40, 0, 80, 40, 520);
+  glowBlue.addColorStop(0, "rgba(26,86,196,0.16)");
+  glowBlue.addColorStop(1, "rgba(26,86,196,0)");
+  g.fillStyle = glowBlue;
+  g.fillRect(0, 0, 1024, 640);
+  const glowGreen = g.createRadialGradient(980, 470, 0, 980, 470, 520);
+  glowGreen.addColorStop(0, "rgba(43,214,107,0.2)");
+  glowGreen.addColorStop(1, "rgba(43,214,107,0)");
+  g.fillStyle = glowGreen;
+  g.fillRect(0, 0, 1024, 640);
 
-  const w = 860;
+  // Logo, centred in the space above the band.
+  const w = 780;
   const h = (logo.naturalHeight / logo.naturalWidth) * w;
-  g.drawImage(logo, (1024 - w) / 2, 270 - h / 2, w, h);
-  g.fillStyle = "#012b75";
-  g.font = `600 34px ${pageFont()}`;
+  g.drawImage(logo, (1024 - w) / 2, (640 - BAND - h) / 2 + 6, w, h);
+
+  // Bottom band, flush with the card's bottom edge.
+  const band = g.createLinearGradient(0, 640 - BAND, 1024, 640);
+  band.addColorStop(0, "#012b75");
+  band.addColorStop(0.65, "#0a4a9e");
+  band.addColorStop(1, "#0f6b3a");
+  g.fillStyle = band;
+  g.fillRect(0, 640 - BAND, 1024, BAND);
+  // bright green accent along the top of the band
+  const accent = g.createLinearGradient(0, 0, 1024, 0);
+  accent.addColorStop(0, "#139528");
+  accent.addColorStop(1, "#2bd66b");
+  g.fillStyle = accent;
+  g.fillRect(0, 640 - BAND, 1024, 8);
+
+  g.fillStyle = "#ffffff";
+  g.font = `700 34px ${F}`;
   g.textAlign = "center";
-  g.fillText(tagline, 512, 520);
+  g.textBaseline = "middle";
+  // letter-spacing via manual spacing for wide caps
+  g.fillText(serviceLine.toUpperCase().split("").join("\u200A"), 512, 640 - BAND / 2 + 4);
   return finish(c);
 }
 

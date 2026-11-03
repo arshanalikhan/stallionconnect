@@ -150,7 +150,7 @@ export function Scene3D() {
     >
       <SiteScene quality={quality} state={state} onReady={() => setReady(true)} />
       {/* light veil keeps text readable by day; fades out at night */}
-      <div ref={veil} className="absolute inset-0 bg-white/40" />
+      <div ref={veil} className="absolute inset-0 bg-white/15" />
     </div>
   );
 }

@@ -215,6 +215,14 @@ html[data-scene] .scene-panel {
   }
 }
 
+/* Headings that share their row with the resting 3D card leave room for it,
+   so the card sits beside the glass panel instead of behind it. */
+@media (min-width: 1024px) {
+  html[data-scene="high"] .heading-lane {
+    max-width: 60%;
+  }
+}
+
 /* Section edges: the hero's readability fade and the night tint fade out
    softly instead of stopping at a hard line. */
 .hero-fade {

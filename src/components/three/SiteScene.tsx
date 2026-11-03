@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import logoFull from "@/assets/brand/logo-full.webp";
-import { site } from "@/config/site";
 import { SECTION_IDS, type Quality, type SceneState } from "./sceneState";
 import { callCardTexture, logoCardTexture, sheenTexture, windowTexture } from "./textures";
 
@@ -277,7 +276,7 @@ const coat = {
   color: "#000000",
   metalness: 1,
   roughness: 0.12,
-  envMapIntensity: 0.55,
+  envMapIntensity: 0.3,
   transparent: true,
   blending: THREE.AdditiveBlending,
   depthWrite: false,
@@ -400,7 +399,7 @@ function GlossyCard({ state }: { state: React.RefObject<SceneState> }) {
     img.onload = () => {
       const m = backMat.current;
       if (!m) return;
-      m.map = logoCardTexture(img, site.tagline);
+      m.map = logoCardTexture(img, "Call centre  ·  BPO  ·  Back office");
       m.needsUpdate = true;
     };
   }, []);

@@ -428,3 +428,15 @@ recruitment data), and optionally one page per service for SEO.
   empty window. Sections are separated by a thin strip of the city.
 - Chatbot script exported to `docs/chatbot-questions.md` and
   `docs/Stallion-Connect-Chatbot-Questions.docx` for review.
+
+### Fix: card logo side and brightness
+
+- The logo side repeated the tagline (the logo image already contains it). It now shows the
+  logo on a bright face with soft blue and green glows, and a solid navy-to-green band flush
+  with the bottom edge reading "Call centre · BPO · Back office" (no empty strip at the bottom).
+  Change the band text in `SiteScene.tsx` (`logoCardTexture` call).
+- The card looked faded because a white veil over the 3D scene was 40% strong and the clear
+  coat added white reflections. Veil is now 15% (text sits on glass panels anyway) and the
+  coat is softer.
+- In Services and How we work the heading panel leaves room on the right on desktop
+  (`.heading-lane`), so the card sits beside the glass instead of behind it.

@@ -9,7 +9,7 @@ export function Services() {
   return (
     <section id="services" className="scene-clear scene-window bg-white py-20 sm:py-28">
       <Container>
-        <Heading {...services} panel />
+        <Heading {...services} panel className="heading-lane" />
         <ul className="m-rail mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {services.items.map((s, i) => {
             const custom = s.id === "custom";
