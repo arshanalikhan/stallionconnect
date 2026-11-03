@@ -1,5 +1,6 @@
 import { About } from "@/components/sections/About";
 import { Careers } from "@/components/sections/Careers";
+import { CeoMessage } from "@/components/sections/CeoMessage";
 import { Contact } from "@/components/sections/Contact";
 import { Faq } from "@/components/sections/Faq";
 import { Hero } from "@/components/sections/Hero";
@@ -14,6 +15,7 @@ export default function HomePage() {
       <Hero />
       <Services />
       <About />
+      <CeoMessage />
       <WhyUs />
       <Process />
       <Industries />

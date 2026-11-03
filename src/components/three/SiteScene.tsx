@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import logoFull from "@/assets/brand/logo-full.webp";
 import { site } from "@/config/site";
-import type { Quality, SceneState } from "./sceneState";
+import { SECTION_IDS, type Quality, type SceneState } from "./sceneState";
 import { callCardTexture, logoCardTexture, sheenTexture, windowTexture } from "./textures";
 
 type Props = {
@@ -298,15 +298,15 @@ const streak = {
  * resting places as the page scrolls (see `stops`).
  */
 /**
- * Phones and tablets: every section opens with an empty "window" at the top
- * (`.scene-window` / `.scene-hero` in globals.css). The card rests centred in
- * that window, then the section content scrolls up over it.
+ * Phones and tablets: the card rests in the hero's open space above the
+ * headline, then steps aside so sections read without big gaps; a little of
+ * the city shows between sections (`.scene-window` in globals.css).
  */
 function mobileStops(vw: number, vh: number): Stop[] {
   const w = Math.min(vw * 0.68, 340);
   const tilt = 0.22;
-  return Array.from({ length: 9 }, (_, i) => ({
-    x: i === 8 ? vw + 300 : vw / 2,
+  return Array.from({ length: SECTION_IDS.length }, (_, i) => ({
+    x: i === 0 ? vw / 2 : vw + 300,
     y: i === 0 ? vh * 0.27 : vh * 0.33,
     w,
     yaw: i * Math.PI + (i % 2 ? tilt : -tilt),
@@ -338,6 +338,8 @@ function stops(vw: number, vh: number): Stop[] {
     { x: right - c * 0.2, y: vh * 0.34, w: side(0.3), yaw: PI + tilt },
     // about: left lane
     { x: left + c * 0.2, y: vh * 0.48, w: lane(0.34), yaw: 2 * PI - tilt },
+    // ceo message: portrait on the left, letter on the right; the card steps aside
+    { x: vw + 420, y: vh * 0.45, w: lane(0.3), yaw: 2.5 * PI },
     // why us: beside the heading, right
     { x: right - c * 0.2, y: vh * 0.32, w: side(0.3), yaw: 3 * PI + tilt },
     // how we work: beside the centred heading, right

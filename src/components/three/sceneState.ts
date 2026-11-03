@@ -40,6 +40,7 @@ export const SECTION_IDS = [
   "home",
   "services",
   "about",
+  "ceo",
   "why-us",
   "process",
   "industries",

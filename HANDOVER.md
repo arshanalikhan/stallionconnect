@@ -80,7 +80,8 @@ src/components/layout/   Header (glossy pill navbar), Footer, Logo, WhatsAppButt
 src/components/ui/       Button, Container, Section, Heading, Icon, Reveal
 src/components/sections/ homepage sections (Hero, Services, About, WhyUs, Process,
                          Industries, Careers, Faq, Contact, plus CallCard and CountUp)
-src/content/home.ts      all homepage text, lists and numbers
+src/content/home.ts      all homepage text, lists and numbers (including the CEO message)
+src/assets/team/         CEO photo
 src/components/forms/    quote form, application form, dialogs, field components
 src/components/admin/    admin panel: AdminShell, AdminData, Dashboard, LeadsView
 src/components/chat/     ChatBot.tsx (widget and guided flows)
@@ -94,7 +95,7 @@ src/lib/admin-auth.ts    Cloudflare Access check for the admin
 migrations/              D1 database schema
 src/config/site.ts       business details, WhatsApp number, navigation
 src/assets/brand/        logo files
-docs/                    Cloudflare deployment steps
+docs/                    Cloudflare deployment steps; chatbot-questions.md (+ .docx) lists every chatbot message
 ```
 
 ## 6. Editing content
@@ -414,3 +415,16 @@ recruitment data), and optionally one page per service for SEO.
 - Verified: lint, typecheck, both builds; browser tests of FAQ buttons, typed questions,
   fallback, full quote and apply flows including invalid email and phone, demo admin and real
   dev-server admin (status change, search, source filter, delete), phone layouts.
+
+### Update: CEO message, staff login link, tighter phone layout
+
+- New "A message from the CEO" section after About: portrait with a glossy frame and name
+  badge, the full message, four value tags and a signature in the script font. Text lives in
+  `ceo` in `src/content/home.ts`; photo in `src/assets/team/ceo.webp`. On desktop the 3D card
+  steps aside for this section.
+- Admin access: a "Staff login" link with a lock icon in the footer opens `/admin`. In
+  production Cloudflare Access asks for the company login there.
+- Phones: the 3D card now appears only in the hero; sections no longer open with a large
+  empty window. Sections are separated by a thin strip of the city.
+- Chatbot script exported to `docs/chatbot-questions.md` and
+  `docs/Stallion-Connect-Chatbot-Questions.docx` for review.

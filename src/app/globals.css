@@ -242,8 +242,12 @@ html[data-scene] .scene-hide-card {
   html[data-scene] .scene-hero {
     padding-top: calc(6rem + 34svh);
   }
+  /* Compact spacing: a thin strip of city between sections, no big gaps. */
   html[data-scene] .scene-window {
-    padding-top: calc(3rem + 40svh);
+    padding-top: 3.5rem;
+  }
+  html[data-scene] :is(.scene-clear, .scene-night) {
+    padding-bottom: 3rem;
   }
   html[data-scene] .m-rail {
     display: flex;

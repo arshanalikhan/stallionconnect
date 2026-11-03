@@ -239,3 +239,20 @@ export const contact = {
   intro:
     "Tell us about your process, expected volumes and timelines, and we will get back to you with a plan and a quote.",
 };
+
+export const ceo = {
+  eyebrow: "A message from the CEO",
+  title: "Lead with purpose,",
+  highlight: "grow with integrity.",
+  paragraphs: [
+    "At our organisation, we believe that success is not just measured by business growth, but by the relationships we build, the people we empower and the value we create.",
+    "My professional journey has taught me that dedication, discipline, integrity and continuous improvement are the foundations of sustainable success.",
+    "Our vision is to create an organisation that sets high standards of professionalism, delivers exceptional value to its clients and provides opportunities for individuals to grow and succeed.",
+    "I strongly believe that our people are our greatest strength. By fostering a culture of accountability, teamwork, innovation and excellence, we aim to achieve meaningful milestones and build long-term partnerships.",
+    "As we move forward, our commitment remains clear: to lead with purpose, grow with integrity and succeed together.",
+    "Thank you to our clients, partners and team members for being part of our journey.",
+  ],
+  name: "Er. Izharuddin Siddiqui",
+  role: "Co-Founder & Chief Executive Officer (CEO)",
+  values: ["Dedication", "Discipline", "Integrity", "Continuous improvement"],
+};
