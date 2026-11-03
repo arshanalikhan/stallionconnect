@@ -25,9 +25,11 @@ export function Heading({
   return (
     <header
       className={cn(
-        "max-w-2xl",
-        align === "center" && "mx-auto text-center",
-        panel && "scene-panel w-fit",
+        // As a panel it spans the full content width so its edges line up
+        // with the cards below; the text inside keeps a readable width.
+        panel ? "scene-panel [&>*]:max-w-2xl" : "max-w-2xl",
+        align === "center" && "text-center",
+        align === "center" && (panel ? "[&>*]:mx-auto" : "mx-auto"),
         className,
       )}
     >

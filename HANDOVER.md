@@ -377,3 +377,11 @@ recruitment data), and optionally one page per service for SEO.
   scrolled the page behind. Fixed, and the page behind is now locked while a form is open.
 - Apply card on desktop: its scrollbar now sits on the card's outer left edge instead of
   against the blade.
+
+### Fix: alignment of panels and cards
+
+- Heading panels and text panels used negative margins and shrank to fit their text, so
+  their edges stuck out past the cards below. Panels now have no negative margins and span
+  the full content width, so the left and right edges line up with the cards and grids in
+  every section (checked by measuring edges in Services, About, How we work, Industries,
+  Careers and FAQ). Panels also look like cards without the 3D scene, so nothing shifts.
