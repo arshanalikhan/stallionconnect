@@ -26,19 +26,20 @@ end of every phase.
 
 ## 2. Decisions so far
 
-| Topic             | Decision                                                               | Reason                                                    |
-| ----------------- | ---------------------------------------------------------------------- | --------------------------------------------------------- |
-| Framework         | Next.js 16 (App Router) + TypeScript                                   | SEO-friendly, API routes for forms, grows into more pages |
-| Styling           | Tailwind CSS v4 with brand tokens                                      | Fast to build, consistent colours                         |
-| Production host   | Cloudflare (Workers, D1, Access), free tier                            | Owner's first preference; one account for everything      |
-| Preview host      | GitHub Pages via Actions                                               | Cloudflare deferred until the final phase                 |
-| Careers           | Listings + application details form, **no CV upload**; CVs go by email | Owner's choice                                            |
-| WhatsApp          | Floating chat button on every page                                     | Owner asked for it                                        |
-| Admin panel       | Yes, protected by Cloudflare Access                                    | Owner asked for it                                        |
-| Deferred to later | Spam protection (Turnstile), email notifications, CMS                  | Owner's choice                                            |
-| Content           | Placeholder text and numbers for now                                   | Owner will edit text after the build                      |
-| `cacheComponents` | Off                                                                    | Hangs on the Cloudflare Workers runtime                   |
-| Images            | Pre-compressed WebP, imported statically, unoptimised                  | Free tier, and works under the Pages sub-path             |
+| Topic             | Decision                                                                | Reason                                                    |
+| ----------------- | ----------------------------------------------------------------------- | --------------------------------------------------------- |
+| Framework         | Next.js 16 (App Router) + TypeScript                                    | SEO-friendly, API routes for forms, grows into more pages |
+| Styling           | Tailwind CSS v4 with brand tokens                                       | Fast to build, consistent colours                         |
+| Fonts             | Plus Jakarta Sans (headings, buttons) and Inter (body), via `next/font` | Clean, professional, self-hosted at build time            |
+| Production host   | Cloudflare (Workers, D1, Access), free tier                             | Owner's first preference; one account for everything      |
+| Preview host      | GitHub Pages via Actions                                                | Cloudflare deferred until the final phase                 |
+| Careers           | Listings + application details form, **no CV upload**; CVs go by email  | Owner's choice                                            |
+| WhatsApp          | Floating chat button on every page                                      | Owner asked for it                                        |
+| Admin panel       | Yes, protected by Cloudflare Access                                     | Owner asked for it                                        |
+| Deferred to later | Spam protection (Turnstile), email notifications, CMS                   | Owner's choice                                            |
+| Content           | Placeholder text and numbers for now                                    | Owner will edit text after the build                      |
+| `cacheComponents` | Off                                                                     | Hangs on the Cloudflare Workers runtime                   |
+| Images            | Pre-compressed WebP, imported statically, unoptimised                   | Free tier, and works under the Pages sub-path             |
 
 ## 3. How to run
 
@@ -98,7 +99,7 @@ docs/                    Cloudflare deployment steps
 - **Homepage text, services, stats, job openings, FAQ:** `src/content/home.ts`
 - **Contact details, WhatsApp, nav:** `src/config/site.ts`
 - **Icons:** add a path to `src/components/ui/Icon.tsx`, then use its name in the content file
-- **Brand colours and fonts:** top of `src/app/globals.css`
+- **Brand colours, fonts, shadows, radius:** top of `src/app/globals.css`; fonts are loaded in `src/app/layout.tsx`
 
 ## 7. Forms and admin
 
@@ -117,20 +118,20 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 
 ## 8. 3D scene
 
-| Item                                      | How it works                                                                                                                                                                                                                    |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Where                                     | One fixed 3D scene behind the whole site. Sections are see-through and text sits on frosted-glass panels                                                                                                                        |
-| Journey                                   | Scrolling the page flies the camera down a city avenue from the hero to Contact                                                                                                                                                 |
-| Hero                                      | Glossy 3D "live call" card (desktop): rounded corners, curved polished rim, clear-coat reflections and a moving light streak. Tilts with the mouse; as the hero scrolls away it flips to the logo and flies off down the avenue |
-| How we work                               | The camera passes through four glowing gates, one per step, while the section is on screen                                                                                                                                      |
-| Why us                                    | The city turns to night: dark sky, glowing windows                                                                                                                                                                              |
-| Mouse                                     | Gentle parallax on the camera and card                                                                                                                                                                                          |
-| Loading                                   | The page text and buttons load first. The 3D code (about 245 KB compressed) downloads only after the page has loaded and the browser is idle, then fades in                                                                     |
-| Desktop (1024px+, mouse, 4+ cores, 4+ GB) | Full scene with the 3D card, which replaces the flat card                                                                                                                                                                       |
-| Phones and modest devices                 | Lighter scene (fewer buildings and particles, no 3D card, lower resolution); the flat card stays                                                                                                                                |
-| No 3D at all                              | Reduced-motion setting, Data Saver, no WebGL, or very weak devices: normal solid sections (Phase 2 look)                                                                                                                        |
-| How the page adapts                       | `<html data-scene="high                                                                                                                                                                                                         | low">`is set when the scene is showing. CSS classes in`globals.css`: `scene-clear`(see-through section),`scene-panel`(glass panel),`scene-night`, `scene-hide`, `scene-only`, `scene-hide-card` |
-| Tuning                                    | Camera route (`PATH`), colours, building density and card behaviour are at the top of each component in `SiteScene.tsx`                                                                                                         |
+| Item                                      | How it works                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Where                                     | One fixed 3D scene behind the whole site. Sections are see-through and text sits on frosted-glass panels                                                                                                                                                                                                                                                                                                                                                                                         |
+| Journey                                   | Scrolling the page flies the camera down a city avenue from the hero to Contact                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Card                                      | Glossy 3D "live call" card (desktop): rounded corners, curved polished rim, soft clear-coat reflections and a gentle light streak. In the hero it tilts with the mouse; as you scroll it glides down and shrinks into a small floating widget at the bottom right (above WhatsApp), which stays for the whole page and keeps turning with the scroll, alternating between the call and the logo. Clicking the widget opens the quote form. Widget size and position: `WIDGET` in `sceneState.ts` |
+| How we work                               | The camera passes through four glowing gates, one per step, while the section is on screen                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Why us                                    | The city turns to night: dark sky, glowing windows                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| Mouse                                     | Gentle parallax on the camera and card                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Loading                                   | The page text and buttons load first. The 3D code (about 245 KB compressed) downloads only after the page has loaded and the browser is idle, then fades in                                                                                                                                                                                                                                                                                                                                      |
+| Desktop (1024px+, mouse, 4+ cores, 4+ GB) | Full scene with the 3D card, which replaces the flat card                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Phones and modest devices                 | Lighter scene (fewer buildings and particles, no 3D card, lower resolution); the flat card stays                                                                                                                                                                                                                                                                                                                                                                                                 |
+| No 3D at all                              | Reduced-motion setting, Data Saver, no WebGL, or very weak devices: normal solid sections (Phase 2 look)                                                                                                                                                                                                                                                                                                                                                                                         |
+| How the page adapts                       | `<html data-scene="high                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | low">`is set when the scene is showing. CSS classes in`globals.css`: `scene-clear`(see-through section),`scene-panel`(glass panel),`scene-night`, `scene-hide`, `scene-only`, `scene-hide-card` |
+| Tuning                                    | Camera route (`PATH`), colours, building density and card behaviour are at the top of each component in `SiteScene.tsx`                                                                                                                                                                                                                                                                                                                                                                          |
 
 ## 9. Custom cursor
 
@@ -296,3 +297,17 @@ recruitment data), and optionally one page per service for SEO.
   is now darker and medium weight, sits on a frosted-glass backdrop when the 3D scene is
   showing (`.scene-glass-text` in `globals.css`), and the white fade on the left of the hero
   is stronger. Without 3D the text is unchanged in position.
+
+### Update: polish pass (fonts, layout, card follows the scroll)
+
+- Fonts: Plus Jakarta Sans for headings and buttons, Inter for body text (replacing Syne).
+- Layout polish: tighter type scale and balanced headline wrapping; eyebrow labels with a
+  short rule; buttons with fixed heights, smaller radius and no bounce; cards with one
+  consistent border, layered shadow and calm hover; refined header with pill hover states
+  and a hairline border; hero badge and a stats strip (24x7 / 8 / 2) instead of the tick list.
+- 3D scene calmer: finer building windows, muted colours, fewer particles.
+- Card: softer reflections and light streak (the left half was washing out), orbiting dots
+  always behind the card. After the hero the card shrinks into a floating widget at the
+  bottom right and keeps turning with the scroll; clicking it opens the quote form.
+- Verified: lint, typecheck, both builds; browser checks at 1440px and 390px, every section,
+  widget hand-over and click, reduced-motion fallback, no horizontal scrolling.
