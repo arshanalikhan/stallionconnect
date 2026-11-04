@@ -91,9 +91,10 @@ export function ScrollFrames() {
       lastT = now;
       const p = progress();
       const target = reduce ? 0 : p * (COUNT - 1);
-      // frame-rate independent easing (~same feel at 60Hz and 120Hz)
-      shown += (target - shown) * (1 - Math.exp(-dt / 35));
-      if (Math.abs(target - shown) < 0.005) shown = target;
+      // Locked 1:1 to the scroll position (SmoothScroll does the smoothing),
+      // so the background never trails behind the page.
+      void dt;
+      shown = target;
       draw(shown);
       dirty = false;
       if (veil.current) veil.current.style.opacity = String(0.35 + 0.25 * Math.sin(p * Math.PI));

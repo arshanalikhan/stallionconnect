@@ -6,6 +6,7 @@ import { CustomCursor } from "@/components/layout/CustomCursor";
 import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { ScrollVideo } from "@/components/background/ScrollVideo";
 import { ScrollFrames } from "@/components/background/ScrollFrames";
+import { SmoothScroll } from "@/components/background/SmoothScroll";
 import { Scene3D } from "@/components/three/Scene3D";
 import { BACKGROUND } from "@/config/site";
 
@@ -20,7 +21,10 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         Skip to content
       </a>
       {BACKGROUND === "frames" ? (
-        <ScrollFrames />
+        <>
+          <ScrollFrames />
+          <SmoothScroll />
+        </>
       ) : BACKGROUND === "video" ? (
         <ScrollVideo />
       ) : (

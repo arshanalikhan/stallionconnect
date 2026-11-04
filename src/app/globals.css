@@ -703,3 +703,12 @@ html[data-scene="video"] .scene-hide-card {
     padding-top: 5rem;
   }
 }
+
+/* Smooth wheel scrolling (SmoothScroll.tsx): Lenis drives the scroll, so the
+   CSS smooth behaviour must be off or the two fight each other. */
+html.lenis, html.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+html.lenis-stopped {
+  overflow: hidden;
+}
