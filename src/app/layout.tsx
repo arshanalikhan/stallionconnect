@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Instrument_Serif, Tinos } from "next/font/google";
+import { Tinos } from "next/font/google";
 import { site } from "@/config/site";
 import logoFull from "@/assets/brand/logo-full.webp";
 import "./globals.css";
@@ -9,15 +9,6 @@ const tinos = Tinos({
   variable: "--font-tinos",
   subsets: ["latin"],
   weight: ["400", "700"],
-  display: "swap",
-});
-
-/** Accent: elegant serif italic for highlighted words in headings. */
-const serif = Instrument_Serif({
-  variable: "--font-instrument",
-  subsets: ["latin"],
-  weight: "400",
-  style: "italic",
   display: "swap",
 });
 
@@ -43,7 +34,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-IN" className={`${tinos.variable} ${serif.variable}`}>
+    <html lang="en-IN" className={tinos.variable}>
       <body className="flex min-h-svh flex-col">
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
