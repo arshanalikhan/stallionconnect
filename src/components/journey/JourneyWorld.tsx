@@ -196,9 +196,9 @@ const INDIA_LL: [number, number] = [22, 79];
 
 function Earth({ dot }: { dot: THREE.Texture }) {
   const [day, night, clouds] = useLoader(THREE.TextureLoader, [
-    `${base}/journey/earth.webp`,
-    `${base}/journey/earth-night.webp`,
-    `${base}/journey/clouds.webp`,
+    `${base}/globe/earth.webp`,
+    `${base}/globe/earth-night.webp`,
+    `${base}/globe/clouds.webp`,
   ]);
   useMemo(() => {
     day.colorSpace = THREE.SRGBColorSpace;
@@ -398,7 +398,7 @@ function Pin({ at, color = GREEN, scale = 1 }: { at: THREE.Vector3; color?: THRE
 }
 
 function IndiaMap() {
-  const [day, night] = useLoader(THREE.TextureLoader, [`${base}/journey/india.webp`, `${base}/journey/india-night.webp`]);
+  const [day, night] = useLoader(THREE.TextureLoader, [`${base}/globe/india.webp`, `${base}/globe/india-night.webp`]);
   useMemo(() => {
     day.colorSpace = THREE.SRGBColorSpace;
     night.colorSpace = THREE.SRGBColorSpace;

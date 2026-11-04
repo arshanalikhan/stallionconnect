@@ -45,6 +45,7 @@ jobs:
 
       - name: Combine previews
         run: |
+          test ! -e out/journey  # must not clash with a public/ folder
           mv journey-out out/journey
           touch out/.nojekyll
 
