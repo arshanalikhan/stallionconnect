@@ -39,12 +39,13 @@ export const ADMIN_PATH = "/izharuddin";
 
 /**
  * Page background (testing switch).
+ * - "network3d": live code-built 3D finance network (no files to load, no lag).
  * - "frames": scroll-controlled image sequence on a canvas (smoothest, default).
  * - "video": the scroll-controlled journey video in public/bg/ (Earth, India, office, logo).
  * - "3d": the original 3D city scene (src/components/three).
  * Nothing is deleted either way; change this word to switch back.
  */
-export const BACKGROUND: "frames" | "video" | "3d" = "frames";
+export const BACKGROUND: "network3d" | "frames" | "video" | "3d" = "network3d";
 
 /**
  * Which picture set "frames" uses (both kept in public/bg):
