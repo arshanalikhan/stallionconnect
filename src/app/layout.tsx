@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Dancing_Script, Instrument_Serif, Tinos } from "next/font/google";
+import { Instrument_Serif, Tinos } from "next/font/google";
 import { site } from "@/config/site";
 import logoFull from "@/assets/brand/logo-full.webp";
 import "./globals.css";
@@ -18,14 +18,6 @@ const serif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   style: "italic",
-  display: "swap",
-});
-
-/** Accent: handwritten script, used sparingly (tagline). */
-const script = Dancing_Script({
-  variable: "--font-dancing",
-  subsets: ["latin"],
-  weight: "700",
   display: "swap",
 });
 
@@ -51,7 +43,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-IN" className={`${tinos.variable} ${serif.variable} ${script.variable}`}>
+    <html lang="en-IN" className={`${tinos.variable} ${serif.variable}`}>
       <body className="flex min-h-svh flex-col">
         <noscript>
           <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
