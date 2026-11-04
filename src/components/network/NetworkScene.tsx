@@ -313,14 +313,16 @@ function LightLines({ z, count }: { z: number; count: number }) {
     return Array.from({ length: count }, (_, i) => {
       const side = i % 2 ? 1 : -1;
       const y0 = (r() - 0.5) * 18;
+      // Each line crosses from one side to the other in one unbroken curve.
       const pts = [
-        new THREE.Vector3(side * (30 + r() * 10), y0, z + 10),
-        new THREE.Vector3(side * (12 + r() * 6), y0 * 0.6 + (r() - 0.5) * 6, z - 10),
-        new THREE.Vector3(side * (4 + r() * 4), y0 * 0.3, z - 35),
-        new THREE.Vector3(side * (10 + r() * 10), -y0 * 0.4, z - 60),
+        new THREE.Vector3(side * (34 + r() * 10), y0, z + 10),
+        new THREE.Vector3(side * (10 + r() * 6), y0 * 0.5 + (r() - 0.5) * 4, z - 12),
+        new THREE.Vector3((r() - 0.5) * 3, y0 * 0.15, z - 32),
+        new THREE.Vector3(-side * (12 + r() * 8), -y0 * 0.4, z - 50),
+        new THREE.Vector3(-side * (34 + r() * 10), -y0 * 0.7, z - 66),
       ];
       const geo = new THREE.BufferGeometry().setFromPoints(
-        new THREE.CatmullRomCurve3(pts).getPoints(80),
+        new THREE.CatmullRomCurve3(pts).getPoints(140),
       );
       const mat = new THREE.LineBasicMaterial({
         color: r() < 0.5 ? CYAN : BLUE,
@@ -564,7 +566,7 @@ function ContactNetwork() {
 /** Flowing green/blue data streams over a grid floor. */
 function Streams({ low }: { low: boolean }) {
   const COUNT = low ? 30 : 60;
-  const SEG = 90;
+  const SEG = 120;
   const { lines, seeds } = useMemo(() => {
     const r = seeded(53);
     const seeds = Array.from({ length: COUNT }, () => ({
@@ -598,10 +600,13 @@ function Streams({ low }: { low: boolean }) {
       const pos = l.geometry.getAttribute("position") as THREE.BufferAttribute;
       for (let k = 0; k < SEG; k++) {
         const u = k / (SEG - 1);
-        // Streams sweep in from the sides and converge to the centre line.
-        const x = s.side * (36 * (1 - u)) * (1 - u * 0.15);
-        const y = s.y + Math.sin(u * 6 + t * 1.2 + s.a) * s.amp * (1 - u * 0.7);
-        const z = s.z + u * 14 - 7 + Math.cos(u * 4 + t * 0.8 + s.a) * 1.5;
+        // One unbroken line from left to right: fanned out at the edges,
+        // pinched together in the middle, so there is no seam.
+        const e = Math.abs(u - 0.5) * 2;
+        const fan = e * e;
+        const x = -42 + 84 * u;
+        const y = -3.2 + (s.y + 1.75) * 2.2 * fan + Math.sin(u * 7 + t * 1.2 + s.a) * s.amp * (0.25 + 0.75 * fan);
+        const z = -210 + (s.z + 209) * fan + Math.cos(u * 5 + t * 0.8 + s.a) * 1.5 * fan;
         pos.setXYZ(k, x, y, z);
       }
       pos.needsUpdate = true;
@@ -614,7 +619,7 @@ function Streams({ low }: { low: boolean }) {
     m.transparent = true;
     m.opacity = 0.28;
     m.depthWrite = false;
-    g.position.set(0, -5, -210);
+    g.position.set(0, -6, -210);
     return g;
   }, []);
 
