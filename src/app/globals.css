@@ -684,3 +684,22 @@ html:has(dialog[open]) {
   scrollbar-width: thin;
   scrollbar-color: rgb(1 43 117 / 0.2) transparent;
 }
+
+/*
+ * Video background mode (<html data-scene="video">): same glass panels and
+ * see-through sections as the 3D mode, but there is no 3D card, so the flat
+ * hero card stays, and phones keep their normal section spacing.
+ */
+html[data-scene="video"] .scene-hide-card {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+}
+@media (max-width: 1023px) {
+  html[data-scene="video"] .scene-hero {
+    padding-top: 8rem;
+  }
+  html[data-scene="video"] .scene-window {
+    padding-top: 5rem;
+  }
+}

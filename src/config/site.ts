@@ -37,5 +37,13 @@ export const site = {
 /** Address of the admin panel (staff only, behind sign-in). */
 export const ADMIN_PATH = "/izharuddin";
 
+/**
+ * Page background (testing switch).
+ * - "video": the scroll-controlled journey video in public/bg/ (Earth, India, office, logo).
+ * - "3d": the original 3D city scene (src/components/three).
+ * Nothing is deleted either way; change this word to switch back.
+ */
+export const BACKGROUND: "video" | "3d" = "video";
+
 export const whatsappUrl = (message: string = site.contact.whatsappMessage) =>
   `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(message)}`;

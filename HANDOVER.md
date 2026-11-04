@@ -149,6 +149,13 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 | How the page adapts                       | `<html data-scene="high                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | low">`is set when the scene is showing. CSS classes in`globals.css`: `scene-clear`(see-through section),`scene-panel`(glass panel),`scene-night`, `scene-hide`, `scene-only`, `scene-hide-card` |
 | Tuning                                    | Camera route (`PATH`), colours, building density and card behaviour are at the top of each component in `SiteScene.tsx`                                                                                                                                                                                                                                                                                                                                                                                                          |
 
+## 9a. Scroll video background (TESTING)
+
+- Switch: `BACKGROUND` in `src/config/site.ts`. `"video"` = scroll-scrubbed video (current test), `"3d"` = original 3D city. Nothing from the 3D scene was deleted; to revert, set it back to `"3d"`.
+- Component: `src/components/background/ScrollVideo.tsx`. Top of page = first frame, bottom = last frame. Reduced-motion visitors see the poster image.
+- Files: `public/bg/journey(.mp4|.webm)`, `journey-mobile(.mp4|.webm)` (used at 767px and below), `journey-poster.jpg`. Encoded with a keyframe every 4 frames so seeking is smooth; cropped to remove the generator watermark.
+- Seeking needs a server that supports byte-range requests (GitHub Pages and Cloudflare do; `python -m http.server` does not, so the video looks frozen there).
+
 ## 10. Custom cursor
 
 | Item                  | How it works                                                                                                               |
