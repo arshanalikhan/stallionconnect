@@ -1,9 +1,15 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { FRAME_SET } from "@/config/site";
 
 const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const COUNT = 240;
+// folder pairs in public/bg: [desktop, phone]
+const SETS = {
+  network: ["network", "network-m"],
+  journey: ["frames", "frames-m"],
+} as const;
 
 /**
  * Scroll-driven background built from still frames drawn on a canvas.
@@ -28,7 +34,7 @@ export function ScrollFrames() {
     const ctx = c?.getContext("2d");
     if (!c || !ctx) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const dir = window.matchMedia("(max-width: 767px)").matches ? "frames-m" : "frames";
+    const dir = SETS[FRAME_SET][window.matchMedia("(max-width: 767px)").matches ? 1 : 0];
     const imgs: (ImageBitmap | HTMLImageElement)[] = [];
     const loaded: boolean[] = new Array(COUNT).fill(false);
     let shown = 0;

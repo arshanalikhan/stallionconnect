@@ -46,5 +46,12 @@ export const ADMIN_PATH = "/izharuddin";
  */
 export const BACKGROUND: "frames" | "video" | "3d" = "frames";
 
+/**
+ * Which picture set "frames" uses (both kept in public/bg):
+ * - "network": dark finance network clip (globe, dashboards, data lines).
+ * - "journey": Earth, India, Aligarh, office, logo.
+ */
+export const FRAME_SET: "network" | "journey" = "network";
+
 export const whatsappUrl = (message: string = site.contact.whatsappMessage) =>
   `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(message)}`;

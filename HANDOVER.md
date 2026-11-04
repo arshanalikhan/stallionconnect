@@ -157,6 +157,8 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 - Files: `public/bg/journey(.mp4|.webm)`, `journey-mobile(.mp4|.webm)` (used at 767px and below), `journey-poster.jpg`. Encoded with a keyframe every 4 frames so seeking is smooth; cropped to remove the generator watermark.
 - Seeking needs a server that supports byte-range requests (GitHub Pages and Cloudflare do; `python -m http.server` does not, so the video looks frozen there).
 
+- Frame sets: `FRAME_SET` in `src/config/site.ts`. `"network"` (current, temporary until the new journey video is generated) = dark finance network clip in `public/bg/network` and `network-m`, Gemini sparkle removed with ffmpeg `delogo=x=1126:y=566:w=70:h=70`. `"journey"` = the earlier Earth/Aligarh/office clip in `public/bg/frames` and `frames-m`.
+
 ## 10. Custom cursor
 
 | Item                  | How it works                                                                                                               |
