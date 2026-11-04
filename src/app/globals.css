@@ -22,7 +22,6 @@
   --font-sans: var(--font-tinos), "Times New Roman", Times, serif;
   --font-display: var(--font-tinos), "Times New Roman", Times, serif;
   --font-serif: var(--font-instrument), "Times New Roman", Times, serif;
-  --font-script: var(--font-dancing), cursive;
 
   /* Layered, subtle shadows read as more refined than one big blur. */
   /* Layered shadows plus a bright inner top edge: the "glossy" highlight. */
@@ -82,11 +81,6 @@
   font-size: 1.12em;
   letter-spacing: -0.01em;
   line-height: 1;
-}
-.accent-script {
-  font-family: var(--font-script);
-  font-weight: 700;
-  letter-spacing: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

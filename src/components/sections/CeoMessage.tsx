@@ -57,7 +57,7 @@ export function CeoMessage() {
           </ul>
 
           <div className="mt-8 border-t border-line/70 pt-6">
-            <p className="accent-script text-3xl text-navy">{ceo.name}</p>
+            <p className="font-display text-xl font-bold text-navy">{ceo.name}</p>
             <p className="mt-1 text-sm text-muted">{ceo.role}</p>
           </div>
         </Reveal>

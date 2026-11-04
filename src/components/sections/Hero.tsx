@@ -39,9 +39,7 @@ export function Hero() {
           <h1 className="text-[2.6rem] leading-[1.05] font-bold tracking-[-0.015em] sm:text-6xl lg:text-[4.25rem]">
             {hero.title} <span className="accent-serif text-brand-green">{hero.highlight}</span>
           </h1>
-          <p className="accent-script mt-4 text-[1.75rem] leading-tight text-royal">
-            {site.tagline}
-          </p>
+          <p className="mt-4 font-display text-xl font-bold text-royal">{site.tagline}</p>
           <p className="scene-glass-text mt-4 max-w-xl text-[17px] leading-relaxed text-[#2b3f57]">
             {hero.intro}
           </p>
