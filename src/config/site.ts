@@ -39,11 +39,12 @@ export const ADMIN_PATH = "/izharuddin";
 
 /**
  * Page background (testing switch).
+ * - "frames": scroll-controlled image sequence on a canvas (smoothest, default).
  * - "video": the scroll-controlled journey video in public/bg/ (Earth, India, office, logo).
  * - "3d": the original 3D city scene (src/components/three).
  * Nothing is deleted either way; change this word to switch back.
  */
-export const BACKGROUND: "video" | "3d" = "video";
+export const BACKGROUND: "frames" | "video" | "3d" = "frames";
 
 export const whatsappUrl = (message: string = site.contact.whatsappMessage) =>
   `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(message)}`;
