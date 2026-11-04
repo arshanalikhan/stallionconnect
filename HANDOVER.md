@@ -161,12 +161,12 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 - Loading: frames are fetched coarse to fine (every 16th first), 6 at a time, decoded and pre-scaled off the main thread with createImageBitmap(blob), so scrolling stays smooth even while loading.
 - Frame sets: `FRAME_SET` in `src/config/site.ts`. `"network"` (current, temporary until the new journey video is generated) = dark finance network clip in `public/bg/network` and `network-m`, Gemini sparkle removed with ffmpeg `delogo=x=1126:y=566:w=70:h=70`. `"journey"` = the earlier Earth/Aligarh/office clip in `public/bg/frames` and `frames-m`.
 
-## 9b. Live 3D network background (TESTING, current)
+## 9b. Network backdrop for the 3D scene (TESTING, current)
 
-- `BACKGROUND = "network3d"` in `src/config/site.ts` (current). Code-built React Three Fiber scene modelled on the network clip, so nothing is downloaded or seeked: `src/components/network/NetworkScene.tsx` (scene) and `Network3D.tsx` (device check, scroll hookup, still-image fallback using `public/bg/network/060.webp`).
-- Camera flies along `PATH` driven 1:1 by page scroll (Lenis smooths the wheel). Stages: stars and light lines, dotted globe with arcs at z -62, finance dashboards z -100 to -132 (canvas-drawn text, so spelling is always correct), contact network with icons and waveform z -150 to -175, data streams over a grid z -196 to -222, closing light lines.
-- Reduced motion, Save-Data, no WebGL or weak devices get the still image. Phones and small screens use the "low" quality (fewer stars and lines, dpr 1).
-- Other switches still work: "frames", "video", "3d".
+- `BACKGROUND = "network3d"` in `src/config/site.ts` (current). Renders the ORIGINAL `Scene3D` (same glossy card that travels with the sections, same `html[data-scene]` page styling, same scroll behaviour) with `world="network"`: only the city is swapped for the finance network scenery. No Lenis in this mode, so scrolling matches the live site.
+- Scenery: `NetworkWorld` in `src/components/network/NetworkScene.tsx` (stars, light lines, dotted globe with arcs, finance dashboards with canvas-drawn text, contact icons and waveform, data streams over a grid). Camera route `networkCamera()`; `NetworkDirector` in `SiteScene.tsx` damps it like the city Director. The white day veil is only used for the city.
+- `Network3D.tsx` (standalone version without the card) is kept but unused.
+- Revert to the city: `BACKGROUND = "3d"`.
 
 ## 10. Custom cursor
 

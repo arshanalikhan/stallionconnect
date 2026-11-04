@@ -506,15 +506,15 @@ function ContactNetwork() {
       icon,
       tex: iconTex(icon),
       p: new THREE.Vector3(
-        (i % 2 ? 1 : -1) * (3 + r() * 7),
-        (r() - 0.5) * 9,
+        (i % 2 ? 1 : -1) * (7 + r() * 7),
+        (r() - 0.5) * 10,
         -150 - i * 2.6 - r() * 2,
       ),
     }));
     const pts: THREE.Vector3[] = [];
     nodes.forEach((a, i) =>
       nodes.forEach((b, j) => {
-        if (j > i && a.p.distanceTo(b.p) < 11) pts.push(a.p, b.p);
+        if (j > i && a.p.distanceTo(b.p) < 9) pts.push(a.p, b.p);
       }),
     );
     const lines = new THREE.LineSegments(
@@ -551,7 +551,7 @@ function ContactNetwork() {
     <>
       <primitive object={lines} />
       {nodes.map((n, i) => (
-        <sprite key={i} position={n.p} scale={[2.2, 2.2, 1]}>
+        <sprite key={i} position={n.p} scale={[1.2, 1.2, 1]}>
           <spriteMaterial map={n.tex} transparent depthWrite={false} toneMapped={false} />
         </sprite>
       ))}
@@ -565,7 +565,7 @@ function ContactNetwork() {
 
 /** Flowing green/blue data streams over a grid floor. */
 function Streams({ low }: { low: boolean }) {
-  const COUNT = low ? 30 : 60;
+  const COUNT = low ? 16 : 28;
   const SEG = 120;
   const { lines, seeds } = useMemo(() => {
     const r = seeded(53);
@@ -584,7 +584,7 @@ function Streams({ low }: { low: boolean }) {
         new THREE.LineBasicMaterial({
           color: i % 3 === 0 ? BLUE : i % 3 === 1 ? GREEN : CYAN,
           transparent: true,
-          opacity: 0.9,
+          opacity: 0.45,
           blending: THREE.AdditiveBlending,
           depthWrite: false,
         }),
@@ -603,7 +603,7 @@ function Streams({ low }: { low: boolean }) {
         // One unbroken line from left to right: fanned out at the edges,
         // pinched together in the middle, so there is no seam.
         const e = Math.abs(u - 0.5) * 2;
-        const fan = e * e;
+        const fan = 0.3 + 0.7 * e * e;
         const x = -42 + 84 * u;
         const y = -3.2 + (s.y + 1.75) * 2.2 * fan + Math.sin(u * 7 + t * 1.2 + s.a) * s.amp * (0.25 + 0.75 * fan);
         const z = -210 + (s.z + 209) * fan + Math.cos(u * 5 + t * 0.8 + s.a) * 1.5 * fan;
@@ -654,6 +654,38 @@ function Rig({ state, onReady }: { state: React.RefObject<NetState>; onReady: ()
   });
   return null;
 }
+
+/** All network scenery (no camera, no canvas): used inside SiteScene. */
+export function NetworkWorld({ low }: { low: boolean }) {
+  const tex = useMemo(() => ({ dot: dotTex(), glow: glowTex() }), []);
+  useEffect(
+    () => () => {
+      tex.dot.dispose();
+      tex.glow.dispose();
+    },
+    [tex],
+  );
+  return (
+    <>
+      <Stars count={low ? 1400 : 3200} tex={tex.dot} />
+      <LightLines z={0} count={low ? 10 : 18} />
+      <Globe low={low} dot={tex.dot} glow={tex.glow} />
+      <Dashboards />
+      <ContactNetwork />
+      <Streams low={low} />
+      <LightLines z={-232} count={low ? 8 : 14} />
+    </>
+  );
+}
+
+/** Camera position on the network route for a page progress u (0 to 1). */
+export function networkCamera(u: number, pos: THREE.Vector3, look: THREE.Vector3) {
+  const k = Math.min(0.999, Math.max(0, u));
+  PATH.getPointAt(k, pos);
+  PATH.getPointAt(Math.min(1, k + 0.02), look);
+}
+
+export const NETWORK_BG = NAVY;
 
 export default function NetworkScene({ low, state, onReady }: Props) {
   const tex = useMemo(() => ({ dot: dotTex(), glow: glowTex() }), []);

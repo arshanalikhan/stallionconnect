@@ -7,7 +7,6 @@ import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 import { ScrollVideo } from "@/components/background/ScrollVideo";
 import { ScrollFrames } from "@/components/background/ScrollFrames";
 import { SmoothScroll } from "@/components/background/SmoothScroll";
-import { Network3D } from "@/components/network/Network3D";
 import { Scene3D } from "@/components/three/Scene3D";
 import { BACKGROUND } from "@/config/site";
 
@@ -22,10 +21,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         Skip to content
       </a>
       {BACKGROUND === "network3d" ? (
-        <>
-          <Network3D />
-          <SmoothScroll />
-        </>
+        <Scene3D world="network" />
       ) : BACKGROUND === "frames" ? (
         <>
           <ScrollFrames />

@@ -6,10 +6,13 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import logoFull from "@/assets/brand/logo-full.webp";
 import { SECTION_IDS, type Quality, type SceneState } from "./sceneState";
+import { NETWORK_BG, NetworkWorld, networkCamera } from "@/components/network/NetworkScene";
 import { callCardTexture, logoCardTexture, sheenTexture, windowTexture } from "./textures";
 
 type Props = {
   quality: Quality;
+  /** What sits behind the card: the original city, or the finance network. */
+  world?: "city" | "network";
   state: React.RefObject<SceneState>;
   onReady: () => void;
 };
@@ -557,6 +560,19 @@ function Director({ state }: { state: React.RefObject<SceneState> }) {
   return null;
 }
 
+/** Camera for the network backdrop; same damping as the city Director. */
+function NetworkDirector({ state }: { state: React.RefObject<SceneState> }) {
+  const u = useRef(0);
+  useFrame(({ camera }, dt) => {
+    const s = state.current;
+    u.current = damp(u.current, clamp01(s.page), 3, dt);
+    networkCamera(u.current, scratch.pos, scratch.look);
+    camera.position.set(scratch.pos.x + s.mx * 0.8, scratch.pos.y + s.my * 0.45, scratch.pos.z);
+    camera.lookAt(scratch.look.x + s.mx * 0.4, scratch.look.y, scratch.look.z);
+  });
+  return null;
+}
+
 function Ready({ onReady }: { onReady: () => void }) {
   const frames = useRef(0);
   const done = useRef(false);
@@ -580,8 +596,9 @@ function setupRenderer(gl: THREE.WebGLRenderer, scene: THREE.Scene) {
   pmrem.dispose();
 }
 
-export default function SiteScene({ quality, state, onReady }: Props) {
+export default function SiteScene({ quality, state, onReady, world = "city" }: Props) {
   const high = quality === "high";
+  const net = world === "network";
   return (
     <Canvas
       aria-hidden="true"
@@ -590,8 +607,8 @@ export default function SiteScene({ quality, state, onReady }: Props) {
       camera={{ fov: 50, near: 0.1, far: 280, position: [0, 3.2, 14] }}
       onCreated={({ gl, scene, camera }) => {
         setupRenderer(gl, scene);
-        scene.background = SKY;
-        scene.fog = new THREE.Fog(SKY, 30, 125);
+        scene.background = net ? NETWORK_BG : SKY;
+        scene.fog = net ? new THREE.Fog(NETWORK_BG, 35, 120) : new THREE.Fog(SKY, 30, 125);
         // The card is attached to the camera, so the camera must be in the scene.
         scene.add(camera);
       }}
@@ -610,11 +627,20 @@ export default function SiteScene({ quality, state, onReady }: Props) {
         intensity={1.8}
         color="#fff4e0"
       />
-      <Director state={state} />
-      <Ground />
-      <Skyline quality={quality} />
-      <Gates state={state} />
-      <Particles count={high ? 500 : 220} />
+      {net ? (
+        <>
+          <NetworkDirector state={state} />
+          <NetworkWorld low={!high} />
+        </>
+      ) : (
+        <>
+          <Director state={state} />
+          <Ground />
+          <Skyline quality={quality} />
+          <Gates state={state} />
+          <Particles count={high ? 500 : 220} />
+        </>
+      )}
       <GlossyCard state={state} />
       <Ready onReady={onReady} />
     </Canvas>

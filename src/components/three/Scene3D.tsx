@@ -43,7 +43,7 @@ function centreCoverage(el: Element | null, vh: number) {
  * and loads only after the page itself is ready. Marks <html data-scene> so
  * the page can adapt (glass sections, hiding the flat hero card).
  */
-export function Scene3D() {
+export function Scene3D({ world = "city" }: { world?: "city" | "network" }) {
   const [quality, setQuality] = useState<Quality | null>(null);
   const [ready, setReady] = useState(false);
   const state = useRef<SceneState>(initialSceneState());
@@ -148,9 +148,9 @@ export function Scene3D() {
         ready ? "opacity-100" : "opacity-0",
       )}
     >
-      <SiteScene quality={quality} state={state} onReady={() => setReady(true)} />
+      <SiteScene quality={quality} world={world} state={state} onReady={() => setReady(true)} />
       {/* light veil keeps text readable by day; fades out at night */}
-      <div ref={veil} className="absolute inset-0 bg-white/15" />
+      <div ref={veil} className={cn("absolute inset-0", world === "city" && "bg-white/15")} />
     </div>
   );
 }
