@@ -8,7 +8,7 @@ const COUNT = 240;
 /**
  * Scroll-driven background built from still frames drawn on a canvas.
  * Smoother than seeking a <video>: every frame is preloaded, and between two
- * frames we cross-fade, so movement stays fluid at any scroll speed.
+ * frames it shows one whole frame (no blending), so nothing ever doubles.
  * Frames live in public/bg/frames (desktop) and public/bg/frames-m (phones).
  */
 export function ScrollFrames() {
@@ -69,15 +69,14 @@ export function ScrollFrames() {
       return -1;
     };
 
+    // Always one whole frame: no cross-fade, so moving text never doubles.
+    let drawn = -1;
     const draw = (pos: number) => {
-      const i = Math.floor(pos);
-      const t = pos - i;
-      const a = nearest(i);
-      if (a < 0) return;
-      cover(imgs[a], 1);
-      const b = Math.min(COUNT - 1, i + 1);
-      if (t > 0.01 && b !== a && loaded[b]) cover(imgs[b], t);
+      const a = nearest(Math.round(pos));
+      if (a < 0 || (a === drawn && !dirty)) return;
       ctx.globalAlpha = 1;
+      cover(imgs[a], 1);
+      drawn = a;
     };
 
     const tick = (now: number) => {
