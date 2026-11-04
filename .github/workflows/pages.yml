@@ -29,13 +29,24 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
 
-      - name: Build static export
+      # Two previews side by side for comparing backgrounds:
+      #   /<repo>/          network backdrop (default in src/config/site.ts)
+      #   /<repo>/journey/  journey backdrop (Earth, India, Aligarh, office)
+      - name: Build journey preview
+        run: npm run build:pages && mv out journey-out
+        env:
+          PAGES_BASE_PATH: /${{ github.event.repository.name }}/journey
+          NEXT_PUBLIC_BACKGROUND: journey3d
+
+      - name: Build main preview
         run: npm run build:pages
         env:
           PAGES_BASE_PATH: /${{ github.event.repository.name }}
 
-      - name: Disable Jekyll
-        run: touch out/.nojekyll
+      - name: Combine previews
+        run: |
+          mv journey-out out/journey
+          touch out/.nojekyll
 
       - name: Publish to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4

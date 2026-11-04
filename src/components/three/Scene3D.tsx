@@ -43,7 +43,7 @@ function centreCoverage(el: Element | null, vh: number) {
  * and loads only after the page itself is ready. Marks <html data-scene> so
  * the page can adapt (glass sections, hiding the flat hero card).
  */
-export function Scene3D({ world = "city" }: { world?: "city" | "network" }) {
+export function Scene3D({ world = "city" }: { world?: "city" | "network" | "journey" }) {
   const [quality, setQuality] = useState<Quality | null>(null);
   const [ready, setReady] = useState(false);
   const state = useRef<SceneState>(initialSceneState());

@@ -168,6 +168,13 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 - `Network3D.tsx` (standalone version without the card) is kept but unused.
 - Revert to the city: `BACKGROUND = "3d"`.
 
+## 9c. Journey backdrop and the second preview (TESTING)
+
+- `BACKGROUND = "journey3d"`: same `Scene3D` and card, backdrop from `src/components/journey/JourneyWorld.tsx`. Stages with soft navy dips between them: Earth (Blue Marble day and night textures, clouds, atmosphere, "PLANET EARTH", country labels and arcs from India) up to 30% of the page; India map with city pins (NEW DELHI, MUMBAI, BENGALURU, LUCKNOW) to 50%; aerial Aligarh at dusk with pin and "ALIGARH / UTTAR PRADESH, INDIA", then the glass office tower with "OFFICE" to 79%; office floor with desks, screens and the logo wall to 92%; final logo and tagline reveal.
+- Images in `public/journey/` (NASA Blue Marble, public domain, via the three-globe package examples): `earth.webp`, `earth-night.webp`, `clouds.webp`, `india.webp`, `india-night.webp` (crop lon 62.6 to 104.8, lat 3.87 to 39.0).
+- The background can be chosen at build time with `NEXT_PUBLIC_BACKGROUND` (overrides the default in `site.ts`).
+- GitHub Pages now publishes two previews from one workflow run (`.github/workflows/pages.yml`): `/stallionconnect/` (network, the default) and `/stallionconnect/journey/` (journey).
+
 ## 10. Custom cursor
 
 | Item                  | How it works                                                                                                               |
