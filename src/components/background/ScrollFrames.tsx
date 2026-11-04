@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const COUNT = 120;
+const COUNT = 240;
 
 /**
  * Scroll-driven background built from still frames drawn on a canvas.
@@ -29,11 +29,12 @@ export function ScrollFrames() {
     if (!c || !ctx) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const dir = window.matchMedia("(max-width: 767px)").matches ? "frames-m" : "frames";
-    const imgs: HTMLImageElement[] = [];
+    const imgs: (ImageBitmap | HTMLImageElement)[] = [];
     const loaded: boolean[] = new Array(COUNT).fill(false);
     let shown = 0;
     let raf = 0;
     let dirty = true;
+    let lastT = 0;
 
     const progress = () => {
       const max = Math.max(1, root().scrollHeight - window.innerHeight);
@@ -44,7 +45,7 @@ export function ScrollFrames() {
     }
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       c.width = Math.round(window.innerWidth * dpr);
       c.height = Math.round(window.innerHeight * dpr);
       dirty = true;
@@ -52,10 +53,12 @@ export function ScrollFrames() {
     };
 
     // object-fit: cover
-    const cover = (img: HTMLImageElement, alpha: number) => {
-      const s = Math.max(c.width / img.naturalWidth, c.height / img.naturalHeight);
-      const w = img.naturalWidth * s;
-      const h = img.naturalHeight * s;
+    const cover = (img: ImageBitmap | HTMLImageElement, alpha: number) => {
+      const iw = img.width;
+      const ih = img.height;
+      const s = Math.max(c.width / iw, c.height / ih);
+      const w = iw * s;
+      const h = ih * s;
       ctx.globalAlpha = alpha;
       ctx.drawImage(img, (c.width - w) / 2, (c.height - h) / 2, w, h);
     };
@@ -77,16 +80,20 @@ export function ScrollFrames() {
       ctx.globalAlpha = 1;
     };
 
-    const tick = () => {
+    const tick = (now: number) => {
       raf = 0;
+      const dt = lastT ? Math.min(64, now - lastT) : 16;
+      lastT = now;
       const p = progress();
       const target = reduce ? 0 : p * (COUNT - 1);
-      shown += (target - shown) * 0.2;
-      if (Math.abs(target - shown) < 0.02) shown = target;
+      // frame-rate independent easing (~same feel at 60Hz and 120Hz)
+      shown += (target - shown) * (1 - Math.exp(-dt / 70));
+      if (Math.abs(target - shown) < 0.005) shown = target;
       draw(shown);
       dirty = false;
       if (veil.current) veil.current.style.opacity = String(0.35 + 0.25 * Math.sin(p * Math.PI));
       if (shown !== target) raf = requestAnimationFrame(tick);
+      else lastT = 0;
     };
     function kick() {
       if (!raf) raf = requestAnimationFrame(tick);
@@ -97,7 +104,12 @@ export function ScrollFrames() {
       const img = new Image();
       img.decoding = "async";
       img.src = `${base}/bg/${dir}/${String(i + 1).padStart(3, "0")}.webp`;
-      img.onload = () => {
+      img.onload = async () => {
+        // Decode once up front so drawing never stalls on a decode.
+        try {
+          if ("createImageBitmap" in window) imgs[i] = await createImageBitmap(img);
+          else await img.decode();
+        } catch {}
         loaded[i] = true;
         if (dirty || Math.abs(i - shown) < 2) {
           dirty = true;
@@ -115,7 +127,10 @@ export function ScrollFrames() {
       window.removeEventListener("scroll", kick);
       window.removeEventListener("resize", resize);
       cancelAnimationFrame(raf);
-      imgs.forEach((im) => (im.onload = null));
+      imgs.forEach((im) => {
+        if (im instanceof HTMLImageElement) im.onload = null;
+        else im.close();
+      });
     };
   }, []);
 
