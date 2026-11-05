@@ -13,7 +13,7 @@ import { applyTheme, dashTex, iconTex, type Dash, type Icon } from "@/components
    camera route as the network scene (networkCamera). */
 
 const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-export const LIGHT_FOG = new THREE.Color("#dfe9f5");
+export const LIGHT_FOG = new THREE.Color("#bcd2ec");
 const BRAND_BLUE = new THREE.Color("#1a4fd0");
 const BRAND_GREEN = new THREE.Color("#13a36e");
 const FLOOR_Y = -14;
@@ -69,11 +69,11 @@ function DaySky() {
     const s = new Sky();
     s.scale.setScalar(250);
     const u = s.material.uniforms;
-    u.turbidity.value = 1.6;
-    u.rayleigh.value = 2.2;
+    u.turbidity.value = 3;
+    u.rayleigh.value = 3.2;
     u.mieCoefficient.value = 0.004;
     u.mieDirectionalG.value = 0.82;
-    const sun = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(58), THREE.MathUtils.degToRad(200));
+    const sun = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(72), THREE.MathUtils.degToRad(200));
     u.sunPosition.value.copy(sun);
     return s;
   }, []);
@@ -123,8 +123,9 @@ function Floor({ shadows }: { shadows: [number, number, number][] }) {
     <group position-y={FLOOR_Y}>
       <mesh rotation-x={-Math.PI / 2} position-z={-120}>
         <planeGeometry args={[900, 900]} />
-        <meshStandardMaterial color="#f3f6fa" roughness={0.85} />
+        <meshStandardMaterial color="#a9bfdc" roughness={0.6} metalness={0.1} />
       </mesh>
+      <gridHelper args={[900, 180, "#7d9cc6", "#93afd3"]} position={[0, 0.01, -120]} />
       {shadows.map(([x, z, s], i) => (
         <mesh key={i} rotation-x={-Math.PI / 2} position={[x, 0.02, z]}>
           <planeGeometry args={[s, s * 0.7]} />
@@ -195,14 +196,31 @@ function roundedShape(w: number, h: number, r: number) {
   return s;
 }
 
-const DASHES: [Dash, string, string, [number, number, number], number][] = [
-  ["line", "Portfolio value", "$1,354,237", [-9, 3.5, -100], 0.35],
-  ["kpi", "Contact centre today", "Live", [9, -2.5, -104], -0.35],
-  ["bars", "Monthly collections", "+12.4%", [-8, -4, -114], 0.3],
-  ["donut", "Work mix", "4 processes", [8.5, 4, -118], -0.3],
-  ["table", "Invoices", "Accounts receivable", [-7, 1, -128], 0.4],
-  ["line", "Revenue growth", "+18.2% YoY", [7, -1, -132], -0.4],
+const DASH_SPECS: [Dash, string, string][] = [
+  ["line", "Portfolio value", "$1,354,237"],
+  ["kpi", "Contact centre today", "Live"],
+  ["bars", "Monthly collections", "+12.4%"],
+  ["donut", "Work mix", "4 processes"],
+  ["table", "Invoices", "Accounts receivable"],
+  ["line", "Revenue growth", "+18.2% YoY"],
+  ["bars", "Calls answered", "18,420"],
+  ["kpi", "Quality score", "96%"],
 ];
+/** Glass panels spread along the whole route, alternating sides, so there is
+    always something in view (the globe owns z -45 to -80). */
+const DASHES: [Dash, string, string, [number, number, number], number][] = (() => {
+  const r = seeded(13);
+  const out: [Dash, string, string, [number, number, number], number][] = [];
+  let i = 0;
+  for (let z = -6; z > -280; z -= 11) {
+    if (z < -42 && z > -84) continue;
+    const side = i % 2 ? 1 : -1;
+    const [k, t, v] = DASH_SPECS[i % DASH_SPECS.length];
+    out.push([k, t, v, [side * (7.5 + r() * 4), -4 + r() * 8, z - r() * 4], -side * (0.3 + r() * 0.15)]);
+    i++;
+  }
+  return out;
+})();
 
 function GlassDashboards({ low }: { low: boolean }) {
   const { slab, glass, items } = useMemo(() => {
@@ -371,12 +389,14 @@ export function LightWorld({ low }: { low: boolean }) {
   return (
     <>
       <DaySky />
-      <Clouds count={low ? 22 : 46} />
+      <Clouds count={low ? 30 : 64} />
       <Floor shadows={shadows} />
       <Earth />
       <GlassDashboards low={low} />
       <IconDiscs />
       <Ribbons count={low ? 6 : 10} z={-8} y={-3} spread={12} />
+      <Ribbons count={low ? 4 : 7} z={-100} y={-6} spread={8} />
+      <Ribbons count={low ? 4 : 7} z={-160} y={-6.5} spread={8} />
       <Ribbons count={low ? 8 : 16} z={-212} y={-5.5} spread={7} />
       <Ribbons count={low ? 5 : 9} z={-285} y={0.5} spread={14} />
     </>

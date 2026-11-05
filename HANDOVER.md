@@ -177,7 +177,7 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 
 ## 9d. Light-themed backdrop (TESTING)
 
-- `BACKGROUND = "light3d"`: photoreal light scene in `src/components/light/LightWorld.tsx`, on the network camera route: three.js `Sky` (follows the camera) with soft painted clouds, white floor with soft contact shadows, daylight Earth (`public/globe` textures) with clouds and atmosphere, frosted-glass dashboard slabs (MeshPhysicalMaterial transmission; plain translucent glass on low quality) with the charts printed on the front, glossy white icon discs with tube links, and glossy blue and green tube ribbons. Fog and background `LIGHT_FOG` #dfe9f5. Same Scene3D, card and page styling; the white day veil is used.
+- `BACKGROUND = "light3d"`: photoreal light scene in `src/components/light/LightWorld.tsx`, on the network camera route: three.js `Sky` (follows the camera) with soft painted clouds, white floor with soft contact shadows, daylight Earth (`public/globe` textures) with clouds and atmosphere, frosted-glass dashboard slabs (MeshPhysicalMaterial transmission; plain translucent glass on low quality) with the charts printed on the front, glossy white icon discs with tube links, and glossy blue and green tube ribbons. Fog and background `LIGHT_FOG` #bcd2ec, blue-grey floor with a grid, deeper blue sky; about 22 glass panels spread along the whole route plus extra ribbon sets so the background is never empty. No white veil (it washed the scene out).
 - Third preview: `/stallionconnect/light/` (built in the same Pages workflow).
 
 ## 10. Custom cursor

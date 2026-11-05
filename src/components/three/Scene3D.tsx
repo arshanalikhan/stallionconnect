@@ -150,7 +150,7 @@ export function Scene3D({ world = "city" }: { world?: "city" | "network" | "jour
     >
       <SiteScene quality={quality} world={world} state={state} onReady={() => setReady(true)} />
       {/* light veil keeps text readable by day; fades out at night */}
-      <div ref={veil} className={cn("absolute inset-0", (world === "city" || world === "light") && "bg-white/15")} />
+      <div ref={veil} className={cn("absolute inset-0", world === "city" && "bg-white/15")} />
     </div>
   );
 }
