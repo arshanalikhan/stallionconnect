@@ -20,7 +20,9 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       >
         Skip to content
       </a>
-      {BACKGROUND === "journey3d" ? (
+      {BACKGROUND === "light3d" ? (
+        <Scene3D world="light" />
+      ) : BACKGROUND === "journey3d" ? (
         <Scene3D world="journey" />
       ) : BACKGROUND === "network3d" ? (
         <Scene3D world="network" />

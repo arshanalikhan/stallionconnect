@@ -173,7 +173,12 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 - `BACKGROUND = "journey3d"`: same `Scene3D` and card, backdrop from `src/components/journey/JourneyWorld.tsx`. Stages with soft navy dips between them: Earth (Blue Marble day and night textures, clouds, atmosphere, "PLANET EARTH", country labels and arcs from India) up to 30% of the page; India map with city pins (NEW DELHI, MUMBAI, BENGALURU, LUCKNOW) to 50%; aerial Aligarh at dusk (block grid with ~3600 painted low-rise buildings and shader windows, roof water tanks, trees and parks, street lights, moving traffic, far city lights, dusk sky; scene lights dim to dusk for this stage) with pin and "ALIGARH / UTTAR PRADESH, INDIA", then the glass office tower with "OFFICE" to 79%; office floor with desks, screens and the logo wall to 92%; final logo and tagline reveal.
 - Images in `public/globe/` (NASA Blue Marble, public domain, via the three-globe package examples): `earth.webp`, `earth-night.webp`, `clouds.webp`, `india.webp`, `india-night.webp` (crop lon 62.6 to 104.8, lat 3.87 to 39.0).
 - The background can be chosen at build time with `NEXT_PUBLIC_BACKGROUND` (overrides the default in `site.ts`).
-- GitHub Pages now publishes two previews from one workflow run (`.github/workflows/pages.yml`): `/stallionconnect/` (network, the default) and `/stallionconnect/journey/` (journey).
+- GitHub Pages now publishes three previews (see 9d for the light one) from one workflow run (`.github/workflows/pages.yml`): `/stallionconnect/` (network, the default) and `/stallionconnect/journey/` (journey).
+
+## 9d. Light-themed backdrop (TESTING)
+
+- `BACKGROUND = "light3d"`: the network scenery with `NetworkWorld light` (pale sky `LIGHT_BG` #eaf2fb with matching fog, normal blending instead of additive glow, deep blue and green lines, white glass dashboards with dark text, white globe with blue dots, white icon discs). Same Scene3D, card and page styling; the white day veil is used, as with the city.
+- Third preview: `/stallionconnect/light/` (built in the same Pages workflow).
 
 ## 10. Custom cursor
 

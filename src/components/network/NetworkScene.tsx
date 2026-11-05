@@ -16,6 +16,19 @@ const CYAN = new THREE.Color("#4fd8ff");
 const BLUE = new THREE.Color("#3b7bff");
 const GREEN = new THREE.Color("#22d39a");
 const NAVY = new THREE.Color("#03102b");
+/** Pale sky used by the light theme. */
+export const LIGHT_BG = new THREE.Color("#eaf2fb");
+
+/** Theme for the scenery; set by NetworkWorld before its children build. */
+const T = { light: false };
+function applyTheme(light: boolean) {
+  T.light = light;
+  CYAN.set(light ? "#1d86d1" : "#4fd8ff");
+  BLUE.set(light ? "#1a4fd0" : "#3b7bff");
+  GREEN.set(light ? "#11a06c" : "#22d39a");
+}
+/** Glow (additive) on the dark theme; plain ink on the light theme. */
+const blend = () => (T.light ? THREE.NormalBlending : THREE.AdditiveBlending);
 
 function seeded(seed = 7) {
   return () => (seed = (seed * 16807) % 2147483647) / 2147483647;
@@ -65,9 +78,11 @@ function dotTex() {
 function glowTex() {
   return canvasTex(256, 256, (g) => {
     const r = g.createRadialGradient(128, 128, 60, 128, 128, 128);
-    r.addColorStop(0, "rgba(79,216,255,0.55)");
-    r.addColorStop(0.5, "rgba(59,123,255,0.18)");
-    r.addColorStop(1, "rgba(59,123,255,0)");
+    const c = T.light ? "29,134,209" : "79,216,255";
+    const d = T.light ? "26,79,208" : "59,123,255";
+    r.addColorStop(0, `rgba(${c},${T.light ? 0.22 : 0.55})`);
+    r.addColorStop(0.5, `rgba(${d},${T.light ? 0.08 : 0.18})`);
+    r.addColorStop(1, `rgba(${d},0)`);
     g.fillStyle = r;
     g.fillRect(0, 0, 256, 256);
   });
@@ -76,8 +91,8 @@ function glowTex() {
 const FONT = '"Tinos", "Times New Roman", serif';
 
 function panel(g: CanvasRenderingContext2D, w: number, h: number) {
-  g.fillStyle = "rgba(8,30,70,0.72)";
-  g.strokeStyle = "rgba(79,216,255,0.55)";
+  g.fillStyle = T.light ? "rgba(255,255,255,0.88)" : "rgba(8,30,70,0.72)";
+  g.strokeStyle = T.light ? "rgba(26,79,208,0.28)" : "rgba(79,216,255,0.55)";
   g.lineWidth = 3;
   g.beginPath();
   g.roundRect(4, 4, w - 8, h - 8, 22);
@@ -92,10 +107,13 @@ function dashTex(kind: Dash, title: string, value: string, rnd: () => number) {
   const H = 320;
   return canvasTex(W, H, (g) => {
     panel(g, W, H);
-    g.fillStyle = "rgba(160,220,255,0.85)";
+    const ink = T.light ? "#0b2a5c" : "#ffffff";
+    const soft = T.light ? "#4a6a90" : "rgba(200,230,255,0.85)";
+    const acc = T.light ? "#1d86d1" : "rgba(79,216,255,0.8)";
+    g.fillStyle = T.light ? "#4a6a90" : "rgba(160,220,255,0.85)";
     g.font = `600 24px ${FONT}`;
     g.fillText(title, 30, 50);
-    g.fillStyle = "#ffffff";
+    g.fillStyle = ink;
     g.font = `700 40px ${FONT}`;
     g.fillText(value, 30, 100);
     const x0 = 30;
@@ -126,14 +144,14 @@ function dashTex(kind: Dash, title: string, value: string, rnd: () => number) {
     } else if (kind === "bars") {
       for (let i = 0; i < 12; i++) {
         const bh = ch * (0.25 + rnd() * 0.7);
-        g.fillStyle = i % 3 === 2 ? "#22d39a" : "rgba(79,216,255,0.8)";
+        g.fillStyle = i % 3 === 2 ? "#22d39a" : acc;
         g.fillRect(x0 + i * (cw / 12) + 6, y0 + ch - bh, cw / 12 - 12, bh);
       }
     } else if (kind === "donut") {
       const cx = W - 120;
       const cy = 190;
       const parts = [0.42, 0.28, 0.18, 0.12];
-      const cols = ["#22d39a", "#4fd8ff", "#3b7bff", "rgba(255,255,255,0.5)"];
+      const cols = ["#22d39a", acc, "#3b7bff", T.light ? "#b9c8dc" : "rgba(255,255,255,0.5)"];
       let a = -Math.PI / 2;
       parts.forEach((p, i) => {
         g.beginPath();
@@ -146,7 +164,7 @@ function dashTex(kind: Dash, title: string, value: string, rnd: () => number) {
       ["Collections", "Support", "Sales", "Other"].forEach((l, i) => {
         g.fillStyle = cols[i];
         g.fillRect(30, 150 + i * 36, 18, 18);
-        g.fillStyle = "rgba(220,240,255,0.85)";
+        g.fillStyle = soft;
         g.font = `22px ${FONT}`;
         g.fillText(l, 58, 167 + i * 36);
       });
@@ -158,23 +176,25 @@ function dashTex(kind: Dash, title: string, value: string, rnd: () => number) {
       ];
       items.forEach(([l, v], i) => {
         const y = y0 + 20 + i * 52;
-        g.fillStyle = "rgba(200,230,255,0.8)";
+        g.fillStyle = soft;
         g.font = `22px ${FONT}`;
         g.fillText(l, 30, y);
         g.fillStyle = "#22d39a";
         g.font = `700 26px ${FONT}`;
         g.fillText(v, W - 30 - g.measureText(v).width, y);
-        g.fillStyle = "rgba(79,216,255,0.25)";
+        g.fillStyle = T.light ? "rgba(26,79,208,0.12)" : "rgba(79,216,255,0.25)";
         g.fillRect(30, y + 12, cw, 4);
-        g.fillStyle = "rgba(79,216,255,0.9)";
+        g.fillStyle = acc;
         g.fillRect(30, y + 12, cw * (0.5 + rnd() * 0.45), 4);
       });
     } else {
       for (let r = 0; r < 5; r++) {
         const y = y0 + 10 + r * 32;
-        g.fillStyle = r % 2 ? "rgba(79,216,255,0.08)" : "rgba(79,216,255,0.16)";
+        g.fillStyle = T.light
+          ? r % 2 ? "rgba(26,79,208,0.04)" : "rgba(26,79,208,0.09)"
+          : r % 2 ? "rgba(79,216,255,0.08)" : "rgba(79,216,255,0.16)";
         g.fillRect(x0, y - 22, cw, 30);
-        g.fillStyle = "rgba(220,240,255,0.85)";
+        g.fillStyle = soft;
         g.font = `20px ${FONT}`;
         g.fillText(`INV-${2041 + r * 7}`, x0 + 12, y);
         const amt = `${(rnd() * 90000 + 4000).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}`;
@@ -193,13 +213,13 @@ function iconTex(icon: Icon) {
     g.translate(80, 80);
     g.beginPath();
     g.arc(0, 0, 66, 0, Math.PI * 2);
-    g.fillStyle = "rgba(8,30,70,0.85)";
+    g.fillStyle = T.light ? "rgba(255,255,255,0.95)" : "rgba(8,30,70,0.85)";
     g.fill();
-    g.strokeStyle = "rgba(79,216,255,0.9)";
+    g.strokeStyle = T.light ? "#1d86d1" : "rgba(79,216,255,0.9)";
     g.lineWidth = 5;
     g.stroke();
-    g.strokeStyle = "#bff3ff";
-    g.fillStyle = "#bff3ff";
+    g.strokeStyle = T.light ? "#0b3a8c" : "#bff3ff";
+    g.fillStyle = T.light ? "#0b3a8c" : "#bff3ff";
     g.lineWidth = 7;
     g.lineCap = "round";
     g.lineJoin = "round";
@@ -299,7 +319,7 @@ function Stars({ count, tex }: { count: number; tex: THREE.Texture }) {
         vertexColors
         transparent
         depthWrite={false}
-        blending={THREE.AdditiveBlending}
+        blending={blend()}
       />
     </points>
   );
@@ -328,7 +348,7 @@ function LightLines({ z, count }: { z: number; count: number }) {
         color: r() < 0.5 ? CYAN : BLUE,
         transparent: true,
         opacity: 0.4 + r() * 0.45,
-        blending: THREE.AdditiveBlending,
+        blending: blend(),
         depthWrite: false,
       });
       return new THREE.Line(geo, mat);
@@ -399,7 +419,7 @@ function Globe({ low, dot, glow }: { low: boolean; dot: THREE.Texture; glow: THR
               color: i % 3 ? CYAN : GREEN,
               transparent: true,
               opacity: 0.8,
-              blending: THREE.AdditiveBlending,
+              blending: blend(),
               depthWrite: false,
             }),
           ),
@@ -422,12 +442,12 @@ function Globe({ low, dot, glow }: { low: boolean; dot: THREE.Texture; glow: THR
   return (
     <group position={[0, 0, -62]}>
       <sprite scale={[R * 3.1, R * 3.1, 1]}>
-        <spriteMaterial map={glow} transparent depthWrite={false} blending={THREE.AdditiveBlending} />
+        <spriteMaterial map={glow} transparent depthWrite={false} blending={blend()} />
       </sprite>
       <group ref={spin} rotation={[0.35, 0, 0.1]}>
         <mesh>
           <sphereGeometry args={[R * 0.985, 48, 32]} />
-          <meshBasicMaterial color="#04183f" transparent opacity={0.85} />
+          <meshBasicMaterial color={T.light ? "#ffffff" : "#04183f"} transparent opacity={T.light ? 0.92 : 0.85} />
         </mesh>
         <points geometry={dots}>
           <pointsMaterial
@@ -436,7 +456,7 @@ function Globe({ low, dot, glow }: { low: boolean; dot: THREE.Texture; glow: THR
             color={CYAN}
             transparent
             depthWrite={false}
-            blending={THREE.AdditiveBlending}
+            blending={blend()}
           />
         </points>
         {arcLines.map((l, i) => (
@@ -449,7 +469,7 @@ function Globe({ low, dot, glow }: { low: boolean; dot: THREE.Texture; glow: THR
             color={GREEN}
             transparent
             depthWrite={false}
-            blending={THREE.AdditiveBlending}
+            blending={blend()}
           />
         </points>
       </group>
@@ -523,7 +543,7 @@ function ContactNetwork() {
         color: CYAN,
         transparent: true,
         opacity: 0.35,
-        blending: THREE.AdditiveBlending,
+        blending: blend(),
         depthWrite: false,
       }),
     );
@@ -557,7 +577,7 @@ function ContactNetwork() {
       ))}
       <instancedMesh ref={wave} args={[undefined, undefined, BARS]} position={[-6, -5.5, -158]}>
         <boxGeometry args={[0.14, 1, 0.05]} />
-        <meshBasicMaterial color={CYAN} transparent opacity={0.7} blending={THREE.AdditiveBlending} />
+        <meshBasicMaterial color={CYAN} transparent opacity={0.7} blending={blend()} />
       </instancedMesh>
     </>
   );
@@ -585,7 +605,7 @@ function Streams({ low }: { low: boolean }) {
           color: i % 3 === 0 ? BLUE : i % 3 === 1 ? GREEN : CYAN,
           transparent: true,
           opacity: 0.45,
-          blending: THREE.AdditiveBlending,
+          blending: blend(),
           depthWrite: false,
         }),
       );
@@ -656,7 +676,8 @@ function Rig({ state, onReady }: { state: React.RefObject<NetState>; onReady: ()
 }
 
 /** All network scenery (no camera, no canvas): used inside SiteScene. */
-export function NetworkWorld({ low }: { low: boolean }) {
+export function NetworkWorld({ low, light = false }: { low: boolean; light?: boolean }) {
+  applyTheme(light);
   const tex = useMemo(() => ({ dot: dotTex(), glow: glowTex() }), []);
   useEffect(
     () => () => {

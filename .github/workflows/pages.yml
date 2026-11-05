@@ -32,11 +32,18 @@ jobs:
       # Two previews side by side for comparing backgrounds:
       #   /<repo>/          network backdrop (default in src/config/site.ts)
       #   /<repo>/journey/  journey backdrop (Earth, India, Aligarh, office)
+      #   /<repo>/light/    light-themed network backdrop
       - name: Build journey preview
         run: npm run build:pages && mv out journey-out
         env:
           PAGES_BASE_PATH: /${{ github.event.repository.name }}/journey
           NEXT_PUBLIC_BACKGROUND: journey3d
+
+      - name: Build light preview
+        run: npm run build:pages && mv out light-out
+        env:
+          PAGES_BASE_PATH: /${{ github.event.repository.name }}/light
+          NEXT_PUBLIC_BACKGROUND: light3d
 
       - name: Build main preview
         run: npm run build:pages
@@ -47,6 +54,8 @@ jobs:
         run: |
           test ! -e out/journey  # must not clash with a public/ folder
           mv journey-out out/journey
+          test ! -e out/light
+          mv light-out out/light
           touch out/.nojekyll
 
       - name: Publish to gh-pages branch

@@ -7,13 +7,13 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 import logoFull from "@/assets/brand/logo-full.webp";
 import { SECTION_IDS, type Quality, type SceneState } from "./sceneState";
 import { JOURNEY_BG, JourneyFade, JourneyWorld, journeyCamera, setJourneyProgress } from "@/components/journey/JourneyWorld";
-import { NETWORK_BG, NetworkWorld, networkCamera } from "@/components/network/NetworkScene";
+import { LIGHT_BG, NETWORK_BG, NetworkWorld, networkCamera } from "@/components/network/NetworkScene";
 import { callCardTexture, logoCardTexture, sheenTexture, windowTexture } from "./textures";
 
 type Props = {
   quality: Quality;
   /** What sits behind the card: the original city, or the finance network. */
-  world?: "city" | "network" | "journey";
+  world?: "city" | "network" | "journey" | "light";
   state: React.RefObject<SceneState>;
   onReady: () => void;
 };
@@ -619,7 +619,8 @@ function setupRenderer(gl: THREE.WebGLRenderer, scene: THREE.Scene) {
 
 export default function SiteScene({ quality, state, onReady, world = "city" }: Props) {
   const high = quality === "high";
-  const net = world === "network";
+  const light = world === "light";
+  const net = world === "network" || light;
   const journey = world === "journey";
   return (
     <Canvas
@@ -629,10 +630,12 @@ export default function SiteScene({ quality, state, onReady, world = "city" }: P
       camera={{ fov: 50, near: 0.1, far: journey ? 900 : 280, position: [0, 3.2, 14] }}
       onCreated={({ gl, scene, camera }) => {
         setupRenderer(gl, scene);
-        scene.background = journey ? JOURNEY_BG : net ? NETWORK_BG : SKY;
+        scene.background = journey ? JOURNEY_BG : light ? LIGHT_BG : net ? NETWORK_BG : SKY;
         scene.fog = journey
           ? new THREE.Fog(JOURNEY_BG, 160, 520)
-          : net
+          : light
+            ? new THREE.Fog(LIGHT_BG, 40, 130)
+            : net
             ? new THREE.Fog(NETWORK_BG, 35, 120)
             : new THREE.Fog(SKY, 30, 125);
         // The card is attached to the camera, so the camera must be in the scene.
@@ -664,7 +667,7 @@ export default function SiteScene({ quality, state, onReady, world = "city" }: P
       ) : net ? (
         <>
           <NetworkDirector state={state} />
-          <NetworkWorld low={!high} />
+          <NetworkWorld low={!high} light={light} />
         </>
       ) : (
         <>
