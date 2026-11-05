@@ -4,7 +4,6 @@
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { Sky } from "three/examples/jsm/objects/Sky.js";
 import { applyTheme, dashTex, iconTex, type Dash, type Icon } from "@/components/network/NetworkScene";
 
 /* Light, photoreal take on the finance network: a real daylight sky with
@@ -63,22 +62,34 @@ function blobTex() {
 
 /* ---------- sky that travels with the camera ---------- */
 
+/** Daylight sky as a cheap gradient (same look as the physical sky model,
+    a fraction of the per-pixel cost). Follows the camera. */
 function DaySky() {
   const camera = useThree((s) => s.camera);
-  const sky = useMemo(() => {
-    const s = new Sky();
-    s.scale.setScalar(250);
-    const u = s.material.uniforms;
-    u.turbidity.value = 3;
-    u.rayleigh.value = 3.2;
-    u.mieCoefficient.value = 0.004;
-    u.mieDirectionalG.value = 0.82;
-    const sun = new THREE.Vector3().setFromSphericalCoords(1, THREE.MathUtils.degToRad(72), THREE.MathUtils.degToRad(200));
-    u.sunPosition.value.copy(sun);
-    return s;
-  }, []);
-  useFrame(() => sky.position.copy(camera.position));
-  return <primitive object={sky} />;
+  const mesh = useRef<THREE.Mesh>(null);
+  useFrame(() => mesh.current?.position.copy(camera.position));
+  return (
+    <mesh ref={mesh} renderOrder={-1}>
+      <sphereGeometry args={[200, 24, 12]} />
+      <shaderMaterial
+        side={THREE.BackSide}
+        depthWrite={false}
+        fog={false}
+        toneMapped={false}
+        vertexShader={`varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`}
+        fragmentShader={`varying vec3 vP; void main(){
+          float h = clamp(vP.y, 0.0, 1.0);
+          vec3 c = mix(vec3(0.83,0.88,0.94), vec3(0.62,0.74,0.89), smoothstep(0.0, 0.18, h));
+          c = mix(c, vec3(0.36,0.55,0.83), smoothstep(0.18, 0.75, h));
+          // soft sun glow, high on the left
+          float sun = pow(max(dot(vP, normalize(vec3(-0.45, 0.55, -0.7))), 0.0), 24.0);
+          c += vec3(1.0, 0.96, 0.86) * sun * 0.35;
+          gl_FragColor = vec4(c, 1.0);
+          #include <colorspace_fragment>
+        }`}
+      />
+    </mesh>
+  );
 }
 
 /* ---------- clouds ---------- */
@@ -129,7 +140,7 @@ function Floor({ shadows }: { shadows: [number, number, number][] }) {
     <group position-y={FLOOR_Y}>
       <mesh rotation-x={-Math.PI / 2} position-z={-120}>
         <planeGeometry args={[900, 900]} />
-        <meshStandardMaterial color="#a9bfdc" roughness={0.6} metalness={0.1} />
+        <meshLambertMaterial color="#a9bfdc" />
       </mesh>
       <gridHelper args={[900, 180, "#7d9cc6", "#93afd3"]} position={[0, 0.01, -120]} />
       {shadows.map(([x, z, s], i) => (
@@ -241,19 +252,17 @@ function GlassDashboards({ low }: { low: boolean }) {
       curveSegments: 12,
     });
     slab.translate(0, 0, -0.11);
-    const glass = low
-      ? new THREE.MeshPhysicalMaterial({ color: "#ffffff", roughness: 0.15, transparent: true, opacity: 0.35, clearcoat: 1 })
-      : new THREE.MeshPhysicalMaterial({
-          color: "#ffffff",
-          transmission: 1,
-          thickness: 0.6,
-          roughness: 0.22,
-          ior: 1.45,
-          clearcoat: 1,
-          clearcoatRoughness: 0.1,
-          attenuationColor: new THREE.Color("#dbe8f7"),
-          attenuationDistance: 3,
-        });
+    // Frosted look without real refraction: transmission re-renders the whole
+    // scene every frame, which made scrolling lag. Env reflections keep the sheen.
+    void low;
+    const glass = new THREE.MeshStandardMaterial({
+      color: "#ffffff",
+      roughness: 0.12,
+      metalness: 0.05,
+      transparent: true,
+      opacity: 0.42,
+      depthWrite: false,
+    });
     const items = DASHES.map(([k, t, v, p, ry]) => ({ tex: dashTex(k, t, v, r), p, ry, ph: r() * 6 }));
     return { slab, glass, items };
   }, [low]);
@@ -328,8 +337,8 @@ function IconDiscs() {
           }}
         >
           <mesh rotation-x={Math.PI / 2}>
-            <cylinderGeometry args={[0.85, 0.85, 0.28, 48]} />
-            <meshPhysicalMaterial color="#ffffff" roughness={0.25} clearcoat={1} clearcoatRoughness={0.08} />
+            <cylinderGeometry args={[0.85, 0.85, 0.28, 32]} />
+            <meshStandardMaterial color="#ffffff" roughness={0.2} />
           </mesh>
           <mesh position-z={0.15}>
             <circleGeometry args={[0.78, 48]} />
@@ -359,7 +368,7 @@ function Ribbons({ count, z, y, spread }: { count: number; z: number; y: number;
         );
       }
       return {
-        geo: new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 240, 0.045 + r() * 0.05, 10, false),
+        geo: new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 110, 0.045 + r() * 0.05, 6, false),
         color: i % 3 === 0 ? BRAND_GREEN : i % 3 === 1 ? BRAND_BLUE : new THREE.Color("#5aa9e6"),
         ph,
       };
@@ -377,7 +386,7 @@ function Ribbons({ count, z, y, spread }: { count: number; z: number; y: number;
     <group ref={group}>
       {tubes.map((t, i) => (
         <mesh key={i} geometry={t.geo}>
-          <meshPhysicalMaterial color={t.color} roughness={0.2} metalness={0.15} clearcoat={1} clearcoatRoughness={0.06} />
+          <meshStandardMaterial color={t.color} roughness={0.22} metalness={0.2} />
         </mesh>
       ))}
     </group>
@@ -395,7 +404,7 @@ export function LightWorld({ low }: { low: boolean }) {
   return (
     <>
       <DaySky />
-      <Clouds count={low ? 30 : 64} />
+      <Clouds count={low ? 18 : 34} />
       <Floor shadows={shadows} />
       <Earth />
       <GlassDashboards low={low} />
@@ -403,7 +412,7 @@ export function LightWorld({ low }: { low: boolean }) {
       <Ribbons count={low ? 6 : 10} z={-8} y={-3} spread={12} />
       <Ribbons count={low ? 4 : 7} z={-100} y={-6} spread={8} />
       <Ribbons count={low ? 4 : 7} z={-160} y={-6.5} spread={8} />
-      <Ribbons count={low ? 8 : 16} z={-212} y={-5.5} spread={7} />
+      <Ribbons count={low ? 6 : 11} z={-212} y={-5.5} spread={7} />
       <Ribbons count={low ? 5 : 9} z={-285} y={0.5} spread={14} />
     </>
   );
