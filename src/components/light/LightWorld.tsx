@@ -91,17 +91,23 @@ function Clouds({ count }: { count: number }) {
       // Mostly to the sides and below the route, a few overhead.
       const side = r() < 0.5 ? -1 : 1;
       const below = r() < 0.55;
-      const x = side * (10 + r() * 45);
-      const y = below ? FLOOR_Y + 3 + r() * 6 : 6 + r() * 14;
-      const z = 20 - r() * 290;
       const s = 14 + r() * 26;
+      // Keep the whole puff clear of the camera route (x within about 8, y -3 to 3).
+      const x = side * (s * 0.5 + 9 + r() * 34);
+      const y = below ? Math.min(FLOOR_Y + 3 + r() * 6, -6 - s * 0.25) : Math.max(6 + r() * 14, 5 + s * 0.25);
+      const z = 20 - r() * 290;
       return { tex: texs[i % texs.length], p: [x, y, z] as [number, number, number], s, ph: r() * 6, op: 0.75 + r() * 0.25 };
     });
   }, [count]);
   const group = useRef<THREE.Group>(null);
+  const camera = useThree((st) => st.camera);
   useFrame(({ clock }) => {
     group.current?.children.forEach((c, i) => {
       c.position.x = items[i].p[0] + Math.sin(clock.elapsedTime * 0.05 + items[i].ph) * 1.5;
+      // Thin out smoothly as the camera nears, so a cloud never pops on or off screen.
+      const d = c.position.distanceTo(camera.position) - items[i].s * 0.35;
+      const k = Math.min(1, Math.max(0, (d - 6) / 22));
+      ((c as THREE.Sprite).material as THREE.SpriteMaterial).opacity = items[i].op * k * k * (3 - 2 * k);
     });
   });
   return (
@@ -152,7 +158,7 @@ function Earth() {
   });
   const R = 11;
   return (
-    <group position={[0, 0, -62]} rotation={[0.35, 0, 0.1]}>
+    <group position={[-17, 1, -66]} rotation={[0.35, 0, 0.1]}>
       <group ref={spin} rotation-y={-1.6}>
         <mesh>
           <sphereGeometry args={[R, 96, 64]} />
@@ -381,7 +387,7 @@ function Ribbons({ count, z, y, spread }: { count: number; z: number; y: number;
 export function LightWorld({ low }: { low: boolean }) {
   useEffect(() => () => applyTheme(false), []);
   const shadows: [number, number, number][] = [
-    [0, -62, 30],
+    [-17, -66, 30],
     ...DASHES.map(([, , , p]) => [p[0], p[2], 9] as [number, number, number]),
     [0, -162, 30],
     [0, -210, 70],
