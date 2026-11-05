@@ -21,7 +21,7 @@ export const LIGHT_BG = new THREE.Color("#eaf2fb");
 
 /** Theme for the scenery; set by NetworkWorld before its children build. */
 const T = { light: false };
-function applyTheme(light: boolean) {
+export function applyTheme(light: boolean) {
   T.light = light;
   CYAN.set(light ? "#1d86d1" : "#4fd8ff");
   BLUE.set(light ? "#1a4fd0" : "#3b7bff");
@@ -100,9 +100,9 @@ function panel(g: CanvasRenderingContext2D, w: number, h: number) {
   g.stroke();
 }
 
-type Dash = "line" | "bars" | "donut" | "kpi" | "table";
+export type Dash = "line" | "bars" | "donut" | "kpi" | "table";
 
-function dashTex(kind: Dash, title: string, value: string, rnd: () => number) {
+export function dashTex(kind: Dash, title: string, value: string, rnd: () => number) {
   const W = 512;
   const H = 320;
   return canvasTex(W, H, (g) => {
@@ -206,9 +206,9 @@ function dashTex(kind: Dash, title: string, value: string, rnd: () => number) {
   });
 }
 
-type Icon = "headset" | "phone" | "chat" | "user" | "mail" | "chart" | "globe";
+export type Icon = "headset" | "phone" | "chat" | "user" | "mail" | "chart" | "globe";
 
-function iconTex(icon: Icon) {
+export function iconTex(icon: Icon) {
   return canvasTex(160, 160, (g) => {
     g.translate(80, 80);
     g.beginPath();

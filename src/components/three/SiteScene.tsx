@@ -7,7 +7,8 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 import logoFull from "@/assets/brand/logo-full.webp";
 import { SECTION_IDS, type Quality, type SceneState } from "./sceneState";
 import { JOURNEY_BG, JourneyFade, JourneyWorld, journeyCamera, setJourneyProgress } from "@/components/journey/JourneyWorld";
-import { LIGHT_BG, NETWORK_BG, NetworkWorld, networkCamera } from "@/components/network/NetworkScene";
+import { LIGHT_FOG, LightWorld } from "@/components/light/LightWorld";
+import { NETWORK_BG, NetworkWorld, networkCamera } from "@/components/network/NetworkScene";
 import { callCardTexture, logoCardTexture, sheenTexture, windowTexture } from "./textures";
 
 type Props = {
@@ -630,11 +631,11 @@ export default function SiteScene({ quality, state, onReady, world = "city" }: P
       camera={{ fov: 50, near: 0.1, far: journey ? 900 : 280, position: [0, 3.2, 14] }}
       onCreated={({ gl, scene, camera }) => {
         setupRenderer(gl, scene);
-        scene.background = journey ? JOURNEY_BG : light ? LIGHT_BG : net ? NETWORK_BG : SKY;
+        scene.background = journey ? JOURNEY_BG : light ? LIGHT_FOG : net ? NETWORK_BG : SKY;
         scene.fog = journey
           ? new THREE.Fog(JOURNEY_BG, 160, 520)
           : light
-            ? new THREE.Fog(LIGHT_BG, 40, 130)
+            ? new THREE.Fog(LIGHT_FOG, 45, 170)
             : net
             ? new THREE.Fog(NETWORK_BG, 35, 120)
             : new THREE.Fog(SKY, 30, 125);
@@ -667,7 +668,13 @@ export default function SiteScene({ quality, state, onReady, world = "city" }: P
       ) : net ? (
         <>
           <NetworkDirector state={state} />
-          <NetworkWorld low={!high} light={light} />
+          {light ? (
+            <Suspense fallback={null}>
+              <LightWorld low={!high} />
+            </Suspense>
+          ) : (
+            <NetworkWorld low={!high} />
+          )}
         </>
       ) : (
         <>
