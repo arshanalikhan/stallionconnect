@@ -301,7 +301,7 @@ function Earth({ dot }: { dot: THREE.Texture }) {
             />
           </line>
         ))}
-        <points geometry={pulse}>
+        <points geometry={pulse} frustumCulled={false}>
           <pointsMaterial
             ref={pulseMat}
             map={dot}
@@ -465,34 +465,42 @@ function IndiaMap() {
 
 /* ---------- stage 3: Aligarh aerial + office tower ---------- */
 
+/* City: dense low-rise blocks on a road grid, painted walls with real-size
+   windows (shader), roof water tanks, trees, street lights, moving traffic
+   and a dusk sky. */
+
+const BLOCK = 10; // road grid spacing
+const CITY_SIZE = 240;
+const MAIN_EVERY = 4; // every 4th road is a main road
+
 function groundTex() {
+  const N = CITY_SIZE / BLOCK; // cells across
+  const px = 2048;
+  const s = px / N;
   const c = document.createElement("canvas");
-  c.width = c.height = 1024;
+  c.width = c.height = px;
   const g = c.getContext("2d")!;
-  g.fillStyle = "#1a2433";
-  g.fillRect(0, 0, 1024, 1024);
+  g.fillStyle = "#2a2a2a";
+  g.fillRect(0, 0, px, px);
   const r = seeded(21);
-  // patches of green and dust between roads
-  for (let i = 0; i < 260; i++) {
-    g.fillStyle = r() < 0.5 ? "rgba(48,72,52,0.55)" : "rgba(70,64,58,0.45)";
-    g.fillRect(r() * 1024, r() * 1024, 20 + r() * 60, 20 + r() * 60);
-  }
-  // roads with warm light
-  for (let i = 0; i <= 16; i++) {
-    const p = i * 64;
-    const main = i % 4 === 0;
-    g.fillStyle = main ? "#3b3a3a" : "#2b2d31";
-    g.fillRect(p - (main ? 7 : 4), 0, main ? 14 : 8, 1024);
-    g.fillRect(0, p - (main ? 7 : 4), 1024, main ? 14 : 8);
-    if (main) {
-      g.fillStyle = "rgba(255,196,110,0.55)";
-      for (let k = 0; k < 1024; k += 16) {
-        g.fillRect(p - 8, k, 2, 2);
-        g.fillRect(p + 6, k, 2, 2);
-        g.fillRect(k, p - 8, 2, 2);
-        g.fillRect(k, p + 6, 2, 2);
-      }
+  // blocks: dusty ground, some parks
+  for (let i = 0; i < N; i++)
+    for (let j = 0; j < N; j++) {
+      const park = r() < 0.07;
+      g.fillStyle = park ? "#2f4a2c" : r() < 0.5 ? "#4a4339" : "#3f3b35";
+      g.fillRect(i * s + s * 0.13, j * s + s * 0.13, s * 0.74, s * 0.74);
     }
+  // lane markings on main roads
+  g.strokeStyle = "rgba(230,220,190,0.35)";
+  g.lineWidth = 1;
+  g.setLineDash([6, 8]);
+  for (let i = 0; i <= N; i += MAIN_EVERY) {
+    g.beginPath();
+    g.moveTo(i * s, 0);
+    g.lineTo(i * s, px);
+    g.moveTo(0, i * s);
+    g.lineTo(px, i * s);
+    g.stroke();
   }
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
@@ -500,67 +508,165 @@ function groundTex() {
   return t;
 }
 
+/** Walls get windows sized in world units; roofs stay plain and darker. */
+function buildingMaterial() {
+  const m = new THREE.MeshStandardMaterial({ roughness: 0.92, metalness: 0 });
+  m.onBeforeCompile = (sh) => {
+    sh.vertexShader = sh.vertexShader
+      .replace(
+        "#include <common>",
+        "#include <common>\nvarying vec3 vWP; varying vec3 vON; varying float vSeed;",
+      )
+      .replace(
+        "#include <project_vertex>",
+        `#include <project_vertex>
+        vec4 wp = vec4(transformed, 1.0);
+        #ifdef USE_INSTANCING
+          wp = instanceMatrix * wp;
+          vSeed = fract(sin(dot(instanceMatrix[3].xz, vec2(12.9898, 78.233))) * 43758.5453);
+        #else
+          vSeed = 0.5;
+        #endif
+        vWP = wp.xyz;
+        vON = objectNormal;`,
+      );
+    sh.fragmentShader = sh.fragmentShader
+      .replace(
+        "#include <common>",
+        `#include <common>
+        varying vec3 vWP; varying vec3 vON; varying float vSeed;
+        float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }`,
+      )
+      .replace(
+        "#include <emissivemap_fragment>",
+        `#include <emissivemap_fragment>
+        if (abs(vON.y) < 0.5) {
+          float along = abs(vON.x) > 0.5 ? vWP.z : vWP.x;
+          vec2 cell = vec2(along / 0.62, vWP.y / 0.72);
+          vec2 f = fract(cell);
+          vec2 id = floor(cell);
+          float win = step(0.24, f.x) * step(f.x, 0.76) * step(0.28, f.y) * step(f.y, 0.78);
+          float ground = 1.0 - step(0.72, vWP.y);
+          win *= 1.0 - ground;
+          float r = h21(id + vSeed * 91.7);
+          float lit = step(0.52, r);
+          vec3 warm = mix(vec3(1.0, 0.74, 0.42), vec3(0.78, 0.88, 1.0), step(0.86, h21(id + 7.3)));
+          diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.06, 0.08, 0.1), win * 0.85);
+          totalEmissiveRadiance += win * lit * warm * (0.9 + 0.6 * h21(id + 1.7));
+          // shop fronts along the ground floor
+          float shop = ground * step(0.15, vWP.y) * step(0.45, vSeed);
+          totalEmissiveRadiance += shop * vec3(1.0, 0.82, 0.55) * 0.55;
+        } else {
+          diffuseColor.rgb *= 0.62;
+        }`,
+      );
+  };
+  return m;
+}
+
+const PAINT = ["#d8cdb4", "#c9b08a", "#a7a9a6", "#c8a39a", "#d4c182", "#a9bccb", "#dcd8cf", "#b9a58d"];
+
 function City({ low }: { low: boolean }) {
-  const win = useMemo(() => {
-    const t = windowTexture();
-    t.wrapS = t.wrapT = THREE.RepeatWrapping;
-    return t;
-  }, []);
   const ground = useMemo(groundTex, []);
-  const mesh = useRef<THREE.InstancedMesh>(null);
-  const COUNT = low ? 700 : 1500;
-  const SIZE = 160; // ground size; 16 road cells of 10 units
+  const bMat = useMemo(buildingMaterial, []);
+  const buildings = useRef<THREE.InstancedMesh>(null);
+  const tanks = useRef<THREE.InstancedMesh>(null);
+  const trees = useRef<THREE.InstancedMesh>(null);
+  const MAXB = low ? 1600 : 3600;
+  const MAXT = low ? 500 : 1200;
+  const MAXTREE = low ? 600 : 1500;
 
   useEffect(() => {
-    const m = mesh.current;
-    if (!m) return;
+    const B = buildings.current;
+    const T = tanks.current;
+    const TR = trees.current;
+    if (!B || !T || !TR) return;
     const r = seeded(33);
     const o = new THREE.Object3D();
     const col = new THREE.Color();
-    let n = 0;
-    for (let tries = 0; n < COUNT && tries < COUNT * 4; tries++) {
-      const x = (r() - 0.5) * SIZE;
-      const z = (r() - 0.5) * SIZE;
-      const cx = ((x % 10) + 10) % 10;
-      const cz = ((z % 10) + 10) % 10;
-      if (cx < 1.8 || cx > 8.2 || cz < 1.8 || cz > 8.2) continue; // keep roads clear
-      if (Math.abs(x) < 12 && z < -36 && z > -64) continue; // office plot
-      const w = 1.2 + r() * 2.2;
-      const d = 1.2 + r() * 2.2;
-      const h = 1 + Math.pow(r(), 2.2) * (Math.hypot(x, z) < 40 ? 9 : 5);
-      o.position.set(x, h / 2, z);
-      o.scale.set(w, h, d);
-      o.rotation.y = 0;
-      o.updateMatrix();
-      m.setMatrixAt(n, o.matrix);
-      col.setHSL(0.6 + r() * 0.05, 0.18, 0.16 + r() * 0.14);
-      m.setColorAt(n, col);
-      n++;
-    }
-    m.count = n;
-    m.instanceMatrix.needsUpdate = true;
-    if (m.instanceColor) m.instanceColor.needsUpdate = true;
-  }, [COUNT]);
+    let nb = 0;
+    let nt = 0;
+    let ntr = 0;
+    const N = CITY_SIZE / BLOCK;
+    const density = low ? 0.42 : 0.68;
+    for (let i = 0; i < N; i++)
+      for (let j = 0; j < N; j++) {
+        const bx = -CITY_SIZE / 2 + i * BLOCK;
+        const bz = -CITY_SIZE / 2 + j * BLOCK;
+        const cx = bx + BLOCK / 2;
+        const cz = bz + BLOCK / 2;
+        if (Math.abs(cx) < 14 && cz < -36 && cz > -66) continue; // office plot
+        const park = r() < 0.07;
+        const centre = Math.hypot(cx, cz);
+        for (let a = 0; a < 3; a++)
+          for (let b = 0; b < 3; b++) {
+            const lx = bx + 2.2 + a * 2.8;
+            const lz = bz + 2.2 + b * 2.8;
+            if (park || r() > density) {
+              // trees on empty lots and parks
+              if (ntr < MAXTREE && r() < (park ? 0.9 : 0.35)) {
+                const s = 0.6 + r() * 0.7;
+                o.position.set(lx + (r() - 0.5), s * 0.9, lz + (r() - 0.5));
+                o.scale.set(s, s * 1.1, s);
+                o.updateMatrix();
+                TR.setMatrixAt(ntr++, o.matrix);
+              }
+              continue;
+            }
+            if (nb >= MAXB) continue;
+            const w = 1.7 + r() * 0.9;
+            const d = 1.7 + r() * 0.9;
+            const tall = centre < 60 && r() < 0.12;
+            const storeys = tall ? 6 + Math.floor(r() * 10) : 2 + Math.floor(Math.pow(r(), 1.6) * 4);
+            const h = storeys * 0.72 + 0.1;
+            o.position.set(lx, h / 2, lz);
+            o.scale.set(w, h, d);
+            o.updateMatrix();
+            B.setMatrixAt(nb, o.matrix);
+            col.set(PAINT[Math.floor(r() * PAINT.length)]).multiplyScalar(0.5 + r() * 0.18);
+            B.setColorAt(nb, col);
+            nb++;
+            // rooftop water tanks, a common sight
+            if (nt < MAXT && r() < 0.45) {
+              o.position.set(lx + (r() - 0.5) * w * 0.5, h + 0.22, lz + (r() - 0.5) * d * 0.5);
+              o.scale.set(1, 1, 1);
+              o.updateMatrix();
+              T.setMatrixAt(nt++, o.matrix);
+            }
+          }
+      }
+    B.count = nb;
+    T.count = nt;
+    TR.count = ntr;
+    [B, T, TR].forEach((m) => (m.instanceMatrix.needsUpdate = true));
+    if (B.instanceColor) B.instanceColor.needsUpdate = true;
+  }, [low, MAXB, MAXT, MAXTREE]);
 
   return (
     <group position={CITY_O}>
+      <DuskSky />
       <mesh rotation-x={-Math.PI / 2}>
-        <planeGeometry args={[SIZE, SIZE]} />
+        <planeGeometry args={[CITY_SIZE, CITY_SIZE]} />
         <meshStandardMaterial map={ground} roughness={1} />
       </mesh>
       <mesh rotation-x={-Math.PI / 2} position-y={-0.05}>
-        <planeGeometry args={[1200, 1200]} />
-        <meshBasicMaterial color="#0d1a2c" />
+        <planeGeometry args={[1400, 1400]} />
+        <meshStandardMaterial color="#2a2722" roughness={1} />
       </mesh>
-      <instancedMesh ref={mesh} args={[undefined, undefined, COUNT]}>
+      <instancedMesh ref={buildings} args={[undefined, undefined, MAXB]} material={bMat} frustumCulled={false}>
         <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial
-          roughness={0.9}
-          emissiveMap={win}
-          emissive="#ffd9a0"
-          emissiveIntensity={0.9}
-        />
       </instancedMesh>
+      <instancedMesh ref={tanks} args={[undefined, undefined, MAXT]} frustumCulled={false}>
+        <cylinderGeometry args={[0.22, 0.22, 0.4, 10]} />
+        <meshStandardMaterial color="#1c1f22" roughness={0.6} />
+      </instancedMesh>
+      <instancedMesh ref={trees} args={[undefined, undefined, MAXTREE]} frustumCulled={false}>
+        <icosahedronGeometry args={[0.8, 0]} />
+        <meshStandardMaterial color="#2c4a26" roughness={1} flatShading />
+      </instancedMesh>
+      <StreetLights />
+      <Traffic low={low} />
+      <FarLights low={low} />
       <Pin at={new THREE.Vector3(0, 0, -10)} scale={2.2} />
       <Label
         lines={[
@@ -571,8 +677,163 @@ function City({ low }: { low: boolean }) {
         position={[0, 24, -10]}
         range={[0.51, 0.54, 0.63, 0.67]}
       />
-      <Tower win={win} />
+      <Tower win={TOWER_WIN()} />
     </group>
+  );
+}
+
+let towerWin: THREE.Texture | null = null;
+function TOWER_WIN() {
+  if (!towerWin) {
+    towerWin = windowTexture();
+    towerWin.wrapS = towerWin.wrapT = THREE.RepeatWrapping;
+  }
+  return towerWin;
+}
+
+/** Deep blue overhead fading to a warm dusk glow at the horizon. */
+function DuskSky() {
+  return (
+    <mesh>
+      <sphereGeometry args={[600, 32, 16]} />
+      <shaderMaterial
+        side={THREE.BackSide}
+        depthWrite={false}
+        fog={false}
+        vertexShader={`varying vec3 vP; void main(){ vP = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }`}
+        fragmentShader={`varying vec3 vP; void main(){
+          float h = clamp(vP.y, -0.1, 1.0);
+          vec3 top = vec3(0.03, 0.07, 0.18);
+          vec3 mid = vec3(0.16, 0.18, 0.32);
+          vec3 low = vec3(0.62, 0.36, 0.26);
+          vec3 c = mix(low, mid, smoothstep(0.0, 0.12, h));
+          c = mix(c, top, smoothstep(0.12, 0.6, h));
+          gl_FragColor = vec4(c, 1.0);
+        }`}
+      />
+    </mesh>
+  );
+}
+
+/** Warm street lights along every road. */
+function StreetLights() {
+  const geo = useMemo(() => {
+    const p: number[] = [];
+    const half = CITY_SIZE / 2;
+    for (let k = 0; k <= CITY_SIZE / BLOCK; k++) {
+      const line = -half + k * BLOCK;
+      for (let t = -half; t < half; t += 3.2) {
+        p.push(line + 0.75, 0.6, t, line - 0.75, 0.6, t + 1.6);
+        p.push(t, 0.6, line + 0.75, t + 1.6, 0.6, line - 0.75);
+      }
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.Float32BufferAttribute(p, 3));
+    return g;
+  }, []);
+  const dot = useMemo(dotTex, []);
+  return (
+    <points geometry={geo}>
+      <pointsMaterial
+        map={dot}
+        size={0.7}
+        color="#ffbf73"
+        transparent
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
+}
+
+/** Head and tail lights moving along the main roads. */
+function Traffic({ low }: { low: boolean }) {
+  const COUNT = low ? 160 : 360;
+  const dot = useMemo(dotTex, []);
+  const cars = useMemo(() => {
+    const r = seeded(61);
+    const half = CITY_SIZE / 2;
+    const mains: number[] = [];
+    for (let k = 0; k <= CITY_SIZE / BLOCK; k += MAIN_EVERY) mains.push(-half + k * BLOCK);
+    return Array.from({ length: COUNT }, () => ({
+      line: mains[Math.floor(r() * mains.length)],
+      vertical: r() < 0.5,
+      dir: r() < 0.5 ? 1 : -1,
+      off: r() * CITY_SIZE,
+      speed: 4 + r() * 5,
+    }));
+  }, [COUNT]);
+  const { geo, colors } = useMemo(() => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(new Float32Array(COUNT * 3), 3));
+    const c = new Float32Array(COUNT * 3);
+    cars.forEach((car, i) => {
+      // facing the camera (towards -z travel) shows headlights, else tail lights
+      const head = car.dir > 0;
+      c.set(head ? [1, 0.95, 0.85] : [1, 0.18, 0.12], i * 3);
+    });
+    g.setAttribute("color", new THREE.BufferAttribute(c, 3));
+    return { geo: g, colors: c };
+  }, [cars, COUNT]);
+  void colors;
+  useFrame(({ clock }) => {
+    const pos = geo.getAttribute("position") as THREE.BufferAttribute;
+    const t = clock.elapsedTime;
+    const half = CITY_SIZE / 2;
+    cars.forEach((c, i) => {
+      const s = ((c.off + c.dir * t * c.speed) % CITY_SIZE + CITY_SIZE) % CITY_SIZE - half;
+      const lane = c.dir * 0.45;
+      if (c.vertical) pos.setXYZ(i, c.line + lane, 0.25, s);
+      else pos.setXYZ(i, s, 0.25, c.line + lane);
+    });
+    pos.needsUpdate = true;
+  });
+  return (
+    <points geometry={geo} frustumCulled={false}>
+      <pointsMaterial
+        map={dot}
+        size={0.55}
+        vertexColors
+        transparent
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
+  );
+}
+
+/** Lights of the wider city beyond the modelled blocks, fading into haze. */
+function FarLights({ low }: { low: boolean }) {
+  const geo = useMemo(() => {
+    const r = seeded(71);
+    const n = low ? 2500 : 6000;
+    const p = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) {
+      let x = 0;
+      let z = 0;
+      do {
+        x = (r() - 0.5) * 900;
+        z = (r() - 0.5) * 900;
+      } while (Math.abs(x) < CITY_SIZE / 2 + 4 && Math.abs(z) < CITY_SIZE / 2 + 4);
+      p.set([x, 0.4 + r() * 2, z], i * 3);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.BufferAttribute(p, 3));
+    return g;
+  }, [low]);
+  const dot = useMemo(dotTex, []);
+  return (
+    <points geometry={geo}>
+      <pointsMaterial
+        map={dot}
+        size={1.4}
+        color="#ffc98a"
+        transparent
+        opacity={0.8}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </points>
   );
 }
 
@@ -588,12 +849,12 @@ function Tower({ win }: { win: THREE.Texture }) {
       <mesh position-y={12}>
         <boxGeometry args={[16, 24, 12]} />
         <meshStandardMaterial
-          color="#2a4a70"
+          color="#1d3554"
           metalness={0.8}
           roughness={0.15}
           emissiveMap={glass}
           emissive="#bfe2ff"
-          emissiveIntensity={0.7}
+          emissiveIntensity={0.45}
         />
       </mesh>
       {/* glowing entrance facing the camera */}

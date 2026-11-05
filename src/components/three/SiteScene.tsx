@@ -581,6 +581,13 @@ function JourneyDirector({ state }: { state: React.RefObject<SceneState> }) {
     const s = state.current;
     u.current = damp(u.current, clamp01(s.page), 3, dt);
     setJourneyProgress(u.current, journeyCamera(u.current, scratch.pos, scratch.look));
+    // Dusk light over the city stage, normal light elsewhere.
+    const dusk = u.current > 0.5 && u.current < 0.79 ? 1 : 0;
+    if (registry.hemi) registry.hemi.intensity = 1.1 - dusk * 0.75;
+    if (registry.sun) {
+      registry.sun.intensity = 1.8 - dusk * 1.25;
+      registry.sun.color.set(dusk ? "#ffb27a" : "#fff4e0");
+    }
     camera.position.set(scratch.pos.x + s.mx * 0.6, scratch.pos.y + s.my * 0.35, scratch.pos.z);
     camera.lookAt(scratch.look.x + s.mx * 0.3, scratch.look.y, scratch.look.z);
   });
