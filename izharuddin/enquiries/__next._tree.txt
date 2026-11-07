@@ -1,0 +1,7 @@
+:HL["/stallionconnect/_next/static/chunks/2q2bucor62d02.css","style"]
+:HL["/stallionconnect/_next/static/media/0f2164aa6be9a641-s.p.09hbj2qs2d6mm.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/stallionconnect/_next/static/media/156dbaab51e32875-s.p.2yk4qfuofiic3.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+3:[["children",{"s":"__PAGE__","h":160}]]
+2:[["children",{"s":"enquiries","h":96,"c":"$Q3"}]]
+1:[["children",{"s":"izharuddin","h":96,"c":"$Q2"}]]
+0:{"b":"57EcEwtqu0NpziSMDe5ih","t":{"t":{"s":"","h":80,"c":"$Q1"}}}

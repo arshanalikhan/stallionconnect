@@ -1,0 +1,6 @@
+:HL["/stallionconnect/journey/_next/static/chunks/37bx-obdln9cg.css","style"]
+:HL["/stallionconnect/journey/_next/static/media/0f2164aa6be9a641-s.p.09hbj2qs2d6mm.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+:HL["/stallionconnect/journey/_next/static/media/156dbaab51e32875-s.p.2yk4qfuofiic3.woff2","font",{"crossOrigin":"","type":"font/woff2"}]
+2:[["children",{"s":"__PAGE__","h":128}]]
+1:[["children",{"s":"(site)","h":32,"c":"$Q2"}]]
+0:{"b":"zQm_wvpMg16Z6ZD-Q6hzy","t":{"t":{"s":"","h":80,"c":"$Q1"}}}
