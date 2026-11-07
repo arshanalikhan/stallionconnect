@@ -196,11 +196,12 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 
 ## 11. Placeholders to replace before launch
 
+Done: phone and WhatsApp `+91 89607 51737`, office address "Stallion Connect, Ground Floor, In front of Dipti hospital, Hamdard Nagar-D, Dhorra Bypass, Aligarh, Uttar Pradesh- 202001" (all in `src/config/site.ts`).
+
+Decision: the dark network backdrop (`BACKGROUND = "network3d"`) is the final background going forward. The journey and light previews are kept for reference only.
+
 | Item              | Where                              | Current value                                                          |
 | ----------------- | ---------------------------------- | ---------------------------------------------------------------------- |
-| Phone number      | `src/config/site.ts`               | `+91 00000 00000`                                                      |
-| WhatsApp number   | `src/config/site.ts`               | `910000000000`                                                         |
-| Office address    | `src/config/site.ts`               | `India`                                                                |
 | Office hours      | `src/config/site.ts`               | Mon to Sat, 9 AM to 7 PM IST (unconfirmed)                             |
 | Logo              | `src/assets/brand/`                | Raster cut from the supplied JPEG; replace with SVG or transparent PNG |
 | Privacy and Terms | `src/app/privacy`, `src/app/terms` | Placeholder text                                                       |

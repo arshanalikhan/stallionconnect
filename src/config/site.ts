@@ -14,11 +14,12 @@ export const site = {
   contact: {
     email: "info@stallionconnect.in",
     careersEmail: "careers@stallionconnect.in",
-    phone: "+91 00000 00000", // TODO: real number
-    phoneHref: "+910000000000", // TODO: real number, digits only with country code
-    whatsapp: "910000000000", // TODO: WhatsApp number, digits only with country code
+    phone: "+91 89607 51737",
+    phoneHref: "+918960751737",
+    whatsapp: "918960751737",
     whatsappMessage: "Hi Stallion Connect, I would like to know more about your services.",
-    address: "India", // TODO: full office address
+    address:
+      "Stallion Connect, Ground Floor, In front of Dipti hospital, Hamdard Nagar-D, Dhorra Bypass, Aligarh, Uttar Pradesh- 202001",
     hours: "Mon to Sat, 9:00 AM to 7:00 PM IST", // TODO: confirm
   },
 
