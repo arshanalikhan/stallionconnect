@@ -3,8 +3,8 @@
 This file is the single place to understand where the project stands. It is updated at the
 end of every phase.
 
-- **Repository:** https://github.com/arshanalikhan/stallionconnect
-- **Working branch:** `claude/modest-euler-dz9n9e`
+- **Repository:** https://github.com/stallion-connect/stallionconnect (private)
+- **Branch:** `main`
 - **Live preview:** https://arshanalikhan.github.io/stallionconnect/ (GitHub Pages, static)
 - **Production (final phase):** Cloudflare Workers on `stallionconnect.in` (domain purchased)
 - **Last updated:** Phase 4 (full-site 3D update)
@@ -512,7 +512,7 @@ recruitment data), and optionally one page per service for SEO.
   `cf:build`, `preview`, `deploy`. Bundle: 1.35 MB gzip (free plan limit 3 MB).
 - Cloudflare Workers Builds settings: build command `npx opennextjs-cloudflare build`,
   deploy command `npx opennextjs-cloudflare deploy`, production branch
-  `claude/modest-euler-dz9n9e` (or merge it into `main`).
+  `main`.
 - Still to do: create the D1 database and add its binding (forms and admin need it), apply
   `migrations/`, set up Cloudflare Access for `/admin*` and `/api/admin/*` plus the two
   Worker variables, attach `stallionconnect.in`.
