@@ -14,11 +14,12 @@ export const site = {
   contact: {
     email: "info@stallionconnect.in",
     careersEmail: "careers@stallionconnect.in",
-    phone: "+91 00000 00000", // TODO: real number
-    phoneHref: "+910000000000", // TODO: real number, digits only with country code
-    whatsapp: "910000000000", // TODO: WhatsApp number, digits only with country code
+    phone: "+91 89607 51737",
+    phoneHref: "+918960751737",
+    whatsapp: "918960751737",
     whatsappMessage: "Hi Stallion Connect, I would like to know more about your services.",
-    address: "India", // TODO: full office address
+    address:
+      "Stallion Connect, Ground Floor, In front of Dipti hospital, Hamdard Nagar-D, Dhorra Bypass, Aligarh, Uttar Pradesh- 202001",
     hours: "Mon to Sat, 9:00 AM to 7:00 PM IST", // TODO: confirm
   },
 
@@ -36,6 +37,30 @@ export const site = {
 
 /** Address of the admin panel (staff only, behind sign-in). */
 export const ADMIN_PATH = "/izharuddin";
+
+/**
+ * Page background (testing switch).
+ * - "light3d": light-themed version of the network scene (white sky, blue and green ink).
+ * - "journey3d": live code-built journey (Earth, India, Aligarh, office, logo).
+ * - "network3d": live code-built 3D finance network (no files to load, no lag).
+ * - "frames": scroll-controlled image sequence on a canvas (smoothest, default).
+ * - "video": the scroll-controlled journey video in public/bg/ (Earth, India, office, logo).
+ * - "3d": the original 3D city scene (src/components/three).
+ * Nothing is deleted either way; change this word to switch back.
+ */
+type Background = "network3d" | "journey3d" | "light3d" | "frames" | "video" | "3d";
+const BACKGROUNDS: Background[] = ["network3d", "journey3d", "light3d", "frames", "video", "3d"];
+/** NEXT_PUBLIC_BACKGROUND (set at build time) overrides the default below. */
+const fromEnv = process.env.NEXT_PUBLIC_BACKGROUND as Background | undefined;
+export const BACKGROUND: Background =
+  fromEnv && BACKGROUNDS.includes(fromEnv) ? fromEnv : "network3d";
+
+/**
+ * Which picture set "frames" uses (both kept in public/bg):
+ * - "network": dark finance network clip (globe, dashboards, data lines).
+ * - "journey": Earth, India, Aligarh, office, logo.
+ */
+export const FRAME_SET: "network" | "journey" = "network";
 
 export const whatsappUrl = (message: string = site.contact.whatsappMessage) =>
   `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(message)}`;

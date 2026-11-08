@@ -149,6 +149,37 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 | How the page adapts                       | `<html data-scene="high                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | low">`is set when the scene is showing. CSS classes in`globals.css`: `scene-clear`(see-through section),`scene-panel`(glass panel),`scene-night`, `scene-hide`, `scene-only`, `scene-hide-card` |
 | Tuning                                    | Camera route (`PATH`), colours, building density and card behaviour are at the top of each component in `SiteScene.tsx`                                                                                                                                                                                                                                                                                                                                                                                                          |
 
+## 9a. Scroll video background (TESTING)
+
+- Switch: `BACKGROUND` in `src/config/site.ts`. `"frames"` = image sequence on a canvas (current, smoothest), `"video"` = seeking the video directly (lagged on scroll), `"3d"` = original 3D city.
+- Frames: `src/components/background/ScrollFrames.tsx` draws 240 WebP stills (every video frame; `public/bg/frames` 1280px, `public/bg/frames-m` 640px for phones), pre-decoded to ImageBitmaps, one whole frame at a time (no blending), 60fps. Note: the doubled "ALIGARH" text around frames 90 to 110 is in the generated source video itself. Regenerate with `ffmpeg -i journey.mp4 -vf "scale=1280:-2" -c:v libwebp -quality 55 frames/%03d.webp`. Nothing from the 3D scene was deleted; to revert, set it back to `"3d"`.
+- Component: `src/components/background/ScrollVideo.tsx`. Top of page = first frame, bottom = last frame. Reduced-motion visitors see the poster image.
+- Files: `public/bg/journey(.mp4|.webm)`, `journey-mobile(.mp4|.webm)` (used at 767px and below), `journey-poster.jpg`. Encoded with a keyframe every 4 frames so seeking is smooth; cropped to remove the generator watermark.
+- Seeking needs a server that supports byte-range requests (GitHub Pages and Cloudflare do; `python -m http.server` does not, so the video looks frozen there).
+
+- Smooth scroll: `src/components/background/SmoothScroll.tsx` (Lenis 1.3.11) smooths mouse-wheel scrolling, only when BACKGROUND is "frames"; the frame shown is locked 1:1 to the scroll position, so the background never trails. Touch scrolling stays native; reduced motion disables it.
+- Loading: frames are fetched coarse to fine (every 16th first), 6 at a time, decoded and pre-scaled off the main thread with createImageBitmap(blob), so scrolling stays smooth even while loading.
+- Frame sets: `FRAME_SET` in `src/config/site.ts`. `"network"` (current, temporary until the new journey video is generated) = dark finance network clip in `public/bg/network` and `network-m`, Gemini sparkle removed with ffmpeg `delogo=x=1126:y=566:w=70:h=70`. `"journey"` = the earlier Earth/Aligarh/office clip in `public/bg/frames` and `frames-m`.
+
+## 9b. Network backdrop for the 3D scene (TESTING, current)
+
+- `BACKGROUND = "network3d"` in `src/config/site.ts` (current). Renders the ORIGINAL `Scene3D` (same glossy card that travels with the sections, same `html[data-scene]` page styling, same scroll behaviour) with `world="network"`: only the city is swapped for the finance network scenery. No Lenis in this mode, so scrolling matches the live site.
+- Scenery: `NetworkWorld` in `src/components/network/NetworkScene.tsx` (stars, light lines, dotted globe with arcs, finance dashboards with canvas-drawn text, contact icons and waveform, data streams over a grid). Camera route `networkCamera()`; `NetworkDirector` in `SiteScene.tsx` damps it like the city Director. The white day veil is only used for the city.
+- `Network3D.tsx` (standalone version without the card) is kept but unused.
+- Revert to the city: `BACKGROUND = "3d"`.
+
+## 9c. Journey backdrop and the second preview (TESTING)
+
+- `BACKGROUND = "journey3d"`: same `Scene3D` and card, backdrop from `src/components/journey/JourneyWorld.tsx`. Stages with soft navy dips between them: Earth (Blue Marble day and night textures, clouds, atmosphere, "PLANET EARTH", country labels and arcs from India) up to 30% of the page; India map with city pins (NEW DELHI, MUMBAI, BENGALURU, LUCKNOW) to 50%; aerial Aligarh at dusk (block grid with ~3600 painted low-rise buildings and shader windows, roof water tanks, trees and parks, street lights, moving traffic, far city lights, dusk sky; scene lights dim to dusk for this stage) with pin and "ALIGARH / UTTAR PRADESH, INDIA", then the glass office tower with "OFFICE" to 79%; office floor with desks, screens and the logo wall to 92%; final logo and tagline reveal.
+- Images in `public/globe/` (NASA Blue Marble, public domain, via the three-globe package examples): `earth.webp`, `earth-night.webp`, `clouds.webp`, `india.webp`, `india-night.webp` (crop lon 62.6 to 104.8, lat 3.87 to 39.0).
+- The background can be chosen at build time with `NEXT_PUBLIC_BACKGROUND` (overrides the default in `site.ts`).
+- GitHub Pages now publishes three previews (see 9d for the light one) from one workflow run (`.github/workflows/pages.yml`): `/stallionconnect/` (network, the default) and `/stallionconnect/journey/` (journey).
+
+## 9d. Light-themed backdrop (TESTING)
+
+- `BACKGROUND = "light3d"`: photoreal light scene in `src/components/light/LightWorld.tsx`, on the network camera route: cheap gradient sky sphere that follows the camera (the physical three.js Sky was too costly) with soft painted clouds (kept clear of the route and faded out near the camera so none pops on or off), white floor with soft contact shadows, daylight Earth (`public/globe` textures, placed beside the route at x -17 so the camera never flies through it) with clouds and atmosphere, frosted dashboard slabs (translucent standard material; real transmission was dropped because it re-renders the scene every frame and caused lag) with the charts printed on the front, glossy white icon discs with tube links, and glossy blue and green tube ribbons. Fog and background `LIGHT_FOG` #bcd2ec, blue-grey floor with a grid, deeper blue sky; about 22 glass panels spread along the whole route plus extra ribbon sets so the background is never empty. No white veil (it washed the scene out).
+- Third preview: `/stallionconnect/light/` (built in the same Pages workflow).
+
 ## 10. Custom cursor
 
 | Item                  | How it works                                                                                                               |
@@ -165,11 +196,12 @@ To try it locally: `npm run dev`, submit a form, then open http://localhost:3000
 
 ## 11. Placeholders to replace before launch
 
+Done: phone and WhatsApp `+91 89607 51737`, office address "Stallion Connect, Ground Floor, In front of Dipti hospital, Hamdard Nagar-D, Dhorra Bypass, Aligarh, Uttar Pradesh- 202001" (all in `src/config/site.ts`).
+
+Decision: the dark network backdrop (`BACKGROUND = "network3d"`) is the final background going forward. The journey and light previews are kept for reference only.
+
 | Item              | Where                              | Current value                                                          |
 | ----------------- | ---------------------------------- | ---------------------------------------------------------------------- |
-| Phone number      | `src/config/site.ts`               | `+91 00000 00000`                                                      |
-| WhatsApp number   | `src/config/site.ts`               | `910000000000`                                                         |
-| Office address    | `src/config/site.ts`               | `India`                                                                |
 | Office hours      | `src/config/site.ts`               | Mon to Sat, 9 AM to 7 PM IST (unconfirmed)                             |
 | Logo              | `src/assets/brand/`                | Raster cut from the supplied JPEG; replace with SVG or transparent PNG |
 | Privacy and Terms | `src/app/privacy`, `src/app/terms` | Placeholder text                                                       |
